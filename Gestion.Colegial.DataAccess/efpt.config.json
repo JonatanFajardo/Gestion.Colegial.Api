@@ -1,0 +1,75 @@
+﻿{
+  "CodeGenerationMode": 0,
+  "ContextClassName": "Gestioncolegial_V20Context",
+  "ContextNamespace": null,
+  "DefaultDacpacSchema": null,
+  "FilterSchemas": false,
+  "IncludeConnectionString": false,
+  "ModelNamespace": null,
+  "OutputContextPath": null,
+  "OutputPath": "Dtos",
+  "ProjectRootNamespace": "GESTION_COLEGIAL.DataAccess",
+  "Schemas": null,
+  "SelectedHandlebarsLanguage": 0,
+  "SelectedToBeGenerated": 0,
+  "Tables": [
+    {
+      "Name": "[dbo].[PR_tbAlumnos_Detail]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbAlumnos_Find]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbCursos_Detail]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbCursos_Find]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbEmpleados_Detail]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbEmpleados_Find]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbEncargados_Detail]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbEncargados_Find]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbNotas_Detail]",
+      "ObjectType": 1
+    },
+    {
+      "Name": "[dbo].[PR_tbNotas_Find]",
+      "ObjectType": 1
+    }
+  ],
+  "UiHint": "JOHN-EB.GestionColegial_V2.0",
+  "UseBoolPropertiesWithoutDefaultSql": false,
+  "UseDatabaseNames": true,
+  "UseDbContextSplitting": false,
+  "UseFluentApiOnly": true,
+  "UseHandleBars": false,
+  "UseHierarchyId": false,
+  "UseInflector": false,
+  "UseLegacyPluralizer": false,
+  "UseManyToManyEntity": false,
+  "UseNoConstructor": false,
+  "UseNoDefaultConstructor": false,
+  "UseNoNavigations": false,
+  "UseNoObjectFilter": false,
+  "UseNodaTime": false,
+  "UseNullableReferences": false,
+  "UseSchemaFolders": false,
+  "UseSpatial": false
+}
