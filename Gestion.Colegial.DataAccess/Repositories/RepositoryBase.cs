@@ -117,7 +117,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
                         SqlDataReader reader = await command.ExecuteReaderAsync();
                         DataTable table = new DataTable();
                         table.Load(reader);
-                        answer.Data = Extension.Mapear.Convert.ToList<T>(table).FirstOrDefault();
+                        answer.Data = Mapear.Convert.ToList<T>(table).FirstOrDefault();
                         if (answer.Data == null)
                         {
                             answer.Access = true;

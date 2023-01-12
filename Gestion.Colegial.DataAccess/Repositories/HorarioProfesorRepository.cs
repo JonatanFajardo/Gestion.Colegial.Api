@@ -1,4 +1,5 @@
-﻿namespace Gestion.Colegial.DataAccess.Repositories
+﻿using Gestion.Colegial.DataAccess.Repositories;
+namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class HorariosProfesoresRepository : RepositoryBase
     {        //public async Task<Answer> Create(tbHorarioProfesores obj)

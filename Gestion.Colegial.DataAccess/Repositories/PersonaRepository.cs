@@ -1,4 +1,4 @@
-﻿//using Gestion.Colegial.DataAccess.Access;
+﻿//using GESTION_COLEGIAL.DataAccess.Access;
 //using System;
 //using System.Collections.Generic;
 //using System.Linq;

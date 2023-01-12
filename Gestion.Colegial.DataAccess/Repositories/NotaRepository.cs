@@ -4,6 +4,9 @@ using Gestion.Colegial.Entities.Entities.dbo;
 using System.Data;
 using System.Data.SqlClient;
 
+using System.Threading.Tasks;
+using Gestion.Colegial.DataAccess.Repositories;
+
 namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class NotaRepository : RepositoryBase
