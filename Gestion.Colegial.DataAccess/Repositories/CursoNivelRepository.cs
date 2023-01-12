@@ -4,6 +4,7 @@ using Gestion.Colegial.Entities.Entities.dbo;
 using System.Data;
 using System.Data.SqlClient;
 
+
 namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class CursoNivelRepository : RepositoryBase

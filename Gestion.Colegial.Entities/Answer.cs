@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text.Json.Serialization;
 
 namespace Gestion.Colegial.Entities
 {
@@ -6,6 +6,11 @@ namespace Gestion.Colegial.Entities
     /// </summary>
     public class Answer
     {
+        /// <summary>
+        /// Indica el tipo de solicitud.
+        /// </summary>
+        [JsonIgnore]
+        public ServiceResultType Type { get; set; }
         /// <summary>
         /// Indica si la solicitud fue o no exitosa.
         /// </summary>
@@ -61,6 +66,23 @@ namespace Gestion.Colegial.Entities
             InnerException = exception.InnerException;
         }
 
+        /// <summary>
+        /// Tipos de resultados que puede generar un servicio.
+        /// </summary>
+        public enum ServiceResultType
+        {
+            Info = 100,
+            Success = 200,
+            Warning = 202,
+            BadRequest = 400,
+            Unauthorized = 401,
+            Forbidden = 403,
+            NotFound = 404,
+            NotAcceptable = 406,
+            Conflict = 409,
+            Disabled = 410,
+            Error = 500
+        }
         //public Answer()
         //{
         //    Access = false;
