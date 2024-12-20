@@ -33,6 +33,7 @@ builder.Services.AddTransient<CargoService>();
 builder.Services.AddTransient<CursoNivelService>();
 builder.Services.AddTransient<CursoService>();
 builder.Services.AddTransient<DiaService>();
+builder.Services.AddTransient<HomeAndChartsService>();
 
 var app = builder.Build();
 
