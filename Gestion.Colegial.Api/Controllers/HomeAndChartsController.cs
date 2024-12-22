@@ -44,5 +44,20 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _homeAndChartsService.ObtenerCantidadAlumnosPorCursoList();
             return Ok(answer.Data);
         }
+
+        /// <summary>
+        /// Obtiene un objeto.
+        /// </summary>
+        /// <returns>Objeto tbAlumnos.</returns>
+        /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
+        [HttpGet("ObtenerPromedioCursoUltimosAnios")]
+        //[ResponseType(typeof(tbAlumnos))]
+        //[Route("ListAsync")]
+        public async Task<IActionResult> ObtenerPromedioCursoUltimosAnios()
+        {
+            Answer answer = await _homeAndChartsService.ObtenerPromedioCursoUltimosAnios();
+            return Ok(answer.Data);
+        }
     }
 }
