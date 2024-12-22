@@ -23,5 +23,13 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Read<PR_ObtenerCantidadAlumnosPorCurso_DashboardResult>(sql);
             return answer;
         }
+
+
+        public async Task<Answer> ObtenerPromedioCursoUltimosAnios()
+        {
+            const string sql = "PR_ObtenerPromedioCursoUltimosAnios_Dashboard";
+            Answer answer = await Read<ObtenerPromedioCursoUltimosAnios>(sql);
+            return answer;
+        }
     }
 }
