@@ -1,14 +1,9 @@
 ﻿using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities.dbo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class HomeAndChartsRepository: RepositoryBase
+    public class HomeAndChartsRepository : RepositoryBase
     {
         /// <summary>
         /// Recupera la diferencia en la cantidad de estudiantes en comparación con el año pasado para el dashboard.
