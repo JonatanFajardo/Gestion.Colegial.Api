@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Gestion.Colegial.DataAccess.Interfaces
+﻿namespace Gestion.Colegial.DataAccess.Interfaces
 {
     public interface IRepository<T>
     {
