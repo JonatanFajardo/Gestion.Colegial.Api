@@ -3,7 +3,7 @@
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     //[Route("api/HorarioAlumnos")]
     public class HorarioAlumnosController : ControllerBase
     {

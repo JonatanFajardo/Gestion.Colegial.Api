@@ -5,7 +5,7 @@ using static Gestion.Colegial.Entities.Answer;
 namespace Gestion.Colegial.Api.Controllers
 {
     //[ApiController]
-    //[Route("api/[controller]")]
+    //[Route("api/v1/[controller]")]
     //[Route("api/Modalidades")]
     public class ApiBaseController : Controller
     {

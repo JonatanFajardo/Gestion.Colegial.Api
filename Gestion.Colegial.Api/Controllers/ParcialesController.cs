@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     //[Route("api/Parciales")]
     public class ParcialesController : ControllerBase
     {

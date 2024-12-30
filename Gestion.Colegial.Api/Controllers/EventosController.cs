@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     //[Route("api/Eventos")]
     public class EventosController : ControllerBase
     {

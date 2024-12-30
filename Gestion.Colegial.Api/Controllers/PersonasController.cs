@@ -9,7 +9,7 @@
 //namespace GESTION_COLEGIAL.API.Controllers
 //{
 //         [ApiController]
-//[Route("api/[controller]")]
+//[Route("api/v1/[controller]")]
 ////[Route("api/Personas")]
 //    public class PersonasController : ControllerBase
 //    {
