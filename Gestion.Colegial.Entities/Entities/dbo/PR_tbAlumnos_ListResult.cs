@@ -8,6 +8,7 @@ namespace Gestion.Colegial.Entities.Entities.dbo
     public partial class PR_tbAlumnos_ListResult
     {
         public int Alu_Id { get; set; }
+        public string Per_Imagen { get; set; }
         public string Per_Identidad { get; set; }
         public string Alu_Nombre { get; set; }
         public string Cno_Descripcion { get; set; }
