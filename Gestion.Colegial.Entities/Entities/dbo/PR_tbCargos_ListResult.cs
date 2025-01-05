@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Gestion.Colegial.Entities.Entities.dbo
+namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbCargos_ListResult
     {

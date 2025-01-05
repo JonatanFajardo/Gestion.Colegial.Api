@@ -1,5 +1,5 @@
 ﻿using Gestion.Colegial.Business.Dtos;
-using Gestion.Colegial.Entities.Entities.app;
+using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Extensions
 {

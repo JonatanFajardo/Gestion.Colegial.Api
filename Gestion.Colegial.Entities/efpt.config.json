@@ -1,0 +1,982 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "GestionColegial_V2.0_R2Context",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Entities",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Gestion.Colegial.Entities",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[app].[tbAlumnos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbAulas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCargos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursos_tbCursosNiveles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursos_tbMaterias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursos_tbModalidades]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursos_tbSecciones]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbCursosNiveles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbDepartamentoEmpleados]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbDias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbDuraciones]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbEmpleados]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbEmpleados_tbMaterias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbEncargados]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbEncargados_tbAlumnos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbEstados]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbHorario]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbHorarioAlumnos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbHorarioProfesores]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbHoras]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbMaterias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbMatriculas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbModalidad_tbDias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbModalidades]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbModalidades_tbCursosNiveles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbNivelesEducativos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbNotas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbParciales]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbParentescos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbPersonas]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbSecciones]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbSemestres]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[app].[tbTitulos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbAlumnosHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbCursosHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbEncargadosHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbHorarioAlumnosHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbMateriasHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbNotasHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[bitacoras].[tbPersonasHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbCursosDetalles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbEventoError]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[seguridad].[tbRoles]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[seguridad].[tbUsuarios]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ObtenerCantidadAlumnos]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_CardsInHome_Dashboard]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_DiferenciaEntreCantidadAlumnosAnioPasado_Dashboard]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_ObtenerCantidadAlumnosPorCurso_Dashboard]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_ObtenerPromedioCursoUltimosAnios_Dashboard]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAlumnos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbAulas_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCargos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_By_tbModalidades_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbCursosNiveles_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbCursosNiveles_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbCursosNiveles_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbCursosNiveles_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbMaterias_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbMaterias_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbMaterias_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbMaterias_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbModalidades_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbModalidades_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbModalidades_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbModalidades_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbSecciones_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbSecciones_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbSecciones_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_tbSecciones_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_By_tbNivelesEducativos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbCursosNiveles_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDias_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbDuraciones_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_tbMaterias_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEmpleados_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEncargados_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbEstados_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHorarioAlumnos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbHoras_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbMaterias_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_By_tbCursosNiveles_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbModalidades_ValidacionUnique]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNivelesEducativos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbNotas_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParciales_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbParentescos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbPersonas_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbPersonas_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbPersonas_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_By_tbCursos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSecciones_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbSemestres_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbTitulos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbUsuarios_Autentication_Segurity]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbUsuarios_Exist_Segurity]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[dbo].[PR_tbUsuarios_List_Segurity]",
+         "ObjectType": 1
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": true,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": true,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
