@@ -1,6 +1,5 @@
 ﻿using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities.app;
-using Gestion.Colegial.Entities.Entities.dbo;
+using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 

@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Gestion.Colegial.Entities.Entities.dbo
+namespace Gestion.Colegial.Entities.Entities
 {
-    public partial class PR_tbHoras_UpdateResult
+    public partial class PR_tbEmpleados_tbMaterias_FindResult
     {
+        public int Emp_Id { get; set; }
+        public string Docente { get; set; }
     }
 }

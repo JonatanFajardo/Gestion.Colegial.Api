@@ -1,6 +1,6 @@
 ﻿using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities.app;
+using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestion.Colegial.Api.Controllers

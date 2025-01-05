@@ -1,4 +1,5 @@
 ﻿using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
 using Gestion.Colegial.Entities.Entities.dbo;
 
 namespace Gestion.Colegial.DataAccess.Repositories

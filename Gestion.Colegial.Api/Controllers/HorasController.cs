@@ -1,5 +1,6 @@
 ﻿using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
 using Gestion.Colegial.Entities.Entities.app;
 using Microsoft.AspNetCore.Mvc;
 

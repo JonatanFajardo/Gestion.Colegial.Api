@@ -1,7 +1,7 @@
 ﻿using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities.app;
+using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {

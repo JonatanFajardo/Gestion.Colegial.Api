@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Gestion.Colegial.Entities.Entities.dbo
+namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbAlumnos_ListResult
     {
@@ -12,6 +12,10 @@ namespace Gestion.Colegial.Entities.Entities.dbo
         public string Per_Identidad { get; set; }
         public string Alu_Nombre { get; set; }
         public string Cno_Descripcion { get; set; }
+        public string Mda_Descripcion { get; set; }
+        public string Sec_Descripcion { get; set; }
+        public string Niv_Descripcion { get; set; }
+        public int? AnioCursado { get; set; }
         public string Est_Descripcion { get; set; }
     }
 }

@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\EventosController.cs" />
+    <Compile Remove="Controllers\HorasController.cs" />
     <Compile Remove="Controllers\ValuesController.cs" />
   </ItemGroup>
 

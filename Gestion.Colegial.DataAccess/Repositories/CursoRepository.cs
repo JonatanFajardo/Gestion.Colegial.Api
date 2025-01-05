@@ -1,6 +1,5 @@
 ﻿using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities.app;
-using Gestion.Colegial.Entities.Entities.dbo;
+using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -134,7 +133,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             Answer answer = new Answer();
             const string sql = "PR_tbCursos_tbModalidades_Insert";
-            foreach (var idModalidades in obj.Modalidades)
+            foreach (var idModalidades in obj.Mda)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Mda_Id", DbType = DbType.Int32, Value = idModalidades}
@@ -150,7 +149,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             Answer answer = new Answer();
             const string sql = "PR_tbCursos_tbModalidades_Update";
-            foreach (var idModalidades in obj.Modalidades)
+            foreach (var idModalidades in obj.Mda)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id},
@@ -190,7 +189,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbMaterias_Insert";
             Answer answer = new Answer();
-            foreach (var idMaterias in obj.Materias)
+            foreach (var idMaterias in obj.Mat)
             {
                 SqlParameter[] sqlParameters = {
                     new SqlParameter(){ParameterName= "@Mat_Id", DbType = DbType.Int32, Value = idMaterias}
@@ -205,7 +204,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbMaterias_Update";
             Answer answer = new Answer();
-            foreach (var idMaterias in obj.Materias)
+            foreach (var idMaterias in obj.Mat)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id},
@@ -245,7 +244,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbSecciones_Insert";
             Answer answer = new Answer();
-            foreach (var idSecciones in obj.Secciones)
+            foreach (var idSecciones in obj.tbCursos_tbSecciones)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = idSecciones}
@@ -260,7 +259,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbSecciones_Update";
             Answer answer = new Answer();
-            foreach (var idSecciones in obj.Secciones)
+            foreach (var idSecciones in obj.tbCursos_tbSecciones)
             {
                 SqlParameter[] sqlParameters = {
                     new SqlParameter() { ParameterName = "@Sec_Id", DbType = DbType.Int32, Value = idSecciones },
@@ -300,7 +299,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbCursosNiveles_Insert";
             Answer answer = new Answer();
-            foreach (var idCursoNiveles in obj.CursoNiveles)
+            foreach (var idCursoNiveles in obj.Cun)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = idCursoNiveles}
@@ -315,7 +314,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             obj.Cur_UsuarioModifica = 1;
             const string sql = "PR_tbCursos_tbCursosNiveles_Update";
             Answer answer = new Answer();
-            foreach (var idCursoNiveles in obj.CursoNiveles)
+            foreach (var idCursoNiveles in obj.Cun)
             {
                 SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = idCursoNiveles},
