@@ -42,7 +42,13 @@ namespace Gestion.Colegial.Entities.Entities
         public int? Cur_UsuarioModifica { get; set; }
         public DateTime? Cur_FechaModifica { get; set; }
 
-        public virtual tbUsuarios Cur_UsuarioModificaNavigation { get; set; }
+		//Array de enteros para los id de los checkbox
+		public int[] Modalidades { get; set; }
+		public int[] CursoNiveles { get; set; }
+		public int[] Secciones { get; set; }
+		public int[] Materias { get; set; }
+
+		public virtual tbUsuarios Cur_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Cur_UsuarioRegistraNavigation { get; set; }
         public virtual tbNivelesEducativos Niv { get; set; }
         public virtual ICollection<tbAlumnos> tbAlumnos { get; set; }
