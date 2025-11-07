@@ -1,17 +1,24 @@
 ﻿using Gestion.Colegial.Business.Extensions;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class CargoService
+    public class CargoService : ICargoService
     {
-        private readonly CargoRepository Repository = new CargoRepository();
+        private readonly ICargoRepository _repository;
+
+        public CargoService(ICargoRepository repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<Answer> List()
         {
-            Answer answer = await Repository.List();
+            Answer answer = await _repository.List();
             try
             {
                 if (answer.Access)
@@ -35,7 +42,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Find(int id)
         {
-            Answer answer = await Repository.Find(id);
+            Answer answer = await _repository.Find(id);
             try
             {
                 if (answer.Access)
@@ -59,7 +66,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Detail(int id)
         {
-            Answer answer = await Repository.Detail(id);
+            Answer answer = await _repository.Detail(id);
             try
             {
                 if (answer.Access)
@@ -83,7 +90,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Create(tbCargos obj)
         {
-            Answer answer = await Repository.Create(obj);
+            Answer answer = await _repository.Create(obj);
             try
             {
                 if (answer.Access)
@@ -108,7 +115,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Edit(tbCargos obj)
         {
-            Answer answer = await Repository.Edit(obj);
+            Answer answer = await _repository.Edit(obj);
             try
             {
                 if (answer.Access)
@@ -133,7 +140,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Exist(string value)
         {
-            Answer answer = await Repository.Exist(value);
+            Answer answer = await _repository.Exist(value);
             try
             {
                 if (answer.Access)
@@ -158,7 +165,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Delete(int id)
         {
-            Answer answer = await Repository.Delete(id);
+            Answer answer = await _repository.Delete(id);
             try
             {
                 if (answer.Access)

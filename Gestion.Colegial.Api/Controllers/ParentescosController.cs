@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Parentescos")]
     public class ParentescosController : ControllerBase
     {
-        private readonly ParentescoService _parentescoService;
+        private readonly IParentescoService _parentescoService;
 
-        public ParentescosController(ParentescoService parentescoService)
+        public ParentescosController(IParentescoService parentescoService)
         {
             _parentescoService = parentescoService;
         }

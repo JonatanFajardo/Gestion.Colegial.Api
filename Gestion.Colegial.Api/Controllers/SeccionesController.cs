@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Secciones")]
     public class SeccionesController : ControllerBase
     {
-        private readonly SeccionService _seccionService;
+        private readonly ISeccionService _seccionService;
 
-        public SeccionesController(SeccionService seccionService)
+        public SeccionesController(ISeccionService seccionService)
         {
             _seccionService = seccionService;
         }

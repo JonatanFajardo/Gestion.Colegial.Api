@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Cargos")]
     public class CargosController : ControllerBase
     {
-        private readonly CargoService _cargoService;
+        private readonly ICargoService _cargoService;
 
-        public CargosController(CargoService cargoService)
+        public CargosController(ICargoService cargoService)
         {
             _cargoService = cargoService;
         }

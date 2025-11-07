@@ -1,11 +1,12 @@
-﻿using Gestion.Colegial.Entities;
+﻿using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class AlumnoRepository : RepositoryBase
+    public class AlumnoRepository : RepositoryBase, IAlumnoRepository
     {
         public async Task<Answer> List()
         {

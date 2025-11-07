@@ -42,14 +42,14 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(ex); // Pass the exception itself
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 			catch (Exception e)
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
@@ -95,7 +95,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
@@ -140,7 +140,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
@@ -177,7 +177,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
@@ -222,7 +222,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
@@ -272,7 +272,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 		/// <param name="queryString"></param>
 		/// <param name="parameters"></param>
 		/// <returns></returns>
-		public static async Task<Answer> Update(string queryString, dynamic parameters)
+		public async Task<Answer> Update(string queryString, dynamic parameters)
 		{
 			Answer answer = new Answer();
 			try
@@ -344,7 +344,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			{
 				answer.Access = true;
 				answer.Incidents(e);
-				answer.Data = null;
+				answer.Data = "";
 				return answer;
 			}
 		}
