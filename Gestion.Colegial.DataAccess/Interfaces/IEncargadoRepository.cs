@@ -1,0 +1,15 @@
+using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
+
+namespace Gestion.Colegial.DataAccess.Interfaces
+{
+    public interface IEncargadoRepository
+    {
+        Task<Answer> List();
+        Task<Answer> Find(int id);
+        Task<Answer> Detail(int id);
+        Task<Answer> Create(tbEncargados obj);
+        Task<Answer> Edit(tbEncargados obj);
+        Task<Answer> Delete(int id);
+    }
+}

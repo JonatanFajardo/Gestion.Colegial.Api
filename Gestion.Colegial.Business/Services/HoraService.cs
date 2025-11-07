@@ -1,17 +1,24 @@
 ﻿using Gestion.Colegial.Business.Extensions;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities.app;
+using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class HoraService
+    public class HoraService : IHoraService
     {
-        private readonly HoraRepository Repository = new HoraRepository();
+        private readonly IHoraRepository _repository;
+
+        public HoraService(IHoraRepository repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<Answer> List()
         {
-            Answer answer = await Repository.List();
+            Answer answer = await _repository.List();
             try
             {
                 if (answer.Access)
@@ -35,7 +42,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Find(int id)
         {
-            Answer answer = await Repository.Find(id);
+            Answer answer = await _repository.Find(id);
             try
             {
                 if (answer.Access)
@@ -59,7 +66,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Create(tbHoras obj)
         {
-            Answer answer = await Repository.Create(obj);
+            Answer answer = await _repository.Create(obj);
             try
             {
                 if (answer.Access)
@@ -84,7 +91,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Edit(tbHoras obj)
         {
-            Answer answer = await Repository.Edit(obj);
+            Answer answer = await _repository.Edit(obj);
             try
             {
                 if (answer.Access)
@@ -109,7 +116,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Exist(string value)
         {
-            Answer answer = await Repository.Exist(value);
+            Answer answer = await _repository.Exist(value);
             try
             {
                 if (answer.Access)
@@ -134,7 +141,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Delete(int id)
         {
-            Answer answer = await Repository.Delete(id);
+            Answer answer = await _repository.Delete(id);
             try
             {
                 if (answer.Access)

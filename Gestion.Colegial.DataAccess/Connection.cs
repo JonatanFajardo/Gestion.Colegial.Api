@@ -8,7 +8,7 @@
         /// <returns>Retorna la cadena de conexión.</returns>
         public static string GetConnectionString()
         {
-            string connection = "Data Source=DESKTOP-I0I12OB;Initial Catalog=DB_GestionColegial;User ID=jonna;Password=admin";
+            string connection = "Data Source=DESKTOP-06VA2CI;Initial Catalog=DB_GestionColegial;Integrated Security=True;Encrypt=False";
             //string connection = Properties.Settings.Default.ConnectionString_GestionColegial_EntitiesDB;
             return connection;
         }

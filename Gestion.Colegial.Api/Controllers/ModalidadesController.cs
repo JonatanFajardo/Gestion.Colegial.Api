@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Modalidades")]
     public class ModalidadesController : ControllerBase
     {
-        private readonly ModalidadService _modalidadService;
+        private readonly IModalidadService _modalidadService;
 
-        public ModalidadesController(ModalidadService modalidadService)
+        public ModalidadesController(IModalidadService modalidadService)
         {
             _modalidadService = modalidadService;
         }

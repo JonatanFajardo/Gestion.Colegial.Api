@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Duraciones")]
     public class DuracionesController : ControllerBase
     {
-        private readonly DuracionService _duracionService;
+        private readonly IDuracionService _duracionService;
 
-        public DuracionesController(DuracionService duracionService)
+        public DuracionesController(IDuracionService duracionService)
         {
             _duracionService = duracionService;
         }

@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Estados")]
     public class EstadosController : ControllerBase
     {
-        private readonly EstadoService _estadoService;
+        private readonly IEstadoService _estadoService;
 
-        public EstadosController(EstadoService estadoService)
+        public EstadosController(IEstadoService estadoService)
         {
             _estadoService = estadoService;
         }

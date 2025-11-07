@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/CursosNiveles")]
     public class CursosNivelesController : ControllerBase
     {
-        private CursoNivelService _cursoNivelService;
+        private readonly ICursoNivelService _cursoNivelService;
 
-        public CursosNivelesController(CursoNivelService cursoNivelService)
+        public CursosNivelesController(ICursoNivelService cursoNivelService)
         {
             _cursoNivelService = cursoNivelService;
         }

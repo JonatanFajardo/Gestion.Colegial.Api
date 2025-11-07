@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Titulos")]
     public class TitulosController : ControllerBase
     {
-        private readonly TituloService _tituloService;
+        private readonly ITituloService _tituloService;
 
-        public TitulosController(TituloService tituloService)
+        public TitulosController(ITituloService tituloService)
         {
             _tituloService = tituloService;
         }

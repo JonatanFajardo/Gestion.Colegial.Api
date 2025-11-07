@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +8,9 @@ namespace Gestion.Colegial.Api.Controllers
     [Route("api/v1/[controller]")]
     public class HomeAndChartsController : Controller
     {
-        private readonly HomeAndChartsService _homeAndChartsService;
+        private readonly IHomeAndChartsService _homeAndChartsService;
 
-        public HomeAndChartsController(HomeAndChartsService homeAndChartsService)
+        public HomeAndChartsController(IHomeAndChartsService homeAndChartsService)
         {
             _homeAndChartsService = homeAndChartsService;
         }

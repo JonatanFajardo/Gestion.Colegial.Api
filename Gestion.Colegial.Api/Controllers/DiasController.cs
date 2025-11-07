@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Dias")]
     public class DiasController : ControllerBase
     {
-        private readonly DiaService _diaService;
+        private readonly IDiaService _diaService;
 
-        public DiasController(DiaService diaService)
+        public DiasController(IDiaService diaService)
         {
             _diaService = diaService;
         }

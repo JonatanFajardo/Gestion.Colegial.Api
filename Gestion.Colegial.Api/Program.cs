@@ -1,5 +1,8 @@
 using Gestion.Colegial.Api.Controllers;
+using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Business.Services;
+using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.DataAccess.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,28 +15,50 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddDbContext<DB_OdoremContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ODOREM")));
 //var s = builder.Configuration.GetConnectionString("ODOREM");
 
+// Repositories
+builder.Services.AddScoped<IAlumnoRepository, AlumnoRepository>();
+builder.Services.AddScoped<ICargoRepository, CargoRepository>();
+builder.Services.AddScoped<ICursoNivelRepository, CursoNivelRepository>();
+builder.Services.AddScoped<ICursoRepository, CursoRepository>();
+builder.Services.AddScoped<IDiaRepository, DiaRepository>();
+builder.Services.AddScoped<IDuracionRepository, DuracionRepository>();
+builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
+builder.Services.AddScoped<IEncargadoRepository, EncargadoRepository>();
+builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
+// builder.Services.AddScoped<IEventoRepository, EventoRepository>(); // tbEventos entity no existe
+builder.Services.AddScoped<IHomeAndChartsRepository, HomeAndChartsRepository>();
+//builder.Services.AddScoped<IHoraRepository, HoraRepository>();
+builder.Services.AddScoped<IMateriaRepository, MateriaRepository>();
+builder.Services.AddScoped<IModalidadRepository, ModalidadRepository>();
+builder.Services.AddScoped<INivelEducativoRepository, NivelEducativoRepository>();
+builder.Services.AddScoped<IParcialRepository, ParcialRepository>();
+builder.Services.AddScoped<IParentescoRepository, ParentescoRepository>();
+builder.Services.AddScoped<ISeccionRepository, SeccionRepository>();
+builder.Services.AddScoped<ISemestreRepository, SemestreRepository>();
+builder.Services.AddScoped<ITituloRepository, TituloRepository>();
+
+// Services
 builder.Services.AddTransient<ApiBaseController>();
-builder.Services.AddTransient<AlumnoService>();
-builder.Services.AddTransient<DuracionService>();
-builder.Services.AddTransient<EmpleadoService>();
-builder.Services.AddTransient<EncargadoService>();
-builder.Services.AddTransient<EstadoService>();
-//builder.Services.AddTransient<EventoService>();
-//builder.Services.AddTransient<HoraService>();
-builder.Services.AddTransient<MateriaService>();
-builder.Services.AddTransient<ModalidadService>();
-builder.Services.AddTransient<NivelEducativoService>();
-builder.Services.AddTransient<ParcialService>();
-builder.Services.AddTransient<ParentescoService>();
-builder.Services.AddTransient<SeccionService>();
-builder.Services.AddTransient<SemestreService>();
-builder.Services.AddTransient<TituloService>();
-builder.Services.AddTransient<AlumnoService>();
-builder.Services.AddTransient<CargoService>();
-builder.Services.AddTransient<CursoNivelService>();
-builder.Services.AddTransient<CursoService>();
-builder.Services.AddTransient<DiaService>();
-builder.Services.AddTransient<HomeAndChartsService>();
+builder.Services.AddScoped<IAlumnoService, AlumnoService>();
+builder.Services.AddScoped<ICargoService, CargoService>();
+builder.Services.AddScoped<ICursoNivelService, CursoNivelService>();
+builder.Services.AddScoped<ICursoService, CursoService>();
+builder.Services.AddScoped<IDiaService, DiaService>();
+builder.Services.AddScoped<IDuracionService, DuracionService>();
+builder.Services.AddScoped<IEmpleadoService, EmpleadoService>();
+builder.Services.AddScoped<IEncargadoService, EncargadoService>();
+builder.Services.AddScoped<IEstadoService, EstadoService>();
+// builder.Services.AddScoped<IEventoService, EventoService>(); // tbEventos entity no existe
+builder.Services.AddScoped<IHomeAndChartsService, HomeAndChartsService>();
+//builder.Services.AddScoped<IHoraService, HoraService>();
+builder.Services.AddScoped<IMateriaService, MateriaService>();
+builder.Services.AddScoped<IModalidadService, ModalidadService>();
+builder.Services.AddScoped<INivelEducativoService, NivelEducativoService>();
+builder.Services.AddScoped<IParcialService, ParcialService>();
+builder.Services.AddScoped<IParentescoService, ParentescoService>();
+builder.Services.AddScoped<ISeccionService, SeccionService>();
+builder.Services.AddScoped<ISemestreService, SemestreService>();
+builder.Services.AddScoped<ITituloService, TituloService>();
 
 var app = builder.Build();
 

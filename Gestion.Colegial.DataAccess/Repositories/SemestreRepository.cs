@@ -2,11 +2,12 @@
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
+using Gestion.Colegial.DataAccess.Interfaces;
 
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-	public class SemestreRepository : RepositoryBase
+	public class SemestreRepository : RepositoryBase, ISemestreRepository
 	{
 		public async Task<Answer> List()
 		{
