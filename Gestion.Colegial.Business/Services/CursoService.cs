@@ -1,17 +1,24 @@
 ﻿using Gestion.Colegial.Business.Extensions;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class CursoService
+    public class CursoService : ICursoService
     {
-        private readonly CursoRepository Repository = new CursoRepository();
+        private readonly ICursoRepository _repository;
+
+        public CursoService(ICursoRepository repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<Answer> List()
         {
-            Answer answer = await Repository.List();
+            Answer answer = await _repository.List();
             try
             {
                 if (answer.Access)
@@ -35,7 +42,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Find(int id)
         {
-            Answer answer = await Repository.Find(id);
+            Answer answer = await _repository.Find(id);
             try
             {
                 if (answer.Access)
@@ -59,7 +66,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Detail(int id)
         {
-            Answer answer = await Repository.Detail(id);
+            Answer answer = await _repository.Detail(id);
             try
             {
                 if (answer.Access)
@@ -83,7 +90,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Create(tbCursos obj)
         {
-            Answer answer = await Repository.Create(obj);
+            Answer answer = await _repository.Create(obj);
             try
             {
                 if (answer.Access)
@@ -108,7 +115,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Edit(tbCursos obj)
         {
-            Answer answer = await Repository.Edit(obj);
+            Answer answer = await _repository.Edit(obj);
             try
             {
                 if (answer.Access)
@@ -133,7 +140,7 @@ namespace Gestion.Colegial.Business.Services
 
         //public async Task<Answer> Exist(string value)
         //{
-        //    Answer answer = await Repository.Exist(value);
+        //    Answer answer = await _repository.Exist(value);
         //    try
         //{
         //if (answer.Access)
@@ -147,7 +154,7 @@ namespace Gestion.Colegial.Business.Services
         //}
         public async Task<Answer> Delete(int id)
         {
-            Answer answer = await Repository.Delete(id);
+            Answer answer = await _repository.Delete(id);
             try
             {
                 if (answer.Access)
@@ -174,7 +181,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> NivelesEducativosDropdown()
         {
-            Answer answer = await Repository.NivelesEducativosDropdown();
+            Answer answer = await _repository.NivelesEducativosDropdown();
             try
             {
                 if (answer.Access)
@@ -202,7 +209,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> ModalidadesList()
         {
-            Answer answer = await Repository.ModalidadesList();
+            Answer answer = await _repository.ModalidadesList();
             try
             {
                 if (answer.Access)
@@ -226,7 +233,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosNivelesList()
         {
-            Answer answer = await Repository.CursosNivelesList();
+            Answer answer = await _repository.CursosNivelesList();
             try
             {
                 if (answer.Access)
@@ -250,7 +257,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> MateriasList()
         {
-            Answer answer = await Repository.MateriasList();
+            Answer answer = await _repository.MateriasList();
             try
             {
                 if (answer.Access)
@@ -274,7 +281,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> SeccionesList()
         {
-            Answer answer = await Repository.SeccionesList();
+            Answer answer = await _repository.SeccionesList();
             try
             {
                 if (answer.Access)
@@ -302,7 +309,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosModalidadesFind(int id)
         {
-            Answer answer = await Repository.CursosModalidadesFind(id);
+            Answer answer = await _repository.CursosModalidadesFind(id);
             try
             {
                 if (answer.Access)
@@ -326,7 +333,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosModalidadesCreate(tbCursos obj)
         {
-            Answer answer = await Repository.CursosModalidadesCreate(obj);
+            Answer answer = await _repository.CursosModalidadesCreate(obj);
             try
             {
                 if (answer.Access)
@@ -351,7 +358,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> CursosModalidadesEdit(tbCursos obj)
         {
             await CursosModalidadesDelete(obj.Cur_Id);
-            Answer answer = await Repository.CursosModalidadesEdit(obj);
+            Answer answer = await _repository.CursosModalidadesEdit(obj);
             try
             {
                 if (answer.Access)
@@ -375,7 +382,7 @@ namespace Gestion.Colegial.Business.Services
 
         private async Task<Answer> CursosModalidadesDelete(int id)
         {
-            Answer answer = await Repository.CursosModalidadesDelete(id);
+            Answer answer = await _repository.CursosModalidadesDelete(id);
             try
             {
                 if (answer.Access)
@@ -403,7 +410,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosMateriasFind(int id)
         {
-            Answer answer = await Repository.CursosMateriasFind(id);
+            Answer answer = await _repository.CursosMateriasFind(id);
             try
             {
                 if (answer.Access)
@@ -427,7 +434,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosMateriasCreate(tbCursos obj)
         {
-            Answer answer = await Repository.CursosMateriasCreate(obj);
+            Answer answer = await _repository.CursosMateriasCreate(obj);
             try
             {
                 if (answer.Access)
@@ -452,7 +459,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> CursosMateriasEdit(tbCursos obj)
         {
             await CursosMateriasDelete(obj.Cur_Id);
-            Answer answer = await Repository.CursosMateriasEdit(obj);
+            Answer answer = await _repository.CursosMateriasEdit(obj);
             try
             {
                 if (answer.Access)
@@ -476,7 +483,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosMateriasDelete(int id)
         {
-            Answer answer = await Repository.CursosMateriasDelete(id);
+            Answer answer = await _repository.CursosMateriasDelete(id);
             try
             {
                 if (answer.Access)
@@ -504,7 +511,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosNivelesFind(int id)
         {
-            Answer answer = await Repository.CursosNivelesFind(id);
+            Answer answer = await _repository.CursosNivelesFind(id);
             try
             {
                 if (answer.Access)
@@ -528,7 +535,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosNivelesCreate(tbCursos obj)
         {
-            Answer answer = await Repository.CursosNivelesCreate(obj);
+            Answer answer = await _repository.CursosNivelesCreate(obj);
             try
             {
                 if (answer.Access)
@@ -553,7 +560,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> CursosNivelesEdit(tbCursos obj)
         {
             await CursosNivelesDelete(obj.Cur_Id);
-            Answer answer = await Repository.CursosNivelesEdit(obj);
+            Answer answer = await _repository.CursosNivelesEdit(obj);
             try
             {
                 if (answer.Access)
@@ -577,7 +584,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosNivelesDelete(int id)
         {
-            Answer answer = await Repository.CursosNivelesDelete(id);
+            Answer answer = await _repository.CursosNivelesDelete(id);
             try
             {
                 if (answer.Access)
@@ -605,7 +612,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosSeccionesFind(int id)
         {
-            Answer answer = await Repository.CursosSeccionesFind(id);
+            Answer answer = await _repository.CursosSeccionesFind(id);
             try
             {
                 if (answer.Access)
@@ -629,7 +636,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosSeccionesCreate(tbCursos obj)
         {
-            Answer answer = await Repository.CursosSeccionesCreate(obj);
+            Answer answer = await _repository.CursosSeccionesCreate(obj);
             try
             {
                 if (answer.Access)
@@ -654,7 +661,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> CursosSeccionesEdit(tbCursos obj)
         {
             await CursosSeccionesDelete(obj.Cur_Id);
-            Answer answer = await Repository.CursosSeccionesEdit(obj);
+            Answer answer = await _repository.CursosSeccionesEdit(obj);
             try
             {
                 if (answer.Access)
@@ -678,7 +685,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosSeccionesDelete(int id)
         {
-            Answer answer = await Repository.CursosSeccionesDelete(id);
+            Answer answer = await _repository.CursosSeccionesDelete(id);
             try
             {
                 if (answer.Access)

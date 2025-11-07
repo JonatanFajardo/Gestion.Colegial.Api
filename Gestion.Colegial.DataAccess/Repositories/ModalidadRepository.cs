@@ -2,10 +2,11 @@
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
+using Gestion.Colegial.DataAccess.Interfaces;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class ModalidadRepository : RepositoryBase
+    public class ModalidadRepository : RepositoryBase, IModalidadRepository
     {
         public async Task<Answer> List()
         {

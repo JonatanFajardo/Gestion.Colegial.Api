@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Materias")]
     public class MateriasController : ControllerBase
     {
-        private readonly MateriaService _materiaService;
+        private readonly IMateriaService _materiaService;
 
-        public MateriasController(MateriaService materiaService)
+        public MateriasController(IMateriaService materiaService)
         {
             _materiaService = materiaService;
         }

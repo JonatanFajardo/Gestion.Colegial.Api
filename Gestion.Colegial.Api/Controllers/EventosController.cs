@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 
@@ -12,7 +12,7 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Eventos")]
     public class EventosController : ControllerBase
     {
-        private readonly EventoService _eventoService;
+        private readonly IEventoService _eventoService;
 
         [HttpGet]
         //[ResponseType(typeof(tbEventos))]

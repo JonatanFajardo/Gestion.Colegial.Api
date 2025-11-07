@@ -1,5 +1,5 @@
 ﻿using Gestion.Colegial.Business.Dtos;
-using Gestion.Colegial.Business.Services;
+using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Encargados")]
     public class EncargadosController : ControllerBase
     {
-        private readonly EncargadoService _encargadoService;
+        private readonly IEncargadoService _encargadoService;
 
-        public EncargadosController(EncargadoService encargadoService)
+        public EncargadosController(IEncargadoService encargadoService)
         {
             _encargadoService = encargadoService;
         }

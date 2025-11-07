@@ -1,19 +1,26 @@
 ﻿using Gestion.Colegial.Business.Extensions;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class HomeAndChartsService
+    public class HomeAndChartsService : IHomeAndChartsService
     {
-        private readonly HomeAndChartsRepository homeAndChartsRepository = new HomeAndChartsRepository();
+        private readonly IHomeAndChartsRepository _repository;
+
+        public HomeAndChartsService(IHomeAndChartsRepository repository)
+        {
+            _repository = repository;
+        }
 
         /// <summary>
         /// Calcula la diferencia en la cantidad de alumnos entre el año pasado y el actual para el dashboard.
         /// </summary>
         public async Task<Answer> DiferenciaEntreCantidadAlumnosAnioPasado_Dashboard()
         {
-            Answer answer = await homeAndChartsRepository.DiferenciaEntreCantidadAlumnosAnioPasado_Dashboard();
+            Answer answer = await _repository.DiferenciaEntreCantidadAlumnosAnioPasado_Dashboard();
             try
             {
                 if (answer.Access)
@@ -41,7 +48,7 @@ namespace Gestion.Colegial.Business.Services
         /// <returns>Lista con la cantidad de alumnos por curso. Devuelve un error si ocurre una excepción.</returns>
         public async Task<Answer> ObtenerCantidadAlumnosPorCursoList()
         {
-            Answer answer = await homeAndChartsRepository.ObtenerCantidadAlumnosPorCursoList();
+            Answer answer = await _repository.ObtenerCantidadAlumnosPorCursoList();
             try
             {
                 if (answer.Access)
@@ -69,7 +76,7 @@ namespace Gestion.Colegial.Business.Services
         /// <returns>Promedio de alumnos por curso. Devuelve un error si ocurre una excepción.</returns>
         public async Task<Answer> ObtenerPromedioCursoUltimosAnios()
         {
-            Answer answer = await homeAndChartsRepository.ObtenerPromedioCursoUltimosAnios();
+            Answer answer = await _repository.ObtenerPromedioCursoUltimosAnios();
             try
             {
                 if (answer.Access)
@@ -97,7 +104,7 @@ namespace Gestion.Colegial.Business.Services
         /// <returns>Lista de tarjetas con datos relevantes. Devuelve un error si ocurre una excepción.</returns>
         public async Task<Answer> CardsInHomeList()
         {
-            Answer answer = await homeAndChartsRepository.CardsInHomeList();
+            Answer answer = await _repository.CardsInHomeList();
             try
             {
                 if (answer.Access)

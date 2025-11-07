@@ -1,18 +1,25 @@
 ﻿using Gestion.Colegial.Business.Dtos;
 using Gestion.Colegial.Business.Extensions;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class EmpleadoService
+    public class EmpleadoService : IEmpleadoService
     {
-        private readonly EmpleadoRepository Repository = new EmpleadoRepository();
+        private readonly IEmpleadoRepository _repository;
+
+        public EmpleadoService(IEmpleadoRepository repository)
+        {
+            _repository = repository;
+        }
 
         public async Task<Answer> List()
         {
-            Answer answer = await Repository.List();
+            Answer answer = await _repository.List();
             try
             {
                 if (answer.Access)
@@ -36,7 +43,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Find(int id)
         {
-            Answer answer = await Repository.Find(id);
+            Answer answer = await _repository.Find(id);
             try
             {
                 if (answer.Access)
@@ -60,7 +67,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Detail(int id)
         {
-            Answer answer = await Repository.Detail(id);
+            Answer answer = await _repository.Detail(id);
             try
             {
                 if (answer.Access)
@@ -85,7 +92,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> Create(EmpleadosFindDto obj)
         {
             var ent = EmpleadosConversion.Edit(obj);
-            Answer answer = await Repository.Create(ent);
+            Answer answer = await _repository.Create(ent);
             try
             {
                 if (answer.Access)
@@ -111,7 +118,7 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> Edit(EmpleadosFindDto obj)
         {
             var ent = EmpleadosConversion.Edit(obj);
-            Answer answer = await Repository.Edit(ent);
+            Answer answer = await _repository.Edit(ent);
             try
             {
                 if (answer.Access)
@@ -136,7 +143,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> TitulosDropdown()
         {
-            Answer answer = await Repository.TitulosDropdown();
+            Answer answer = await _repository.TitulosDropdown();
             try
             {
                 if (answer.Access)
@@ -160,7 +167,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CargosDropdown()
         {
-            Answer answer = await Repository.CargosDropdown();
+            Answer answer = await _repository.CargosDropdown();
             try
             {
                 if (answer.Access)
@@ -184,7 +191,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Delete(int id)
         {
-            Answer answer = await Repository.Delete(id);
+            Answer answer = await _repository.Delete(id);
             try
             {
                 if (answer.Access)

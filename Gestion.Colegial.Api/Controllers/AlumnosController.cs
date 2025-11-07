@@ -1,5 +1,5 @@
 ﻿using Gestion.Colegial.Business.Dtos;
-using Gestion.Colegial.Business.Services;
+using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/-Alumnos")]
     public class AlumnosController : ControllerBase
     {
-        private readonly AlumnoService _alumnoService;
+        private readonly IAlumnoService _alumnoService;
 
-        public AlumnosController(AlumnoService alumnoService)
+        public AlumnosController(IAlumnoService alumnoService)
         {
             _alumnoService = alumnoService;
         }

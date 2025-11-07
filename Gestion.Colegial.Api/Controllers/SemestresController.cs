@@ -1,4 +1,4 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Semestres")]
     public class SemestresController : ControllerBase
     {
-        private readonly SemestreService _semestreService;
+        private readonly ISemestreService _semestreService;
 
-        public SemestresController(SemestreService semestreService)
+        public SemestresController(ISemestreService semestreService)
         {
             _semestreService = semestreService;
         }

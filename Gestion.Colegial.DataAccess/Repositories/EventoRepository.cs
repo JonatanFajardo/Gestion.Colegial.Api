@@ -3,10 +3,11 @@ using Gestion.Colegial.Entities.Entities.app;
 using Gestion.Colegial.Entities.Entities.dbo;
 using System.Data;
 using System.Data.SqlClient;
+using Gestion.Colegial.DataAccess.Interfaces;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class EventoRepository : RepositoryBase
+    public class EventoRepository : RepositoryBase, IEventoRepository
     {
         public async Task<Answer> List()
         {

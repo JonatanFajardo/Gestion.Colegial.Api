@@ -1,5 +1,5 @@
 ﻿using Gestion.Colegial.Business.Dtos;
-using Gestion.Colegial.Business.Services;
+using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +10,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Empleados")]
     public class EmpleadosController : ControllerBase
     {
-        private readonly EmpleadoService _empleadoService;
+        private readonly IEmpleadoService _empleadoService;
 
-        public EmpleadosController(EmpleadoService empleadoService)
+        public EmpleadosController(IEmpleadoService empleadoService)
         {
             _empleadoService = empleadoService;
         }

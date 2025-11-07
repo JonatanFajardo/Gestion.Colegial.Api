@@ -2,11 +2,12 @@
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
+using Gestion.Colegial.DataAccess.Interfaces;
 
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class CursoNivelRepository : RepositoryBase
+    public class CursoNivelRepository : RepositoryBase, ICursoNivelRepository
     {
         public async Task<Answer> List()
         {
