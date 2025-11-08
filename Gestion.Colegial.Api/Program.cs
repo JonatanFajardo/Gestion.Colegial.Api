@@ -1,5 +1,6 @@
 using Gestion.Colegial.Api.Controllers;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Mapping;
 using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(DtoMappingProfile).Assembly);
 //builder.Services.AddDbContext<DB_OdoremContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ODOREM")));
 //var s = builder.Configuration.GetConnectionString("ODOREM");
 
