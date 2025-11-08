@@ -6,10 +6,15 @@ namespace Gestion.Colegial.DataAccess.Interfaces
     public interface IHoraRepository
     {
         Task<Answer> List();
+
         Task<Answer> Find(int id);
+
         Task<Answer> Create(tbHoras obj);
+
         Task<Answer> Edit(tbHoras obj);
+
         Task<Answer> Exist(string value);
+
         Task<Answer> Delete(int id);
     }
 }

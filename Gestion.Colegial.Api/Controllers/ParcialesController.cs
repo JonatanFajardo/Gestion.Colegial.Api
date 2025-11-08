@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Parciales")]
     public class ParcialesController : ControllerBase
     {
         private readonly IParcialService _parcialService;
@@ -18,7 +17,6 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbParciales))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -27,14 +25,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbParciales))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parcialService.Find(value);
             return Ok(answer.Data);
         }
@@ -51,36 +44,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parcialService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbParciales))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbParciales entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parcialService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbParciales))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbParciales entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parcialService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -111,14 +90,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbParciales))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parcialService.Delete(value);
             return Ok(answer.Data);
         }

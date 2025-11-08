@@ -11,6 +11,7 @@ namespace Gestion.Colegial.Entities
         /// </summary>
         [JsonIgnore]
         public ServiceResultType Type { get; set; }
+
         /// <summary>
         /// Indica si la solicitud fue o no exitosa.
         /// </summary>
@@ -53,9 +54,7 @@ namespace Gestion.Colegial.Entities
 
         public Answer()
         {
-            Access = true;//si ocurrio un error
-            //Message = "Ocurrio un error al intentar ingresar el registro.";
-            //RegistrationDate = DateTime.Now;
+            Access = true;
         }
 
         public void Incidents(Exception exception)
@@ -83,11 +82,5 @@ namespace Gestion.Colegial.Entities
             Disabled = 410,
             Error = 500
         }
-        //public Answer()
-        //{
-        //    Access = false;
-        //    Message = "Ocurrio un error al intentar ingresar el registro.";
-        //    RegistrationDate = DateTime.Now;
-        //}
     }
 }

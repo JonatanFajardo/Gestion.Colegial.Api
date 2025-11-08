@@ -12,29 +12,24 @@ namespace Gestion.Colegial.Business.Extensions
         {
             try
             {
-                // Implementación con archivo de texto
-                //ErrorWithSerilog(answer);
-                ErrorToConsole(answer);
+                                                ErrorToConsole(answer);
             }
             catch (Exception ex)
             {
-                // Si falla el logging, intenta escribir en un archivo de backup
-                try
+                                try
                 {
                     LogToBackupFile(ex, answer);
                 }
                 catch
                 {
-                    // Si todo falla, al menos escribe en consola
-                    Console.WriteLine($"Error crítico en logging: {ex.Message}");
+                                        Console.WriteLine($"Error crítico en logging: {ex.Message}");
                 }
             }
         }
 
         private static void LogToFile(Answer answer)
         {
-            // Crear directorio de logs si no existe
-            string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+                        string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
             if (!Directory.Exists(logDirectory))
             {
                 Directory.CreateDirectory(logDirectory);
@@ -50,8 +45,7 @@ namespace Gestion.Colegial.Business.Extensions
                               $"[DETALLES] {answer.ErrorDetails} " +
                               $"[MSJINTERNO] {innerException}{Environment.NewLine}";
 
-            // Escribir al archivo de log
-            File.AppendAllText(logPath, logResult);
+                        File.AppendAllText(logPath, logResult);
         }
 
         private static void LogToBackupFile(Exception loggingException, Answer answer)
@@ -66,8 +60,7 @@ namespace Gestion.Colegial.Business.Extensions
         }
         public static void ErrorWithSerilog(Answer answer)
         {
-            // Descomenta este código al usar Serilog
-
+            
             string logdirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
             if (!Directory.Exists(logdirectory))
             {
@@ -76,8 +69,7 @@ namespace Gestion.Colegial.Business.Extensions
 
             var logpath = Path.Combine(logdirectory, "log_.txt");
             var log = new LoggerConfiguration()
-    .WriteTo.File(logpath, rollingInterval: RollingInterval.Day) // La propiedad es 'RollingInterval' y es un enum
-    .CreateLogger();
+    .WriteTo.File(logpath, rollingInterval: RollingInterval.Day)     .CreateLogger();
 
             string innerexception = answer.InnerException?.ToString() ?? "no contiene.";
 
@@ -90,8 +82,7 @@ namespace Gestion.Colegial.Business.Extensions
             log.Dispose();
         }
 
-        // Método para logging en consola (útil para desarrollo)
-        public static void ErrorToConsole(Answer answer)
+                public static void ErrorToConsole(Answer answer)
         {
             string innerException = answer.InnerException?.ToString() ?? "No contiene.";
 

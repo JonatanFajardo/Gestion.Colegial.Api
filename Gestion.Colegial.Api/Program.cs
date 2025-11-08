@@ -7,17 +7,11 @@ using Gestion.Colegial.DataAccess.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(DtoMappingProfile).Assembly);
-//builder.Services.AddDbContext<DB_OdoremContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ODOREM")));
-//var s = builder.Configuration.GetConnectionString("ODOREM");
 
-// Repositories
 builder.Services.AddScoped<IAlumnoRepository, AlumnoRepository>();
 builder.Services.AddScoped<ICargoRepository, CargoRepository>();
 builder.Services.AddScoped<ICursoNivelRepository, CursoNivelRepository>();
@@ -27,9 +21,7 @@ builder.Services.AddScoped<IDuracionRepository, DuracionRepository>();
 builder.Services.AddScoped<IEmpleadoRepository, EmpleadoRepository>();
 builder.Services.AddScoped<IEncargadoRepository, EncargadoRepository>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
-// builder.Services.AddScoped<IEventoRepository, EventoRepository>(); // tbEventos entity no existe
 builder.Services.AddScoped<IHomeAndChartsRepository, HomeAndChartsRepository>();
-//builder.Services.AddScoped<IHoraRepository, HoraRepository>();
 builder.Services.AddScoped<IMateriaRepository, MateriaRepository>();
 builder.Services.AddScoped<IModalidadRepository, ModalidadRepository>();
 builder.Services.AddScoped<INivelEducativoRepository, NivelEducativoRepository>();
@@ -39,7 +31,6 @@ builder.Services.AddScoped<ISeccionRepository, SeccionRepository>();
 builder.Services.AddScoped<ISemestreRepository, SemestreRepository>();
 builder.Services.AddScoped<ITituloRepository, TituloRepository>();
 
-// Services
 builder.Services.AddTransient<ApiBaseController>();
 builder.Services.AddScoped<IAlumnoService, AlumnoService>();
 builder.Services.AddScoped<ICargoService, CargoService>();
@@ -50,9 +41,7 @@ builder.Services.AddScoped<IDuracionService, DuracionService>();
 builder.Services.AddScoped<IEmpleadoService, EmpleadoService>();
 builder.Services.AddScoped<IEncargadoService, EncargadoService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
-// builder.Services.AddScoped<IEventoService, EventoService>(); // tbEventos entity no existe
 builder.Services.AddScoped<IHomeAndChartsService, HomeAndChartsService>();
-//builder.Services.AddScoped<IHoraService, HoraService>();
 builder.Services.AddScoped<IMateriaService, MateriaService>();
 builder.Services.AddScoped<IModalidadService, ModalidadService>();
 builder.Services.AddScoped<INivelEducativoService, NivelEducativoService>();
@@ -64,7 +53,6 @@ builder.Services.AddScoped<ITituloService, TituloService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

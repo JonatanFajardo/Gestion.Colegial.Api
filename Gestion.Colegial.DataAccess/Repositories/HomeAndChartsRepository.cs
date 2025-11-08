@@ -1,7 +1,7 @@
-﻿using Gestion.Colegial.Entities;
+﻿using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Gestion.Colegial.Entities.Entities.dbo;
-using Gestion.Colegial.DataAccess.Interfaces;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
@@ -50,6 +50,5 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Read<PR_CardsInHome_DashboardResult>(sql);
             return answer;
         }
-
     }
 }

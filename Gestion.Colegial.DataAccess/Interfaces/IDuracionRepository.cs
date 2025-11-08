@@ -6,11 +6,17 @@ namespace Gestion.Colegial.DataAccess.Interfaces
     public interface IDuracionRepository
     {
         Task<Answer> List();
+
         Task<Answer> Find(int id);
+
         Task<Answer> Detail(int id);
+
         Task<Answer> Create(tbDuraciones obj);
+
         Task<Answer> Edit(tbDuraciones obj);
+
         Task<Answer> Exist(string value);
+
         Task<Answer> Delete(int id);
     }
 }

@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/CursosNiveles")]
     public class CursosNivelesController : ControllerBase
     {
         private readonly ICursoNivelService _cursoNivelService;
@@ -24,7 +23,6 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpGet]
-        //[ResponseType(typeof(tbCursosNiveles))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -41,14 +39,9 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpGet]
-        //[ResponseType(typeof(tbCursosNiveles))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _cursoNivelService.Find(value);
             return Ok(answer.Data);
         }
@@ -65,10 +58,6 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _cursoNivelService.Detail(value);
             return Ok(answer.Data);
         }
@@ -82,14 +71,9 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpPost]
-        //[ResponseType(typeof(tbCursosNiveles))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbCursosNiveles entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _cursoNivelService.Create(entity);
             return Ok(answer.Data);
         }
@@ -102,15 +86,10 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
-        //[ResponseType(typeof(tbCursosNiveles))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbCursosNiveles entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _cursoNivelService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -145,23 +124,12 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         /// <param name="value">Identificador único del objeto.</param>
         /// <returns></returns>
-        //[ResponseType(typeof(tbCursosNiveles))]
         [HttpPut]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _cursoNivelService.Delete(value);
             return Ok(answer.Data);
-
-            //if (answer.Access)
-            //{
-            //    return BadRequest(answer.Message);
-            //}
-            //return Ok(answer.Access);
         }
     }
 }

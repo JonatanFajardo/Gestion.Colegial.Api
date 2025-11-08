@@ -826,8 +826,6 @@ namespace Gestion.Colegial.Business.Mapping
                 .ForMember(dest => dest.NombreUsuario, opt => opt.MapFrom(src => src.Usu_Name))
                 .ForMember(dest => dest.DescripcionRol, opt => opt.MapFrom(src => src.Rol_Descripcion))
                 ;
-
         }
     }
 }
-
