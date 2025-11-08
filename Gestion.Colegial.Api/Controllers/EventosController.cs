@@ -9,14 +9,12 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Eventos")]
-    public class EventosController : ControllerBase
+        public class EventosController : ControllerBase
     {
         private readonly IEventoService _eventoService;
 
         [HttpGet]
-        //[ResponseType(typeof(tbEventos))]
-        [Route("ListAsync")]
+                [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
             Answer answer = await _eventoService.List();
@@ -24,15 +22,10 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbEventos))]
-        [Route("FindAsync")]
+                [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
-            Answer answer = await _eventoService.Find(value);
+                                                            Answer answer = await _eventoService.Find(value);
             return Ok(answer.Data);
         }
 
@@ -48,50 +41,31 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
-            Answer answer = await _eventoService.Detail(value);
+                                                            Answer answer = await _eventoService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbEventos))]
-        [Route("CreateAsync")]
+                [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbEventos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
-            Answer answer = await _eventoService.Create(entity);
+                                                            Answer answer = await _eventoService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbEventos))]
-        [HttpPut]
+                [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbEventos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
-            Answer answer = await _eventoService.Edit(entity);
+                                                            Answer answer = await _eventoService.Edit(entity);
             return Ok(answer.Data);
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbEventos))]
-        [Route("RemoveAsync")]
+                [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
-            Answer answer = await _eventoService.Delete(value);
+                                                            Answer answer = await _eventoService.Delete(value);
             return Ok(answer.Data);
         }
     }

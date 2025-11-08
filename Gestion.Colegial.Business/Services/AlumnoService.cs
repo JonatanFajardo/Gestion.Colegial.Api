@@ -140,22 +140,6 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
-        //public async Task<Answer> Exist(string value)
-        //{
-        //    Answer answer = await _repository.Exist(value);
-        //    try
-        //{
-        //if (answer.Access)
-        //    {
-        //        answer.Access = true;
-        //        answer.Message = MessageShow.Error;
-        //        Logs.Error(answer);
-        //return answer;
-        //        return answer;
-        //    }
-        //    answer.Message = MessageShow.SuccessExist;
-        //    return answer;
-        //}
         public async Task<Answer> Delete(int id)
         {
             Answer answer = await _repository.Delete(id);

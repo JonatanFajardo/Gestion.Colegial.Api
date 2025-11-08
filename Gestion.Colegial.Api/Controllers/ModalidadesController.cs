@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Modalidades")]
     public class ModalidadesController : ControllerBase
     {
         private readonly IModalidadService _modalidadService;
@@ -20,11 +19,10 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>
         /// Obtiene un objeto.
         /// </summary>
-        /// <returns>Objeto tbModalidades.</returns>
+        /// <returns>Objeto tbModalidades.</returns>    
         /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpGet]
-        //[ResponseType(typeof(tbModalidades))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -41,14 +39,9 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpGet]
-        //[ResponseType(typeof(tbModalidades))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _modalidadService.Find(value);
             return Ok(answer.Data);
         }
@@ -65,10 +58,6 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _modalidadService.Detail(value);
             return Ok(answer.Data);
         }
@@ -82,14 +71,9 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpPost]
-        //[ResponseType(typeof(tbModalidades))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbModalidades entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _modalidadService.Create(entity);
             return Ok(answer.Data);
         }
@@ -102,15 +86,10 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
-        //[ResponseType(typeof(tbModalidades))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbModalidades entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _modalidadService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -145,15 +124,10 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         /// <param name="value">Identificador único del objeto.</param>
         /// <returns></returns>
-        //[ResponseType(typeof(tbModalidades))]
         [HttpPut]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _modalidadService.Delete(value);
             return Ok(answer.Data);
         }

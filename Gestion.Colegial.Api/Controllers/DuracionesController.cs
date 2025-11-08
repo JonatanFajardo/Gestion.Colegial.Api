@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Duraciones")]
     public class DuracionesController : ControllerBase
     {
         private readonly IDuracionService _duracionService;
@@ -24,7 +23,6 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpGet]
-        //[ResponseType(typeof(tbDuraciones))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -33,14 +31,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbDuraciones))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _duracionService.Find(value);
             return Ok(answer.Data);
         }
@@ -57,36 +50,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _duracionService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbDuraciones))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbDuraciones entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _duracionService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbDuraciones))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbDuraciones entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _duracionService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -117,14 +96,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbDuraciones))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _duracionService.Delete(value);
             return Ok(answer.Data);
         }

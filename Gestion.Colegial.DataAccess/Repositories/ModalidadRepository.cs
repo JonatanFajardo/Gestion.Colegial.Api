@@ -1,8 +1,8 @@
-﻿using Gestion.Colegial.Entities;
+﻿using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
-using Gestion.Colegial.DataAccess.Interfaces;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
@@ -23,14 +23,6 @@ namespace Gestion.Colegial.DataAccess.Repositories
             };
             Answer answer = await Search<PR_tbModalidades_FindResult>(sql, sqlParameters);
             return answer;
-
-            //const string sql = "PR_tbModalidades_Find";
-            //await db.SaveChangesAsync();
-            //if (resultado == null)
-            //{
-            //    return null;
-            //}
-            //return resultado;
         }
 
         public async Task<Answer> Detail(int id)

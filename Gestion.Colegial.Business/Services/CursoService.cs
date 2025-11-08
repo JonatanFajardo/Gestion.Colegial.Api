@@ -1,7 +1,6 @@
 ﻿using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.DataAccess.Interfaces;
-using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 
@@ -138,20 +137,6 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
-        //public async Task<Answer> Exist(string value)
-        //{
-        //    Answer answer = await _repository.Exist(value);
-        //    try
-        //{
-        //if (answer.Access)
-        //    {
-        //        answer.Access = true;
-        //        answer.Message = MessageShow.Error;
-        //        return answer;
-        //    }
-        //    answer.Message = MessageShow.SuccessExist;
-        //    return answer;
-        //}
         public async Task<Answer> Delete(int id)
         {
             Answer answer = await _repository.Delete(id);

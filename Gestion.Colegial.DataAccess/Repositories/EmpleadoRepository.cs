@@ -1,8 +1,8 @@
-﻿using Gestion.Colegial.Entities;
+﻿using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
-using Gestion.Colegial.DataAccess.Interfaces;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
@@ -85,16 +85,6 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Update(sql, sqlParameters);
             return answer;
         }
-
-        //public async Task<Answer> Exist(string value)
-        //{
-        //    const string sql = "PR_tbEmpleados_Exist";
-        //    SqlParameter[] sqlParameters = {
-        //    new SqlParameter(){ParameterName= "@Emp_Descripcion", DbType = DbType.String, Value = value }
-        //    };
-        //    Answer answer = await Exist<PR_tbEmpleados_ExistResult>(sql, sqlParameters);
-        //    return answer;
-        //}
 
         public async Task<Answer> Delete(int id)
         {

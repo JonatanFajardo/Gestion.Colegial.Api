@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Parentescos")]
     public class ParentescosController : ControllerBase
     {
         private readonly IParentescoService _parentescoService;
@@ -18,7 +17,6 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbParentescos))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -27,14 +25,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbParentescos))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parentescoService.Find(value);
             return Ok(answer.Data);
         }
@@ -51,36 +44,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parentescoService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbParentescos))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbParentescos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parentescoService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbParentescos))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbParentescos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parentescoService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -111,14 +90,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbParentescos))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _parentescoService.Delete(value);
             return Ok(answer.Data);
         }

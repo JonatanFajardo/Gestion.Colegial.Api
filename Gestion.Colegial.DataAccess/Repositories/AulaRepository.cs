@@ -59,17 +59,6 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
-        //public async Task<PR_tbAulas_ExistResult> Exist(string value)
-        //{
-        //    const string sql = "PR_tbAulas_Exist";
-        //    await db.SaveChangesAsync();
-        //    if (resultado == null)
-        //    {
-        //        return null;
-        //    }
-        //    return resultado;
-        //}
-
         public async Task<Answer> Delete(int id)
         {
             const string sql = "PR_tbAulas_Delete";

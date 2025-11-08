@@ -66,6 +66,5 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _homeAndChartsService.CardsInHomeList();
             return Ok(answer.Data);
         }
-
     }
 }

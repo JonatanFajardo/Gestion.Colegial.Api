@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Titulos")]
     public class TitulosController : ControllerBase
     {
         private readonly ITituloService _tituloService;
@@ -18,7 +17,6 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbTitulos))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -27,14 +25,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbTitulos))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _tituloService.Find(value);
             return Ok(answer.Data);
         }
@@ -51,36 +44,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _tituloService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbTitulos))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbTitulos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _tituloService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbTitulos))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbTitulos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _tituloService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -111,14 +90,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbTitulos))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _tituloService.Delete(value);
             return Ok(answer.Data);
         }

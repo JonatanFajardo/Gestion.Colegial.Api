@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/NivelesEducativos")]
     public class NivelesEducativosController : ControllerBase
     {
         private readonly INivelEducativoService _nivelEducativoService;
@@ -18,7 +17,6 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbNivelesEducativos))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -27,14 +25,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbNivelesEducativos))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _nivelEducativoService.Find(value);
             return Ok(answer.Data);
         }
@@ -51,36 +44,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _nivelEducativoService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbNivelesEducativos))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbNivelesEducativos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _nivelEducativoService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbNivelesEducativos))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbNivelesEducativos entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _nivelEducativoService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -111,14 +90,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbNivelesEducativos))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _nivelEducativoService.Delete(value);
             return Ok(answer.Data);
         }

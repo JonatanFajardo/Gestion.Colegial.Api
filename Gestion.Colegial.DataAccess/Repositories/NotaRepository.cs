@@ -68,17 +68,6 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
-        //public async Task<IEnumerable<PR_tbNotas_ExistResult>> Exist(string value)
-        //{
-        //    const string sql = "PR_tbNotas_Exist";
-        //    await db.SaveChangesAsync();
-        //    if (resultado == null)
-        //    {
-        //        return null;
-        //    }
-        //    return resultado;
-        //}
-
         public async Task<Answer> Delete(int id)
         {
             const string sql = "PR_tbNotas_Delete";

@@ -2,7 +2,6 @@
 using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.DataAccess.Interfaces;
-using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.Entities;
 using static Gestion.Colegial.Business.Extensions.CustomMapping;
 

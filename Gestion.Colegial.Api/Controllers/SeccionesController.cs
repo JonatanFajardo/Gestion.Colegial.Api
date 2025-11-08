@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    //[Route("api/Secciones")]
     public class SeccionesController : ControllerBase
     {
         private readonly ISeccionService _seccionService;
@@ -18,7 +17,6 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbSecciones))]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
@@ -27,14 +25,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
-        //[ResponseType(typeof(tbSecciones))]
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _seccionService.Find(value);
             return Ok(answer.Data);
         }
@@ -51,36 +44,22 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _seccionService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
-        //[ResponseType(typeof(tbSecciones))]
         [Route("CreateAsync")]
         public async Task<IActionResult> Create(tbSecciones entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _seccionService.Create(entity);
             return Ok(answer.Data);
         }
 
-        //[ResponseType(typeof(tbSecciones))]
         [HttpPut]
         [Route("EditAsync")]
         public async Task<IActionResult> Edit(tbSecciones entity)
         {
-            //if (entity == null)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _seccionService.Edit(entity);
             return Ok(answer.Data);
         }
@@ -111,14 +90,9 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPut]
-        //[ResponseType(typeof(tbSecciones))]
         [Route("RemoveAsync")]
         public async Task<IActionResult> Remove(int value)
         {
-            //if (value == 0)
-            //{
-            //    return NotFound();
-            //}
             Answer answer = await _seccionService.Delete(value);
             return Ok(answer.Data);
         }
