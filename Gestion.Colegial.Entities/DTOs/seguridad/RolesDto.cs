@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbRoles
-    {
+    public partial class tbRolesDto    {
         public int Rol_Id { get; set; }
         public string Rol_Descripcion { get; set; }
         public bool Rol_Estado { get; set; }

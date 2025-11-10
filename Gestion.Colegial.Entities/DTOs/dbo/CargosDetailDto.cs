@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class CargoDetailDto
-    {
+    public partial class CargoDetailDto    {
         public int? CargoId { get; set; }
         public string DescripcionCargo { get; set; }
         public string NombreUsuarioRegistraCargo { get; set; }

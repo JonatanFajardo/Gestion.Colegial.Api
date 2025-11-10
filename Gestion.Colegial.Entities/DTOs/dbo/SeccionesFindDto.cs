@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class SeccionFindDto
-    {
+    public partial class SeccionFindDto    {
         public int SeccionId { get; set; }
         public string DescripcionSeccion { get; set; }
     }

@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class AlumnoDetailDto
-    {
+    public partial class AlumnoDetailDto    {
         public int? AlumnoId { get; set; }
         public string NumeroIdentidad { get; set; }
         public string PrimerNombre { get; set; }

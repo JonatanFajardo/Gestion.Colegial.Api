@@ -1,17 +1,15 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbDepartamentoEmpleados
+    public partial class tbDepartamentoEmpleadosDto
     {
-        public tbDepartamentoEmpleados()
-        {
-            tbEmpleados = new HashSet<tbEmpleados>();
-        }
-
-        public int Dep_Id { get; set; }
-        public string Nombre { get; set; }
-
-        public virtual ICollection<tbEmpleados> tbEmpleados { get; set; }
+        public int DepartamentoId { get; set; }
+        public string DescripcionDepartamento { get; set; }
+        public bool EsEliminado { get; set; }
+        public int UsuarioRegistra { get; set; }
+        public DateTime FechaRegistra { get; set; }
+        public int? UsuarioModifica { get; set; }
+        public DateTime? FechaModifica { get; set; }
     }
 }

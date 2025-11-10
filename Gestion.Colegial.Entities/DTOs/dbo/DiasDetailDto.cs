@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class DiaDetailDto
-    {
+    public partial class DiaDetailDto    {
         public int? DiaId { get; set; }
         public string DescripcionDia { get; set; }
         public string NombreUsuarioRegistraDia { get; set; }

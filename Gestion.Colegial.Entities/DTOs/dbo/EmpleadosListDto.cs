@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class EmpleadoListDto
-    {
+    public partial class EmpleadoListDto    {
         public int EmpleadoId { get; set; }
         public string CodigoEmpleado { get; set; }
         public string NombreEmpleado { get; set; }

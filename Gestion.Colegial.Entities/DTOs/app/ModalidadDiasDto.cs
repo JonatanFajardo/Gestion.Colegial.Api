@@ -1,14 +1,10 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbModalidad_tbDias
+    public partial class tbModalidad_tbDiasDto
     {
-        public int Mdia_Id { get; set; }
-        public int? Mda_Id { get; set; }
-        public int? Dia_Id { get; set; }
-
-        public virtual tbDias Dia { get; set; }
-        public virtual tbModalidades Mda { get; set; }
+        public int ModalidadId { get; set; }
+        public int DiaId { get; set; }
     }
 }

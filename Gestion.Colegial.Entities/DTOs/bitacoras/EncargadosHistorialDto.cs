@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbEncargadosHistorial
-    {
+    public partial class tbEncargadosHistorialDto    {
         public int Enc_Id { get; set; }
         public int? Per_Id { get; set; }
         public bool? EsActivo { get; set; }

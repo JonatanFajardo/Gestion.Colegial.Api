@@ -1,18 +1,11 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    /// <summary>
-    /// Contiene los encargados relacionados con el alumno.
-    /// </summary>
-    public partial class tbEncargados_tbAlumnos
+    public partial class tbEncargados_tbAlumnosDto
     {
-        public int Enc_Id { get; set; }
-        public int Alu_Id { get; set; }
-        public int Par_Id { get; set; }
-
-        public virtual tbAlumnos Alu { get; set; }
-        public virtual tbEncargados Enc { get; set; }
-        public virtual tbParentescos Par { get; set; }
+        public int EncargadoId { get; set; }
+        public int AlumnoId { get; set; }
+        public int ParentescoId { get; set; }
     }
 }

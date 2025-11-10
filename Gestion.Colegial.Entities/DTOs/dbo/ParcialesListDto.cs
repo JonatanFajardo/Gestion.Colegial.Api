@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class ParcialListDto
-    {
+    public partial class ParcialListDto    {
         public int ParcialId { get; set; }
         public string DescripcionParcial { get; set; }
     }
