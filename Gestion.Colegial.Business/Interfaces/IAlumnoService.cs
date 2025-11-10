@@ -1,5 +1,5 @@
-using Gestion.Colegial.Business.Dtos;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs;
 
 namespace Gestion.Colegial.Business.Interfaces
 {
@@ -11,9 +11,9 @@ namespace Gestion.Colegial.Business.Interfaces
 
         Task<Answer> Detail(int id);
 
-        Task<Answer> Create(AlumnosFindDto obj);
+        Task<Answer> Create(AlumnoFindDto obj);
 
-        Task<Answer> Edit(AlumnosFindDto obj);
+        Task<Answer> Edit(AlumnoFindDto obj);
 
         Task<Answer> Delete(int id);
 

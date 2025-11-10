@@ -68,6 +68,31 @@ namespace Gestion.Colegial.Business.Mapping
                 .ForMember(dest => dest.ScopeIdentity, opt => opt.MapFrom(src => src.SCOPE_IDENTITY))
                 ;
 
+            CreateMap<AlumnoFindDto, tbAlumnos>()
+                .ForMember(dest => dest.Alu_Id, opt => opt.MapFrom(src => src.AlumnoId))
+                .ForMember(dest => dest.Niv_Id, opt => opt.MapFrom(src => src.NivelId))
+                .ForMember(dest => dest.Cun_Id, opt => opt.MapFrom(src => src.CursoNivelId))
+                .ForMember(dest => dest.Mda_Id, opt => opt.MapFrom(src => src.ModalidadId))
+                .ForMember(dest => dest.Cur_Id, opt => opt.MapFrom(src => src.CursoId))
+                .ForMember(dest => dest.Sec_Id, opt => opt.MapFrom(src => src.SeccionId))
+                .ForMember(dest => dest.Est_Id, opt => opt.MapFrom(src => src.EstadoId))
+                .ForMember(dest => dest.Per_Id, opt => opt.MapFrom(src => src.PersonaId))
+                .ForMember(dest => dest.Per, opt => opt.MapFrom(src => new tbPersonas
+                {
+                    Per_Id = src.PersonaId,
+                    Per_Identidad = src.NumeroIdentidad,
+                    Per_PrimerNombre = src.PrimerNombre,
+                    Per_SegundoNombre = src.SegundoNombre,
+                    Per_ApellidoPaterno = src.ApellidoPaterno,
+                    Per_ApellidoMaterno = src.ApellidoMaterno,
+                    Per_FechaNacimiento = src.FechaNacimiento,
+                    Per_CorreoElectronico = src.CorreoElectronico,
+                    Per_Telefono = src.Telefono,
+                    Per_Direccion = src.Direccion,
+                    Per_Sexo = src.Sexo
+                }))
+                ;
+
             CreateMap<PR_tbAlumnos_ListResult, AlumnoListDto>()
                 .ForMember(dest => dest.AlumnoId, opt => opt.MapFrom(src => src.Alu_Id))
                 .ForMember(dest => dest.ImagenPersona, opt => opt.MapFrom(src => src.Per_Imagen))
@@ -826,6 +851,63 @@ namespace Gestion.Colegial.Business.Mapping
                 .ForMember(dest => dest.NombreUsuario, opt => opt.MapFrom(src => src.Usu_Name))
                 .ForMember(dest => dest.DescripcionRol, opt => opt.MapFrom(src => src.Rol_Descripcion))
                 ;
+
+            //CreateMap<PR_tbHorarioAlumnos_ListResult, HorarioAlumnoListDto>()
+            //    .ForMember(dest => dest.HorarioAlumnoId, opt => opt.MapFrom(src => src.HoAl_Id))
+            //    .ForMember(dest => dest.NombreCurso, opt => opt.MapFrom(src => src.Cur_Nombre))
+            //    .ForMember(dest => dest.DescripcionCursoNivel, opt => opt.MapFrom(src => src.Cun_Descripcion))
+            //    .ForMember(dest => dest.NombreMateria, opt => opt.MapFrom(src => src.Mat_Nombre))
+            //    .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.Hor_Hora))
+            //    .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.Hor_Hora1))
+            //    .ForMember(dest => dest.DescripcionDia, opt => opt.MapFrom(src => src.Dia_Descripcion))
+            //    ;
+
+        //    CreateMap<PR_tbHorarioAlumnos_FindResult, HorarioAlumnoFindDto>()
+        //        .ForMember(dest => dest.HorarioAlumnoId, opt => opt.MapFrom(src => src.HoAl_Id))
+        //        .ForMember(dest => dest.CursoId, opt => opt.MapFrom(src => src.Cur_Id))
+        //        .ForMember(dest => dest.NombreCurso, opt => opt.MapFrom(src => src.Cur_Nombre))
+        //        .ForMember(dest => dest.CursoNivelId, opt => opt.MapFrom(src => src.Cun_Id))
+        //        .ForMember(dest => dest.DescripcionCursoNivel, opt => opt.MapFrom(src => src.Cun_Descripcion))
+        //        .ForMember(dest => dest.MateriaId, opt => opt.MapFrom(src => src.Mat_Id))
+        //        .ForMember(dest => dest.NombreMateria, opt => opt.MapFrom(src => src.Mat_Nombre))
+        //        .ForMember(dest => dest.HoraInicioId, opt => opt.MapFrom(src => src.HoAl_HoraInicio))
+        //        .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.Hor_Hora))
+        //        .ForMember(dest => dest.HoraFinId, opt => opt.MapFrom(src => src.HoAl_HoraFinaliza))
+        //        .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.Hor_Hora1))
+        //        .ForMember(dest => dest.DiaId, opt => opt.MapFrom(src => src.Dia_Id))
+        //        .ForMember(dest => dest.DescripcionDia, opt => opt.MapFrom(src => src.Dia_Descripcion))
+        //        .ForMember(dest => dest.SeccionId, opt => opt.MapFrom(src => src.Sec_Id))
+        //        .ForMember(dest => dest.DescripcionSeccion, opt => opt.MapFrom(src => src.Sec_Descripcion))
+        //        .ForMember(dest => dest.AulaId, opt => opt.MapFrom(src => src.Aul_Id))
+        //        .ForMember(dest => dest.DescripcionAula, opt => opt.MapFrom(src => src.Aul_Descripcion))
+        //        .ForMember(dest => dest.EmpleadoId, opt => opt.MapFrom(src => src.Emp_Id))
+        //        .ForMember(dest => dest.NombreEmpleado, opt => opt.MapFrom(src => src.Emp_Nombre))
+        //        .ForMember(dest => dest.SemestreId, opt => opt.MapFrom(src => src.Sem_Id))
+        //        .ForMember(dest => dest.DescripcionSemestre, opt => opt.MapFrom(src => src.Sem_Descripcion))
+        //        .ForMember(dest => dest.ModalidadId, opt => opt.MapFrom(src => src.Mda_Id))
+        //        .ForMember(dest => dest.DescripcionModalidad, opt => opt.MapFrom(src => src.Mda_Descripcion))
+        //        .ForMember(dest => dest.Anio, opt => opt.MapFrom(src => src.HoAl_Año))
+        //        ;
+
+        //    CreateMap<PR_tbHorarioAlumnos_DetailResult, HorarioAlumnoDetailDto>()
+        //        .ForMember(dest => dest.HorarioAlumnoId, opt => opt.MapFrom(src => src.HoAl_Id))
+        //        .ForMember(dest => dest.NombreCurso, opt => opt.MapFrom(src => src.Cur_Nombre))
+        //        .ForMember(dest => dest.DescripcionCursoNivel, opt => opt.MapFrom(src => src.Cun_Descripcion))
+        //        .ForMember(dest => dest.NombreMateria, opt => opt.MapFrom(src => src.Mat_Nombre))
+        //        .ForMember(dest => dest.HoraInicio, opt => opt.MapFrom(src => src.Hor_Hora))
+        //        .ForMember(dest => dest.HoraFin, opt => opt.MapFrom(src => src.Hor_Hora1))
+        //        .ForMember(dest => dest.DescripcionDia, opt => opt.MapFrom(src => src.Dia_Descripcion))
+        //        .ForMember(dest => dest.DescripcionSeccion, opt => opt.MapFrom(src => src.Sec_Descripcion))
+        //        .ForMember(dest => dest.DescripcionAula, opt => opt.MapFrom(src => src.Aul_Descripcion))
+        //        .ForMember(dest => dest.NombreEmpleado, opt => opt.MapFrom(src => src.Emp_Nombre))
+        //        .ForMember(dest => dest.DescripcionSemestre, opt => opt.MapFrom(src => src.Sem_Descripcion))
+        //        .ForMember(dest => dest.DescripcionModalidad, opt => opt.MapFrom(src => src.Mda_Descripcion))
+        //        .ForMember(dest => dest.Anio, opt => opt.MapFrom(src => src.HoAl_Año))
+        //        .ForMember(dest => dest.NombreUsuarioRegistraHorarioAlumno, opt => opt.MapFrom(src => src.HoAl_UsuarioRegistraNombre))
+        //        .ForMember(dest => dest.FechaRegistroHorarioAlumno, opt => opt.MapFrom(src => src.HoAl_FechaRegistra))
+        //        .ForMember(dest => dest.NombreUsuarioModificaHorarioAlumno, opt => opt.MapFrom(src => src.HoAl_UsuarioModificaNombre))
+        //        .ForMember(dest => dest.FechaModificacionHorarioAlumno, opt => opt.MapFrom(src => src.HoAl_FechaModifica))
+        //        ;
         }
     }
 }

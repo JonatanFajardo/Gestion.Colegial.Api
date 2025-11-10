@@ -1,4 +1,5 @@
-﻿using Gestion.Colegial.Business.Dtos;
+﻿using Gestion.Colegial.Entities.DTOs;
+using Gestion.Colegial.Entities.DTOs.dbo;
 using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Extensions
@@ -9,7 +10,7 @@ namespace Gestion.Colegial.Business.Extensions
 
         public class AlumnosConversion
         {
-            public static tbAlumnos Create(AlumnosFindDto obj)
+            public static tbAlumnos Create(AlumnoFindDto obj)
             {
                 tbAlumnos entity = new tbAlumnos
                 {
@@ -38,7 +39,7 @@ namespace Gestion.Colegial.Business.Extensions
                 return entity;
             }
 
-            public static tbAlumnos Edit(AlumnosFindDto obj)
+            public static tbAlumnos Edit(AlumnoFindDto obj)
             {
                 tbAlumnos entity = new tbAlumnos
                 {
@@ -76,7 +77,7 @@ namespace Gestion.Colegial.Business.Extensions
 
         public class EmpleadosConversion
         {
-            public static tbEmpleados Create(EmpleadosFindDto obj)
+            public static tbEmpleados Create(EmpleadoFindDto obj)
             {
                 tbEmpleados entity = new tbEmpleados
                 {
@@ -101,7 +102,7 @@ namespace Gestion.Colegial.Business.Extensions
                 return entity;
             }
 
-            public static tbEmpleados Edit(EmpleadosFindDto obj)
+            public static tbEmpleados Edit(EmpleadoFindDto obj)
             {
                 tbEmpleados entity = new tbEmpleados
                 {
@@ -136,7 +137,7 @@ namespace Gestion.Colegial.Business.Extensions
 
         public class EncargadosConversion
         {
-            public static tbEncargados Create(EncargadosFindDto obj)
+            public static tbEncargados Create(EncargadoFindDto obj)
             {
                 tbEncargados entity = new tbEncargados
                 {
@@ -159,7 +160,7 @@ namespace Gestion.Colegial.Business.Extensions
                 return entity;
             }
 
-            public static tbEncargados Edit(EncargadosFindDto obj)
+            public static tbEncargados Edit(EncargadoFindDto obj)
             {
                 tbEncargados entity = new tbEncargados
                 {

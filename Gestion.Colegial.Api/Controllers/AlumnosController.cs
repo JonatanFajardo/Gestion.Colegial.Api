@@ -1,6 +1,6 @@
-﻿using Gestion.Colegial.Business.Dtos;
-using Gestion.Colegial.Business.Interfaces;
+﻿using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestion.Colegial.Api.Controllers
@@ -68,7 +68,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpPost("CreateAsync")]
-        public async Task<IActionResult> Create(AlumnosFindDto entity)
+        public async Task<IActionResult> Create(AlumnoFindDto entity)
         {
             Answer answer = await _alumnoService.Create(entity);
             return Ok(answer.Data);
@@ -83,7 +83,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <response code="400">BadRequest. Conexión no establecida.</response>
         /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
         [HttpPut("EditAsync")]
-        public async Task<IActionResult> Edit(AlumnosFindDto entity)
+        public async Task<IActionResult> Edit(AlumnoFindDto entity)
         {
             Answer answer = await _alumnoService.Edit(entity);
             return Ok(answer.Data);
