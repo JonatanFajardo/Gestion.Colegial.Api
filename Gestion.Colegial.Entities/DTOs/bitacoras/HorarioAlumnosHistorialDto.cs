@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbHorarioAlumnosHistorial
-    {
+    public partial class tbHorarioAlumnosHistorialDto    {
         public int HoAl_Id { get; set; }
         public int? Cur_Id { get; set; }
         public int? Cun_Id { get; set; }

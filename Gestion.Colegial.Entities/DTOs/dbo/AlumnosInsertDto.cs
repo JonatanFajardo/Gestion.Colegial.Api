@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class AlumnoInsertDto
-    {
+    public partial class AlumnoInsertDto    {
         [Column("ScopeIdentity", TypeName = "decimal(38,0)")]
         public decimal? ScopeIdentity { get; set; }
     }

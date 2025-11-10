@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbNotasHistorial
-    {
+    public partial class tbNotasHistorialDto    {
         public int Not_Id { get; set; }
         public int? Not_Nota { get; set; }
         public int? Mat_Id { get; set; }

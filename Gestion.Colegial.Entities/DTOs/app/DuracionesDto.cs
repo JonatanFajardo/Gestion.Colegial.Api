@@ -1,35 +1,15 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    /// <summary>
-    /// Registra las diferentes duraciones que puede tener una materia.
-    /// </summary>
-    public partial class tbDuraciones
+    public partial class tbDuracionesDto
     {
-        public tbDuraciones()
-        {
-            tbMaterias = new HashSet<tbMaterias>();
-        }
-
-        /// <summary>
-        /// Identificador único de la duracion.
-        /// </summary>
-        public int Dur_Id { get; set; }
-
-        /// <summary>
-        /// Información del tiempo designado para una materia.
-        /// </summary>
-        public string Dur_Descripcion { get; set; }
-
-        public bool Dur_EsEliminado { get; set; }
-        public int Dur_UsuarioRegistra { get; set; }
-        public DateTime Dur_FechaRegistra { get; set; }
-        public int? Dur_UsuarioModifica { get; set; }
-        public DateTime? Dur_FechaModifica { get; set; }
-
-        public virtual tbUsuarios Dur_UsuarioModificaNavigation { get; set; }
-        public virtual tbUsuarios Dur_UsuarioRegistraNavigation { get; set; }
-        public virtual ICollection<tbMaterias> tbMaterias { get; set; }
+        public int DuracionId { get; set; }
+        public string DescripcionDuracion { get; set; }
+        public bool EsEliminado { get; set; }
+        public int UsuarioRegistra { get; set; }
+        public DateTime FechaRegistra { get; set; }
+        public int? UsuarioModifica { get; set; }
+        public DateTime? FechaModifica { get; set; }
     }
 }

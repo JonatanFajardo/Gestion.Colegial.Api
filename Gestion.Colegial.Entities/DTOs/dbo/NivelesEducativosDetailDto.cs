@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class NivelEducativoDetailDto
-    {
+    public partial class NivelEducativoDetailDto    {
         public int? NivelId { get; set; }
         public string DescripcionNivel { get; set; }
         public string EsActivoNivel { get; set; }

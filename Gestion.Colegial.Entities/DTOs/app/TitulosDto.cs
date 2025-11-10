@@ -1,35 +1,15 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    /// <summary>
-    /// Información del título.
-    /// </summary>
-    public partial class tbTitulos
+    public partial class tbTitulosDto
     {
-        public tbTitulos()
-        {
-            tbEmpleados = new HashSet<tbEmpleados>();
-        }
-
-        /// <summary>
-        /// Identificador único del titulo.
-        /// </summary>
-        public int Tit_Id { get; set; }
-
-        /// <summary>
-        /// Nombre que tiene el titulo.
-        /// </summary>
-        public string Tit_Descripcion { get; set; }
-
-        public bool Tit_EsEliminado { get; set; }
-        public int Tit_UsuarioRegistra { get; set; }
-        public DateTime Tit_FechaRegistra { get; set; }
-        public int? Tit_UsuarioModifica { get; set; }
-        public DateTime? Tit_FechaModifica { get; set; }
-
-        public virtual tbUsuarios Tit_UsuarioModificaNavigation { get; set; }
-        public virtual tbUsuarios Tit_UsuarioRegistraNavigation { get; set; }
-        public virtual ICollection<tbEmpleados> tbEmpleados { get; set; }
+        public int TituloId { get; set; }
+        public string DescripcionTitulo { get; set; }
+        public bool EsEliminado { get; set; }
+        public int UsuarioRegistra { get; set; }
+        public DateTime FechaRegistra { get; set; }
+        public int? UsuarioModifica { get; set; }
+        public DateTime? FechaModifica { get; set; }
     }
 }

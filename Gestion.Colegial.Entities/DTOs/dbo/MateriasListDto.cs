@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class MateriaListDto
-    {
+    public partial class MateriaListDto    {
         public int MateriaId { get; set; }
         public string NombreMateria { get; set; }
         public string DescripcionDuracion { get; set; }

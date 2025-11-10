@@ -1,7 +1,6 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class ParentescoDetailDto
-    {
+    public partial class ParentescoDetailDto    {
         public int? ParentescoId { get; set; }
         public string DescripcionParentesco { get; set; }
         public string NombreUsuarioRegistraParentesco { get; set; }

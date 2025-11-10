@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbPersonasHistorial
-    {
+    public partial class tbPersonasHistorialDto    {
         public int Per_Id { get; set; }
         public string Per_Identidad { get; set; }
         public string Per_PrimerNombre { get; set; }

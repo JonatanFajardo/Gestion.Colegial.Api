@@ -1,10 +1,10 @@
-﻿#nullable disable
+#nullable disable
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class tbMatriculas
+    public partial class tbMatriculasDto
     {
-        public int? Matri_Id { get; set; }
-        public int? Alu_Id { get; set; }
+        public int? MatriculaId { get; set; }
+        public int? AlumnoId { get; set; }
     }
 }

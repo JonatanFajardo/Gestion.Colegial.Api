@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class EncargadoListDto
-    {
+    public partial class EncargadoListDto    {
         public int EncargadoId { get; set; }
         public string NumeroIdentidad { get; set; }
         public string NombreEncargado { get; set; }

@@ -1,6 +1,5 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class CursoMateriaUpdateDto
-    {
+    public partial class CursoMateriaUpdateDto    {
     }
 }

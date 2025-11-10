@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class UsuarioAutenticacionSeguridadDto
-    {
+    public partial class UsuarioAutenticacionSeguridadDto    {
     }
 }

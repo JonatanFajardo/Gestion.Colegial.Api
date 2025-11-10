@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class ObtenerPromedioCursoUltimosAniosDashboardDto
-    {
+    public partial class ObtenerPromedioCursoUltimosAniosDashboardDto    {
         public int? AnioCursado { get; set; }
 
         [Column("PromedioAnual", TypeName = "decimal(38,6)")]

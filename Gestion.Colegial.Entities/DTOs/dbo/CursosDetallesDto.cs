@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class CursoDetalleDto
-    {
+    public partial class CursoDetalleDto    {
         public int CursoDetalleId { get; set; }
 
         /// <summary>

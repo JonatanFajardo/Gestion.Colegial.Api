@@ -1,6 +1,5 @@
 ﻿namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class CursoNivelPorCursoInsertDto
-    {
+    public partial class CursoNivelPorCursoInsertDto    {
     }
 }

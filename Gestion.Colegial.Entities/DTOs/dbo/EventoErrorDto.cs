@@ -2,8 +2,7 @@
 
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public partial class EventoErrorDto
-    {
+    public partial class EventoErrorDto    {
         public int? ErrorId { get; set; }
         public string NombreArchivoError { get; set; }
         public DateTime? FechaError { get; set; }
