@@ -7,7 +7,7 @@ using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class EmpleadoService : IEmpleadoService
+    public class EmpleadoService 
     {
         private readonly IEmpleadoRepository _repository;
 

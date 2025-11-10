@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\AlumnosDetailDto.cs" />
+    <Compile Remove="Dtos\AlumnosFindDto.cs" />
+    <Compile Remove="Extensions\CustomMapping.cs" />
+    <Compile Remove="Services\EmpleadoService.cs" />
+    <Compile Remove="Services\EncargadoService.cs" />
     <Compile Remove="Services\EventoService.cs" />
     <Compile Remove="Services\HoraService.cs" />
   </ItemGroup>

@@ -14,6 +14,7 @@
         public int EstadoId { get; set; }
         public string DescripcionEstado { get; set; }
         public int AlumnoId { get; set; }
+        public int PersonaId { get; set; }
         public string NumeroIdentidad { get; set; }
         public string PrimerNombre { get; set; }
         public string SegundoNombre { get; set; }
