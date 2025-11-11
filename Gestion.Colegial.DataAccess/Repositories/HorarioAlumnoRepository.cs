@@ -1,4 +1,6 @@
-﻿using Gestion.Colegial.Entities;
+﻿using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
 using Gestion.Colegial.Entities.Entities.app;
 using Gestion.Colegial.Entities.Entities.dbo;
 using System.Data;
@@ -6,7 +8,7 @@ using System.Data.SqlClient;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
-    public class HorarioAlumnoRepository : RepositoryBase
+    public class HorarioAlumnoRepository : RepositoryBase, IHorarioAlumnoRepository
     {
         public async Task<Answer> List()
         {
