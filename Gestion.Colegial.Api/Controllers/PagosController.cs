@@ -1,5 +1,6 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs.finansas;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestion.Colegial.Api.Controllers
@@ -65,7 +66,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
-        public async Task<IActionResult> Create([FromBody] object entity)
+        public async Task<IActionResult> Create([FromBody] PagoFindDto entity)
         {
             Answer answer = await _pagoService.Create(entity);
             return Ok(answer.Data);

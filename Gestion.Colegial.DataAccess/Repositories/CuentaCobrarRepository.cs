@@ -108,7 +108,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
                 new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int32, Value = anio },
             };
-            Answer answer = await Execute(sql, sqlParameters);
+            Answer answer = await New(sql, sqlParameters);
             return answer;
         }
 
@@ -121,7 +121,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
                 new SqlParameter(){ParameterName= "@Dap_MontoAplicado", DbType = DbType.Decimal, Value = monto },
                 new SqlParameter(){ParameterName= "@Dap_Justificacion", DbType = DbType.String, Value = justificacion },
             };
-            Answer answer = await Execute(sql, sqlParameters);
+            Answer answer = await New(sql, sqlParameters);
             return answer;
         }
 
@@ -131,7 +131,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = cuentaCobrarId },
             };
-            Answer answer = await Execute(sql, sqlParameters);
+            Answer answer = await New(sql, sqlParameters);
             return answer;
         }
     }

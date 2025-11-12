@@ -58,6 +58,19 @@ public class DtoMappingProfile : Profile
         CreateMap<PR_tbTarifas_ExistResult, TarifaExistDto>()
             .ForMember(dest => dest.Existe, opt => opt.MapFrom(src => src.Exists))
             .ForMember(dest => dest.Mensaje, opt => opt.MapFrom(src => src.Message));
+
+        CreateMap<PR_tbTarifas_GetByConceptoAndNivelResult, TarifaFindDto>()
+            .ForMember(dest => dest.TarifaId, opt => opt.MapFrom(src => src.Tar_Id))
+            .ForMember(dest => dest.ConceptoPagoId, opt => opt.MapFrom(src => src.Cpa_Id))
+            .ForMember(dest => dest.NivelId, opt => opt.MapFrom(src => src.Niv_Id))
+            .ForMember(dest => dest.CursoNivelId, opt => opt.MapFrom(src => src.Cun_Id))
+            .ForMember(dest => dest.Monto, opt => opt.MapFrom(src => src.Tar_Monto))
+            .ForMember(dest => dest.AnioVigencia, opt => opt.MapFrom(src => src.Tar_AnioVigencia))
+            .ForMember(dest => dest.EsEliminado, opt => opt.MapFrom(src => src.Per_EsEliminado))
+            .ForMember(dest => dest.UsuarioRegistraId, opt => opt.MapFrom(src => src.Per_UsuarioRegistra))
+            .ForMember(dest => dest.FechaRegistro, opt => opt.MapFrom(src => src.Per_FechaRegistra))
+            .ForMember(dest => dest.UsuarioModificaId, opt => opt.MapFrom(src => src.Per_UsuarioModifica))
+            .ForMember(dest => dest.FechaModifica, opt => opt.MapFrom(src => src.Per_FechaModifica));
     }
 
     private void ConfigureConceptosPago()
