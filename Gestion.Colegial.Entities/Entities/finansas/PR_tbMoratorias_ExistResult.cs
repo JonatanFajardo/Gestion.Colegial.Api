@@ -7,5 +7,6 @@ namespace Gestion.Colegial.Entities.Entities;
 
 public class PR_tbMoratorias_ExistResult
 {
-public bool Exists { get; set; }
-public string? Message { get; set; }
+    public bool Exists { get; set; }
+    public string? Message { get; set; }
+}
