@@ -1,6 +1,6 @@
 namespace Gestion.Colegial.Entities.DTOs
 {
-    public class PR_HorarioAlumnos_FindResult
+    public class PR_tbHorarioAlumnos_FindResult
     {
         public int HoAl_Id { get; set; }
 
