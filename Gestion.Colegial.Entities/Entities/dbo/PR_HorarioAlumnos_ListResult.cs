@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Gestion.Colegial.Entities.Entities.dbo
 {
-    public class PR_HorarioAlumnos_ListResult
+    public class PR_tbHorarioAlumnos_ListResult
     {
         public int HoAl_Id { get; set; }
 
