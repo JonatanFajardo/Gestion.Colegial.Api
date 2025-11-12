@@ -77,6 +77,16 @@ builder.Services.AddScoped<ISeccionRepository, SeccionRepository>();
 builder.Services.AddScoped<ISemestreRepository, SemestreRepository>();
 builder.Services.AddScoped<ITituloRepository, TituloRepository>();
 
+// Repositorios Financieros
+builder.Services.AddScoped<IConceptoPagoRepository, ConceptoPagoRepository>();
+builder.Services.AddScoped<ITarifaRepository, TarifaRepository>();
+builder.Services.AddScoped<IFormaPagoRepository, FormaPagoRepository>();
+builder.Services.AddScoped<IDescuentoRepository, DescuentoRepository>();
+builder.Services.AddScoped<IEstadoPagoRepository, EstadoPagoRepository>();
+builder.Services.AddScoped<ICuentaCobrarRepository, CuentaCobrarRepository>();
+builder.Services.AddScoped<IPagoRepository, PagoRepository>();
+builder.Services.AddScoped<IReporteFinancieroRepository, ReporteFinancieroRepository>();
+
 // Services
 builder.Services.AddTransient<ApiBaseController>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
@@ -101,6 +111,16 @@ builder.Services.AddScoped<IParentescoService, ParentescoService>();
 builder.Services.AddScoped<ISeccionService, SeccionService>();
 builder.Services.AddScoped<ISemestreService, SemestreService>();
 builder.Services.AddScoped<ITituloService, TituloService>();
+
+// Servicios Financieros
+builder.Services.AddScoped<IConceptoPagoService, ConceptoPagoService>();
+builder.Services.AddScoped<ITarifaService, TarifaService>();
+builder.Services.AddScoped<IFormaPagoService, FormaPagoService>();
+builder.Services.AddScoped<IDescuentoService, DescuentoService>();
+builder.Services.AddScoped<IEstadoPagoService, EstadoPagoService>();
+builder.Services.AddScoped<ICuentaCobrarService, CuentaCobrarService>();
+builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
 
 var app = builder.Build();
 
