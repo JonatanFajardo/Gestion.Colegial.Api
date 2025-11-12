@@ -7,20 +7,20 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ConceptosPagoController : ControllerBase
+    public class DescuentosController : ControllerBase
     {
-        private readonly IConceptoPagoService _conceptoPagoService;
+        private readonly IDescuentoService _descuentoService;
 
-        public ConceptosPagoController(IConceptoPagoService conceptoPagoService)
+        public DescuentosController(IDescuentoService descuentoService)
         {
-            _conceptoPagoService = conceptoPagoService;
+            _descuentoService = descuentoService;
         }
 
         [HttpGet]
         [Route("ListAsync")]
         public async Task<IActionResult> List()
         {
-            Answer answer = await _conceptoPagoService.List();
+            Answer answer = await _descuentoService.List();
             return Ok(answer.Data);
         }
 
@@ -28,7 +28,7 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("FindAsync")]
         public async Task<IActionResult> Find(int value)
         {
-            Answer answer = await _conceptoPagoService.Find(value);
+            Answer answer = await _descuentoService.Find(value);
             return Ok(answer.Data);
         }
 
@@ -36,23 +36,23 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DetailAsync")]
         public async Task<IActionResult> Detail(int value)
         {
-            Answer answer = await _conceptoPagoService.Detail(value);
+            Answer answer = await _descuentoService.Detail(value);
             return Ok(answer.Data);
         }
 
         [HttpPost]
         [Route("CreateAsync")]
-        public async Task<IActionResult> Create([FromBody] ConceptoPagoFindDto entity)
+        public async Task<IActionResult> Create([FromBody] DescuentoFindDto entity)
         {
-            Answer answer = await _conceptoPagoService.Create(entity);
+            Answer answer = await _descuentoService.Create(entity);
             return Ok(answer.Data);
         }
 
         [HttpPut]
         [Route("EditAsync")]
-        public async Task<IActionResult> Edit([FromBody] ConceptoPagoFindDto entity)
+        public async Task<IActionResult> Edit([FromBody] DescuentoFindDto entity)
         {
-            Answer answer = await _conceptoPagoService.Edit(entity);
+            Answer answer = await _descuentoService.Edit(entity);
             return Ok(answer.Data);
         }
 
@@ -60,7 +60,7 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DeleteAsync")]
         public async Task<IActionResult> Delete(int value)
         {
-            Answer answer = await _conceptoPagoService.Delete(value);
+            Answer answer = await _descuentoService.Delete(value);
             return Ok(answer.Data);
         }
 
@@ -68,7 +68,7 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("DropdownAsync")]
         public async Task<IActionResult> Dropdown()
         {
-            Answer answer = await _conceptoPagoService.Dropdown();
+            Answer answer = await _descuentoService.Dropdown();
             return Ok(answer.Data);
         }
     }
