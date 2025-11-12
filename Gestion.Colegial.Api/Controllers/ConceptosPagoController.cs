@@ -1,5 +1,6 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs.finansas;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gestion.Colegial.Api.Controllers
@@ -41,7 +42,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
-        public async Task<IActionResult> Create([FromBody] object entity)
+        public async Task<IActionResult> Create([FromBody] ConceptoPagoFindDto entity)
         {
             Answer answer = await _conceptoPagoService.Create(entity);
             return Ok(answer.Data);
@@ -49,7 +50,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("EditAsync")]
-        public async Task<IActionResult> Edit([FromBody] object entity)
+        public async Task<IActionResult> Edit([FromBody] ConceptoPagoFindDto entity)
         {
             Answer answer = await _conceptoPagoService.Edit(entity);
             return Ok(answer.Data);

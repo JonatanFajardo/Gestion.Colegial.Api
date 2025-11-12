@@ -1,7 +1,7 @@
 ﻿using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities;
-using Gestion.Colegial.Entities.Entities.app;
+using Gestion.Colegial.Entities.DTOs;
+using Gestion.Colegial.Entities.Entities; 
 using Gestion.Colegial.Entities.Entities.dbo;
 using System.Data;
 using System.Data.SqlClient;

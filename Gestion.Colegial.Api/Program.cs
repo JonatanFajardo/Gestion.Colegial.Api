@@ -1,5 +1,6 @@
 using Gestion.Colegial.Api.Controllers;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Mapping;
 using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
@@ -10,6 +11,9 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Configure AutoMapper
+builder.Services.AddAutoMapper(typeof(DtoMappingProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -85,7 +89,7 @@ builder.Services.AddScoped<IDescuentoRepository, DescuentoRepository>();
 builder.Services.AddScoped<IEstadoPagoRepository, EstadoPagoRepository>();
 builder.Services.AddScoped<ICuentaCobrarRepository, CuentaCobrarRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
-builder.Services.AddScoped<IReporteFinancieroRepository, ReporteFinancieroRepository>();
+//builder.Services.AddScoped<IReporteFinancieroRepository, ReporteFinancieroRepository>();
 
 // Services
 builder.Services.AddTransient<ApiBaseController>();
@@ -120,7 +124,7 @@ builder.Services.AddScoped<IDescuentoService, DescuentoService>();
 builder.Services.AddScoped<IEstadoPagoService, EstadoPagoService>();
 builder.Services.AddScoped<ICuentaCobrarService, CuentaCobrarService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
-builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
+//builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
 
 var app = builder.Build();
 
