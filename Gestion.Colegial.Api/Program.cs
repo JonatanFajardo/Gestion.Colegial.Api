@@ -4,6 +4,7 @@ using Gestion.Colegial.Business.Mapping;
 using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.DataAccess.Repositories;
+using Gestion.Colegial.DataAccess.Repositories.Finanzas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -122,7 +123,7 @@ builder.Services.AddScoped<ITarifaService, TarifaService>();
 builder.Services.AddScoped<IFormaPagoService, FormaPagoService>();
 builder.Services.AddScoped<IDescuentoService, DescuentoService>();
 builder.Services.AddScoped<IEstadoPagoService, EstadoPagoService>();
-builder.Services.AddScoped<ICuentaCobrarService, CuentaCobrarService>();
+builder.Services.AddScoped<CuentaCobrarService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 //builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
 

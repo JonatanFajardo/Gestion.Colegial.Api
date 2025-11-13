@@ -4,20 +4,20 @@ using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class PagoRepository : RepositoryBase, IPagoRepository
     {
         public async Task<Answer> List()
         {
-            const string sql = "PR_tbPagos_List";
+            const string sql = "finanza.PR_tbPagos_List";
             Answer answer = await Read<PR_tbPagos_ListResult>(sql);
             return answer;
         }
 
         public async Task<Answer> ListByAlumno(int alumnoId)
         {
-            const string sql = "PR_tbPagos_ListByAlumno";
+            const string sql = "finanza.PR_tbPagos_ListByAlumno";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
             };
@@ -27,7 +27,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> ListByFecha(DateTime fecha)
         {
-            const string sql = "PR_tbPagos_ListByFecha";
+            const string sql = "finanza.PR_tbPagos_ListByFecha";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Fecha", DbType = DbType.DateTime, Value = fecha },
             };
@@ -37,7 +37,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> ListByRangoFechas(DateTime fechaInicio, DateTime fechaFin)
         {
-            const string sql = "PR_tbPagos_ListByRangoFechas";
+            const string sql = "finanza.PR_tbPagos_ListByRangoFechas";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@FechaInicio", DbType = DbType.DateTime, Value = fechaInicio },
                 new SqlParameter(){ParameterName= "@FechaFin", DbType = DbType.DateTime, Value = fechaFin },
@@ -48,7 +48,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Find(int id)
         {
-            const string sql = "PR_tbPagos_Find";
+            const string sql = "finanza.PR_tbPagos_Find";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Pag_Id", DbType = DbType.Int32, Value = id },
             };
@@ -58,7 +58,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Detail(int id)
         {
-            const string sql = "PR_tbPagos_Detail";
+            const string sql = "finanza.PR_tbPagos_Detail";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Pag_Id", DbType = DbType.Int32, Value = id },
             };
@@ -68,7 +68,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbPagos obj)
         {
-            const string sql = "PR_tbPagos_Insert";
+            const string sql = "finanza.PR_tbPagos_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = obj.Alu_Id },
                 new SqlParameter(){ParameterName= "@Enc_Id", DbType = DbType.Int32, Value = (object)obj.Enc_Id ?? DBNull.Value },
@@ -85,7 +85,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Delete(int id)
         {
-            const string sql = "PR_tbPagos_Delete";
+            const string sql = "finanza.PR_tbPagos_Delete";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Pag_Id", DbType = DbType.Int32, Value = id },
             };
@@ -95,7 +95,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> GetRecibo(int pagoId)
         {
-            const string sql = "PR_tbPagos_GetRecibo";
+            const string sql = "finanza.PR_tbPagos_GetRecibo";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Pag_Id", DbType = DbType.Int32, Value = pagoId },
             };

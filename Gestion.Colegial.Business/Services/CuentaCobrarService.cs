@@ -1,37 +1,28 @@
+using AutoMapper;
 using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs.finansas;
+using Gestion.Colegial.Entities.Entities;
+using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class CuentaCobrarService : ICuentaCobrarService
+    public class CuentaCobrarService 
     {
         private readonly ICuentaCobrarRepository _repository;
+        private readonly IMapper _mapper;
 
-        public CuentaCobrarService(ICuentaCobrarRepository repository)
+        public CuentaCobrarService(ICuentaCobrarRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
-        public async Task<Answer> List() => await ExecuteRepositoryMethod(() => _repository.List());
-        public async Task<Answer> ListByAlumno(int alumnoId) => await ExecuteRepositoryMethod(() => _repository.ListByAlumno(alumnoId));
-        public async Task<Answer> ListPendientes() => await ExecuteRepositoryMethod(() => _repository.ListPendientes());
-        public async Task<Answer> ListVencidas() => await ExecuteRepositoryMethod(() => _repository.ListVencidas());
-        public async Task<Answer> Find(int id) => await ExecuteRepositoryMethod(() => _repository.Find(id));
-        public async Task<Answer> Detail(int id) => await ExecuteRepositoryMethod(() => _repository.Detail(id));
-        public async Task<Answer> Delete(int id) => await ExecuteRepositoryMethod(() => _repository.Delete(id), MessageShow.SuccessDelete);
-        public async Task<Answer> GenerarCargosAlumno(int alumnoId, int anio) => await ExecuteRepositoryMethod(() => _repository.GenerarCargosAlumno(alumnoId, anio));
-        public async Task<Answer> AplicarDescuento(int cuentaCobrarId, int descuentoId, decimal monto, string justificacion) =>
-            await ExecuteRepositoryMethod(() => _repository.AplicarDescuento(cuentaCobrarId, descuentoId, monto, justificacion));
-        public async Task<Answer> CalcularMoratoria(int cuentaCobrarId) => await ExecuteRepositoryMethod(() => _repository.CalcularMoratoria(cuentaCobrarId));
-
-        public async Task<Answer> Create(object obj) => await ExecuteRepositoryMethod(() => _repository.Create(obj as dynamic), MessageShow.SuccessSave);
-        public async Task<Answer> Edit(object obj) => await ExecuteRepositoryMethod(() => _repository.Edit(obj as dynamic), MessageShow.SuccessEdit);
-
-        private async Task<Answer> ExecuteRepositoryMethod(Func<Task<Answer>> method, string successMessage = null)
+        public async Task<Answer> List()
         {
-            Answer answer = await method();
+            Answer answer = await _repository.List();
             try
             {
                 if (answer.Access)
@@ -40,16 +31,291 @@ namespace Gestion.Colegial.Business.Services
                     Logs.Error(answer);
                     return answer;
                 }
-                if (successMessage != null) answer.Message = successMessage;
+
+                // Mapear de PR_tbCuentasCobrar_ListResult a CuentaCobrarListDto
+                if (answer.Data is IEnumerable<PR_tbCuentasCobrar_ListResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<CuentaCobrarListDto>>(resultList);
+                }
+
                 return answer;
             }
             catch (Exception e)
             {
-                answer.Access = true;
-                answer.Message = MessageShow.Error;
-                answer.Incidents(e);
-                Logs.Error(answer);
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> Find(int id)
+        {
+            Answer answer = await _repository.Find(id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                // Mapear de PR_tbCuentasCobrar_FindResult a CuentaCobrarFindDto
+                if (answer.Data is PR_tbCuentasCobrar_FindResult result)
+                {
+                    answer.Data = _mapper.Map<CuentaCobrarFindDto>(result);
+                }
+
                 return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> Detail(int id)
+        {
+            Answer answer = await _repository.Detail(id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                // Mapear de PR_tbCuentasCobrar_DetailResult a CuentaCobrarDetailDto
+                if (answer.Data is PR_tbCuentasCobrar_DetailResult result)
+                {
+                    answer.Data = _mapper.Map<CuentaCobrarDetailDto>(result);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> ListByAlumno(int alumnoId)
+        {
+            Answer answer = await _repository.ListByAlumno(alumnoId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_tbCuentasCobrar_ListByAlumnoResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<CuentaCobrarListDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> ListPendientes() => await ExecuteSimple(() => _repository.ListPendientes(), typeof(PR_tbCuentasCobrar_ListPendientesResult), typeof(CuentaCobrarListDto));
+        public async Task<Answer> ListVencidas() => await ExecuteSimple(() => _repository.ListVencidas(), typeof(PR_tbCuentasCobrar_ListVencidasResult), typeof(CuentaCobrarListDto));
+        //public async Task<Answer> ListDeudores() => await ExecuteSimple(() => _repository.ListDeudores(), typeof(PR_tbCuentasCobrar_ListDeudoresResult), typeof(CuentaCobrarDeudorDto));
+
+        public async Task<Answer> Create(object obj)
+        {
+            var ent = CuentasCobrarConversion.Create(obj);
+            Answer answer = await _repository.Create(ent);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                answer.Message = MessageShow.SuccessSave;
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> Edit(object obj)
+        {
+            var ent = CuentasCobrarConversion.Edit(obj);
+            Answer answer = await _repository.Edit(ent);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                answer.Message = MessageShow.SuccessEdit;
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> Delete(int id)
+        {
+            Answer answer = await _repository.Delete(id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                answer.Message = MessageShow.SuccessDelete;
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> GenerarCargosAlumno(int alumnoId, int anio)
+        {
+            Answer answer = await _repository.GenerarCargosAlumno(alumnoId, anio);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> AplicarDescuento(int cuentaCobrarId, int descuentoId, decimal monto, string justificacion)
+        {
+            Answer answer = await _repository.AplicarDescuento(cuentaCobrarId, descuentoId, monto, justificacion);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> CalcularMoratoria(int cuentaCobrarId)
+        {
+            Answer answer = await _repository.CalcularMoratoria(cuentaCobrarId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> GenerarCargosMasivos(object filtros)
+        {
+            Answer answer = await _repository.GenerarCargosMasivos(filtros);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> PrevisualizarCargos(object filtros)
+        {
+            Answer answer = await _repository.PrevisualizarCargos(filtros);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        // ================================================
+        // MÉTODOS AUXILIARES
+        // ================================================
+
+        private static Answer HandleException(Answer answer, Exception e)
+        {
+            answer.Access = true;
+            answer.Message = MessageShow.Error;
+            answer.Incidents(e);
+            Logs.Error(answer);
+            return answer;
+        }
+
+        private async Task<Answer> ExecuteSimple(Func<Task<Answer>> func, Type resultType, Type dtoType)
+        {
+            Answer answer = await func();
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                var dataList = answer.Data as System.Collections.IEnumerable;
+                if (dataList != null)
+                {
+                    var mappedList = _mapper.Map(typeof(List<>).MakeGenericType(dtoType), dataList);
+                    answer.Data = mappedList;
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
             }
         }
     }
