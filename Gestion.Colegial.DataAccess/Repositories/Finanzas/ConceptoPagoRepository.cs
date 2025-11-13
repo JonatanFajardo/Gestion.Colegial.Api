@@ -4,20 +4,20 @@ using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class ConceptoPagoRepository : RepositoryBase, IConceptoPagoRepository
     {
         public async Task<Answer> List()
         {
-            const string sql = "PR_tbConceptosPago_List";
+            const string sql = "finanza.PR_tbConceptosPago_List";
             Answer answer = await Read<PR_tbConceptosPago_ListResult>(sql);
             return answer;
         }
 
         public async Task<Answer> Find(int id)
         {
-            const string sql = "PR_tbConceptosPago_Find";
+            const string sql = "finanza.PR_tbConceptosPago_Find";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = id },
             };
@@ -27,7 +27,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Detail(int id)
         {
-            const string sql = "PR_tbConceptosPago_Detail";
+            const string sql = "finanza.PR_tbConceptosPago_Detail";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = id },
             };
@@ -37,7 +37,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbConceptosPago obj)
         {
-            const string sql = "PR_tbConceptosPago_Insert";
+            const string sql = "finanza.PR_tbConceptosPago_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Descripcion", DbType = DbType.String, Value = obj.Cpa_Descripcion },
                 new SqlParameter(){ParameterName= "@Cpa_EsRecurrente", DbType = DbType.Boolean, Value = obj.Cpa_EsRecurrente },
@@ -50,7 +50,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Edit(tbConceptosPago obj)
         {
-            const string sql = "PR_tbConceptosPago_Update";
+            const string sql = "finanza.PR_tbConceptosPago_Update";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = obj.Cpa_Id },
                 new SqlParameter(){ParameterName= "@Cpa_Descripcion", DbType = DbType.String, Value = obj.Cpa_Descripcion },
@@ -64,7 +64,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Delete(int id)
         {
-            const string sql = "PR_tbConceptosPago_Delete";
+            const string sql = "finanza.PR_tbConceptosPago_Delete";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = id },
             };
@@ -74,7 +74,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Dropdown()
         {
-            const string sql = "PR_tbConceptosPago_Dropdown";
+            const string sql = "finanza.PR_tbConceptosPago_Dropdown";
             Answer answer = await Read<PR_tbConceptosPago_DropdownResult>(sql);
             return answer;
         }

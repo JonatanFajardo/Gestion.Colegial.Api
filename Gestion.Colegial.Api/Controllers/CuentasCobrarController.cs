@@ -111,5 +111,29 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _cuentaCobrarService.CalcularMoratoria(cuentaCobrarId);
             return Ok(answer.Data);
         }
+
+        [HttpGet]
+        [Route("ListDeudoresAsync")]
+        public async Task<IActionResult> ListDeudores()
+        {
+            Answer answer = await _cuentaCobrarService.ListDeudores();
+            return Ok(answer.Data);
+        }
+
+        [HttpPost]
+        [Route("GenerarCargosMasivosAsync")]
+        public async Task<IActionResult> GenerarCargosMasivos([FromBody] object filtros)
+        {
+            Answer answer = await _cuentaCobrarService.GenerarCargosMasivos(filtros);
+            return Ok(answer.Data);
+        }
+
+        [HttpPost]
+        [Route("PrevisualizarCargosAsync")]
+        public async Task<IActionResult> PrevisualizarCargos([FromBody] object filtros)
+        {
+            Answer answer = await _cuentaCobrarService.PrevisualizarCargos(filtros);
+            return Ok(answer.Data);
+        }
     }
 }
