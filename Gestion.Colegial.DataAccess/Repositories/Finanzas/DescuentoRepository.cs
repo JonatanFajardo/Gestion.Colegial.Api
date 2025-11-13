@@ -4,20 +4,20 @@ using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class DescuentoRepository : RepositoryBase, IDescuentoRepository
     {
         public async Task<Answer> List()
         {
-            const string sql = "PR_tbDescuentos_List";
+            const string sql = "finanza.PR_tbDescuentos_List";
             Answer answer = await Read<PR_tbDescuentos_ListResult>(sql);
             return answer;
         }
 
         public async Task<Answer> Find(int id)
         {
-            const string sql = "PR_tbDescuentos_Find";
+            const string sql = "finanza.PR_tbDescuentos_Find";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Des_Id", DbType = DbType.Int32, Value = id },
             };
@@ -27,7 +27,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Detail(int id)
         {
-            const string sql = "PR_tbDescuentos_Detail";
+            const string sql = "finanza.PR_tbDescuentos_Detail";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Des_Id", DbType = DbType.Int32, Value = id },
             };
@@ -37,7 +37,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbDescuentos obj)
         {
-            const string sql = "PR_tbDescuentos_Insert";
+            const string sql = "finanza.PR_tbDescuentos_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Des_Descripcion", DbType = DbType.String, Value = obj.Des_Descripcion },
                 new SqlParameter(){ParameterName= "@Des_TipoDescuento", DbType = DbType.String, Value = obj.Des_TipoDescuento },
@@ -50,7 +50,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Edit(tbDescuentos obj)
         {
-            const string sql = "PR_tbDescuentos_Update";
+            const string sql = "finanza.PR_tbDescuentos_Update";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Des_Id", DbType = DbType.Int32, Value = obj.Des_Id },
                 new SqlParameter(){ParameterName= "@Des_Descripcion", DbType = DbType.String, Value = obj.Des_Descripcion },
@@ -64,7 +64,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Delete(int id)
         {
-            const string sql = "PR_tbDescuentos_Delete";
+            const string sql = "finanza.PR_tbDescuentos_Delete";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Des_Id", DbType = DbType.Int32, Value = id },
             };
@@ -74,7 +74,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Dropdown()
         {
-            const string sql = "PR_tbDescuentos_Dropdown";
+            const string sql = "finanza.PR_tbDescuentos_Dropdown";
             Answer answer = await Read<PR_tbDescuentos_DropdownResult>(sql);
             return answer;
         }

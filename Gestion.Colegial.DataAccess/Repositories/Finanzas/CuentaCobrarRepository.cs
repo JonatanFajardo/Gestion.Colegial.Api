@@ -4,20 +4,20 @@ using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class CuentaCobrarRepository : RepositoryBase, ICuentaCobrarRepository
     {
         public async Task<Answer> List()
         {
-            const string sql = "PR_tbCuentasCobrar_List";
+            const string sql = "finanza.PR_tbCuentasCobrar_List";
             Answer answer = await Read<PR_tbCuentasCobrar_ListResult>(sql);
             return answer;
         }
 
         public async Task<Answer> ListByAlumno(int alumnoId)
         {
-            const string sql = "PR_tbCuentasCobrar_ListByAlumno";
+            const string sql = "finanza.PR_tbCuentasCobrar_ListByAlumno";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
             };
@@ -27,21 +27,21 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> ListPendientes()
         {
-            const string sql = "PR_tbCuentasCobrar_ListPendientes";
+            const string sql = "finanza.PR_tbCuentasCobrar_ListPendientes";
             Answer answer = await Read<PR_tbCuentasCobrar_ListPendientesResult>(sql);
             return answer;
         }
 
         public async Task<Answer> ListVencidas()
         {
-            const string sql = "PR_tbCuentasCobrar_ListVencidas";
+            const string sql = "finanza.PR_tbCuentasCobrar_ListVencidas";
             Answer answer = await Read<PR_tbCuentasCobrar_ListVencidasResult>(sql);
             return answer;
         }
 
         public async Task<Answer> Find(int id)
         {
-            const string sql = "PR_tbCuentasCobrar_Find";
+            const string sql = "finanza.PR_tbCuentasCobrar_Find";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = id },
             };
@@ -51,7 +51,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Detail(int id)
         {
-            const string sql = "PR_tbCuentasCobrar_Detail";
+            const string sql = "finanza.PR_tbCuentasCobrar_Detail";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = id },
             };
@@ -61,7 +61,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbCuentasCobrar obj)
         {
-            const string sql = "PR_tbCuentasCobrar_Insert";
+            const string sql = "finanza.PR_tbCuentasCobrar_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = obj.Alu_Id },
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = obj.Cpa_Id },
@@ -77,7 +77,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Edit(tbCuentasCobrar obj)
         {
-            const string sql = "PR_tbCuentasCobrar_Update";
+            const string sql = "finanza.PR_tbCuentasCobrar_Update";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = obj.Cco_Id },
                 new SqlParameter(){ParameterName= "@Cco_MontoOriginal", DbType = DbType.Decimal, Value = obj.Cco_MontoOriginal },
@@ -93,7 +93,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Delete(int id)
         {
-            const string sql = "PR_tbCuentasCobrar_Delete";
+            const string sql = "finanza.PR_tbCuentasCobrar_Delete";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = id },
             };
@@ -103,7 +103,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> GenerarCargosAlumno(int alumnoId, int anio)
         {
-            const string sql = "PR_tbCuentasCobrar_GenerarCargosAlumno";
+            const string sql = "finanza.PR_tbCuentasCobrar_GenerarCargosAlumno";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
                 new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int32, Value = anio },
@@ -114,7 +114,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> AplicarDescuento(int cuentaCobrarId, int descuentoId, decimal monto, string justificacion)
         {
-            const string sql = "PR_tbCuentasCobrar_AplicarDescuento";
+            const string sql = "finanza.PR_tbCuentasCobrar_AplicarDescuento";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = cuentaCobrarId },
                 new SqlParameter(){ParameterName= "@Des_Id", DbType = DbType.Int32, Value = descuentoId },
@@ -127,11 +127,47 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> CalcularMoratoria(int cuentaCobrarId)
         {
-            const string sql = "PR_tbCuentasCobrar_CalcularMoratoria";
+            const string sql = "finanza.PR_tbCuentasCobrar_CalcularMoratoria";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cco_Id", DbType = DbType.Int32, Value = cuentaCobrarId },
             };
             Answer answer = await New(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> ListDeudores()
+        {
+            const string sql = "finanza.PR_tbCuentasCobrar_ListDeudores";
+            Answer answer = await Read<PR_tbCuentasCobrar_ListDeudoresResult>(sql);
+            return answer;
+        }
+
+        public async Task<Answer> GenerarCargosMasivos(object filtros)
+        {
+            const string sql = "finanza.PR_tbCuentasCobrar_GenerarCargosMasivos";
+            dynamic f = filtros;
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int32, Value = f.anio },
+                new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = (object)f.nivelId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = (object)f.cursoId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = (object)f.seccionId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@ConceptosIds", DbType = DbType.String, Value = string.Join(",", f.conceptos) },
+            };
+            Answer answer = await New(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> PrevisualizarCargos(object filtros)
+        {
+            const string sql = "finanza.PR_tbCuentasCobrar_PrevisualizarCargos";
+            dynamic f = filtros;
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int32, Value = f.anio },
+                new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = (object)f.nivelId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = (object)f.cursoId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = (object)f.seccionId ?? DBNull.Value },
+            };
+            Answer answer = await Read<PR_tbCuentasCobrar_PrevisualizarCargosResult>(sql, sqlParameters);
             return answer;
         }
     }

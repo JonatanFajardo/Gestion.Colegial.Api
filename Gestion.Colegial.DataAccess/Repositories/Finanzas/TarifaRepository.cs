@@ -4,20 +4,20 @@ using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class TarifaRepository : RepositoryBase, ITarifaRepository
     {
         public async Task<Answer> List()
         {
-            const string sql = "PR_tbTarifas_List";
+            const string sql = "finanza.PR_tbTarifas_List";
             Answer answer = await Read<PR_tbTarifas_ListResult>(sql);
             return answer;
         }
 
         public async Task<Answer> Find(int id)
         {
-            const string sql = "PR_tbTarifas_Find";
+            const string sql = "finanza.PR_tbTarifas_Find";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Tar_Id", DbType = DbType.Int32, Value = id },
             };
@@ -27,7 +27,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Detail(int id)
         {
-            const string sql = "PR_tbTarifas_Detail";
+            const string sql = "finanza.PR_tbTarifas_Detail";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Tar_Id", DbType = DbType.Int32, Value = id },
             };
@@ -37,7 +37,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbTarifas obj)
         {
-            const string sql = "PR_tbTarifas_Insert";
+            const string sql = "finanza.PR_tbTarifas_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = obj.Cpa_Id },
                 new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = obj.Niv_Id },
@@ -52,7 +52,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Edit(tbTarifas obj)
         {
-            const string sql = "PR_tbTarifas_Update";
+            const string sql = "finanza.PR_tbTarifas_Update";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Tar_Id", DbType = DbType.Int32, Value = obj.Tar_Id },
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = obj.Cpa_Id },
@@ -68,7 +68,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Delete(int id)
         {
-            const string sql = "PR_tbTarifas_Delete";
+            const string sql = "finanza.PR_tbTarifas_Delete";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Tar_Id", DbType = DbType.Int32, Value = id },
             };
@@ -78,7 +78,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> GetByConceptoAndNivel(int conceptoId, int nivelId, int anio)
         {
-            const string sql = "PR_tbTarifas_GetByConceptoAndNivel";
+            const string sql = "finanza.PR_tbTarifas_GetByConceptoAndNivel";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = conceptoId },
                 new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = nivelId },
