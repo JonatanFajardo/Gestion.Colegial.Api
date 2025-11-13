@@ -10,8 +10,17 @@ namespace Gestion.Colegial.Entities.Entities
     /// </summary>
     public partial class tbEncargados_tbAlumnos
     {
+        /// <summary>
+        /// Identificador único del encargado.
+        /// </summary>
         public int Enc_Id { get; set; }
+        /// <summary>
+        /// Identificador único del alumno.
+        /// </summary>
         public int Alu_Id { get; set; }
+        /// <summary>
+        /// Identificador único del parcial.
+        /// </summary>
         public int Par_Id { get; set; }
 
         public virtual tbAlumnos Alu { get; set; }

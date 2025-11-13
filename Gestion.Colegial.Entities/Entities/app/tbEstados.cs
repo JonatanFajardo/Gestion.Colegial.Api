@@ -23,10 +23,26 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información del estado actual del alumno en el instituto.
         /// </summary>
         public string Est_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el estado ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool Est_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el estado.
+        /// </summary>
         public int Est_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del estado.
+        /// </summary>
         public DateTime Est_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el estado.
+        /// </summary>
         public int? Est_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del estado.
+        /// </summary>
         public DateTime? Est_FechaModifica { get; set; }
 
         public virtual tbUsuarios Est_UsuarioModificaNavigation { get; set; }

@@ -14,6 +14,8 @@ namespace Gestion.Colegial.Entities.Entities
         {
             tbAlumnos = new HashSet<tbAlumnos>();
             tbCursos_tbSecciones = new HashSet<tbCursos_tbSecciones>();
+            tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
         }
 
         /// <summary>
@@ -24,15 +26,32 @@ namespace Gestion.Colegial.Entities.Entities
         /// Nombre de la sección.
         /// </summary>
         public string Sec_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si la sección ha sido eliminada (1) o no (0).
+        /// </summary>
         public bool Sec_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la sección.
+        /// </summary>
         public int Sec_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la sección.
+        /// </summary>
         public DateTime Sec_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la sección.
+        /// </summary>
         public int? Sec_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la sección.
+        /// </summary>
         public DateTime? Sec_FechaModifica { get; set; }
 
         public virtual tbUsuarios Sec_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Sec_UsuarioRegistraNavigation { get; set; }
         public virtual ICollection<tbAlumnos> tbAlumnos { get; set; }
         public virtual ICollection<tbCursos_tbSecciones> tbCursos_tbSecciones { get; set; }
+        public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
     }
 }

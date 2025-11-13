@@ -1,7 +1,8 @@
-namespace Gestion.Colegial.Entities.DTOs.finansas;
-
-public class ReciboExistDto
+namespace Gestion.Colegial.Entities.DTOs.finansas
 {
-    public bool Existe { get; set; }
-    public string? Mensaje { get; set; }
+    public class ReciboExistDto
+    {
+        public bool Existe { get; set; }
+        public string Mensaje { get; set; }
+    }
 }

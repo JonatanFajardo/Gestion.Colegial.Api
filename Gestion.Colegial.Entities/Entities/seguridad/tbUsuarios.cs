@@ -45,16 +45,49 @@ namespace Gestion.Colegial.Entities.Entities
             tbTitulosTit_UsuarioRegistraNavigation = new HashSet<tbTitulos>();
         }
 
+        /// <summary>
+        /// Identificador único del usuario.
+        /// </summary>
         public int Usu_Id { get; set; }
+        /// <summary>
+        /// Identificador del empleado asociado al usuario.
+        /// </summary>
         public int Emp_Id { get; set; }
+        /// <summary>
+        /// Nombre de usuario.
+        /// </summary>
         public string Usu_Name { get; set; }
+        /// <summary>
+        /// Contraseña del usuario (normalmente encriptada).
+        /// </summary>
         public string Usu_Contraseña { get; set; }
+        /// <summary>
+        /// Identificador del rol del usuario.
+        /// </summary>
         public int Rol_Id { get; set; }
+        /// <summary>
+        /// Dirección IP del usuario.
+        /// </summary>
         public string Usu_Ip { get; set; }
+        /// <summary>
+        /// Indica si el usuario está activo (1) o no (0).
+        /// </summary>
         public bool Usu_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si el usuario está suspendido (1) o no (0).
+        /// </summary>
         public bool? Usu_Suspendido { get; set; }
+        /// <summary>
+        /// Indica si el usuario ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool? Usu_EsEliminado { get; set; }
+        /// <summary>
+        /// Fecha y hora de creación del usuario.
+        /// </summary>
         public DateTime? Usu_FechaCreacion { get; set; }
+        /// <summary>
+        /// Fecha y hora de la última modificación del usuario.
+        /// </summary>
         public DateTime? Usu_fechaModificacion { get; set; }
 
         public virtual ICollection<tbAulas> tbAulasAul_UsuarioModificaNavigation { get; set; }

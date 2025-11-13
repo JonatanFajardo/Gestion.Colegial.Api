@@ -1,7 +1,8 @@
-namespace Gestion.Colegial.Entities.DTOs.finansas;
-
-public class TarifaExistDto
+namespace Gestion.Colegial.Entities.DTOs.finansas
 {
-    public bool Existe { get; set; }
-    public string? Mensaje { get; set; }
+    public class TarifaExistDto
+    {
+        public bool Existe { get; set; }
+        public string Mensaje { get; set; }
+    }
 }

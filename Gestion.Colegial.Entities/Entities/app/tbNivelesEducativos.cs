@@ -25,11 +25,29 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información de el nivel del alumno.
         /// </summary>
         public string Niv_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el nivel educativo está activo (1) o no (0).
+        /// </summary>
         public bool Niv_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si el nivel educativo ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Niv_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el nivel educativo.
+        /// </summary>
         public int Niv_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del nivel educativo.
+        /// </summary>
         public DateTime Niv_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el nivel educativo.
+        /// </summary>
         public int? Niv_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del nivel educativo.
+        /// </summary>
         public DateTime? Niv_FechaModifica { get; set; }
 
         public virtual tbUsuarios Niv_UsuarioModificaNavigation { get; set; }

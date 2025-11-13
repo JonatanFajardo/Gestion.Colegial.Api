@@ -54,11 +54,11 @@ namespace Gestion.Colegial.Entities.Entities
         /// </summary>
         public string Per_CorreoElectronico { get; set; }
         /// <summary>
-        /// Almacena una serie de digitos de telefono.
+        /// Almacena una serie de digitos de teléfono.
         /// </summary>
         public string Per_Telefono { get; set; }
         /// <summary>
-        /// Información sobre una direccion aproximada.
+        /// Información sobre una dirección aproximada.
         /// </summary>
         public string Per_Direccion { get; set; }
         /// <summary>
@@ -69,10 +69,26 @@ namespace Gestion.Colegial.Entities.Entities
         /// Indica el estado actual de la persona.
         /// </summary>
         public bool Per_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si la persona ha sido eliminada (1) o no (0).
+        /// 
+        /// </summary>
         public bool Per_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la persona.
+        /// </summary>
         public int Per_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la persona.
+        /// </summary>
         public DateTime Per_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la persona.
+        /// </summary>
         public int? Per_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la persona.
+        /// </summary>
         public DateTime? Per_FechaModifica { get; set; }
 
         public virtual tbUsuarios Per_UsuarioModificaNavigation { get; set; }
