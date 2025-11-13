@@ -42,7 +42,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Des_Descripcion", DbType = DbType.String, Value = obj.Des_Descripcion },
                 new SqlParameter(){ParameterName= "@Des_TipoDescuento", DbType = DbType.String, Value = obj.Des_TipoDescuento },
                 new SqlParameter(){ParameterName= "@Des_Valor", DbType = DbType.Decimal, Value = obj.Des_Valor },
-                new SqlParameter(){ParameterName= "@Des_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Des_UsuarioRegistra },
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;
@@ -56,7 +55,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Des_Descripcion", DbType = DbType.String, Value = obj.Des_Descripcion },
                 new SqlParameter(){ParameterName= "@Des_TipoDescuento", DbType = DbType.String, Value = obj.Des_TipoDescuento },
                 new SqlParameter(){ParameterName= "@Des_Valor", DbType = DbType.Decimal, Value = obj.Des_Valor },
-                new SqlParameter(){ParameterName= "@Des_UsuarioModifica", DbType = DbType.Int32, Value = obj.Des_UsuarioModifica },
             };
             Answer answer = await Update(sql, sqlParameters);
             return answer;

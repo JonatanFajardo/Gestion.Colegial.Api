@@ -38,18 +38,45 @@ namespace Gestion.Colegial.Entities.Entities
         /// Identificador del dia.
         /// </summary>
         public int Dia_Id { get; set; }
+        /// <summary>
+        /// Indica si el horario del alumno ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool HoAl_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el horario del alumno.
+        /// </summary>
         public int HoAl_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del horario del alumno.
+        /// </summary>
         public DateTime HoAl_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el horario del alumno.
+        /// </summary>
         public int? HoAl_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del horario del alumno.
+        /// </summary>
         public DateTime? HoAl_FechaModifica { get; set; }
+        public int Sec_Id { get; set; }
+        public int Aul_Id { get; set; }
+        public int Emp_Id { get; set; }
+        public int Sem_Id { get; set; }
+        public int? Mda_Id { get; set; }
+        public int HoAl_Año { get; set; }
 
+        public virtual tbAulas Aul { get; set; }
         public virtual tbCursosNiveles Cun { get; set; }
         public virtual tbDias Dia { get; set; }
+        public virtual tbEmpleados Emp { get; set; }
         public virtual tbHoras HoAl_HoraFinalizaNavigation { get; set; }
         public virtual tbHoras HoAl_HoraInicioNavigation { get; set; }
         public virtual tbUsuarios HoAl_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios HoAl_UsuarioRegistraNavigation { get; set; }
         public virtual tbMaterias Mat { get; set; }
+        public virtual tbModalidades Mda { get; set; }
+        public virtual tbSecciones Sec { get; set; }
+        public virtual tbSemestres Sem { get; set; }
     }
 }

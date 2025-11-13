@@ -26,10 +26,25 @@ namespace Gestion.Colegial.Entities.Entities
         /// Descripción de la hora indicada.
         /// </summary>
         public string Hor_Hora { get; set; }
+        /// <summary>
+        /// Indica si la hora ha sido eliminada (1) o no (0).
+        /// </summary>
         public bool Hor_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la hora.
+        /// </summary>
         public int Hor_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la hora.
+        /// </summary>
         public DateTime Hor_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la hora.
+        /// </summary>
         public int? Hor_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la hora.
+        /// </summary>
         public DateTime? Hor_FechaModifica { get; set; }
 
         public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnosHoAl_HoraFinalizaNavigation { get; set; }

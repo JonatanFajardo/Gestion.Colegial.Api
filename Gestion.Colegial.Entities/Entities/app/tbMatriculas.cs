@@ -7,7 +7,13 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class tbMatriculas
     {
+        /// <summary>
+        /// Identificador único de la matricula.
+        /// </summary>
         public int? Matri_Id { get; set; }
+        /// <summary>
+        /// Identificador único del alumno.
+        /// </summary>
         public int? Alu_Id { get; set; }
     }
 }

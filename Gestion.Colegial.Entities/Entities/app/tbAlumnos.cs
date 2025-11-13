@@ -47,7 +47,14 @@ namespace Gestion.Colegial.Entities.Entities
         /// Indica el identificador único de tbEstados.
         /// </summary>
         public int Est_Id { get; set; }
+        /// <summary>
+        /// Año en que se cursó el ciclo.
+        /// 
+        /// </summary>
         public int? AnioCursado { get; set; }
+        /// <summary>
+        /// Promedio anual del alumno.
+        /// </summary>
         public decimal? PromedioAnual { get; set; }
 
         public virtual tbCursosNiveles Cun { get; set; }

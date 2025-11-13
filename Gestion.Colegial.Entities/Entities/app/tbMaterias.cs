@@ -13,6 +13,7 @@ namespace Gestion.Colegial.Entities.Entities
         public tbMaterias()
         {
             tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
             tbNotas = new HashSet<tbNotas>();
             Cur = new HashSet<tbCursos>();
             Emp = new HashSet<tbEmpleados>();
@@ -34,16 +35,32 @@ namespace Gestion.Colegial.Entities.Entities
         /// Valor que indica si este registro sera visible.
         /// </summary>
         public bool Mat_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si la materia ha sido eliminada (1) o no (0).
+        /// </summary>
         public bool Mat_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la materia.
+        /// </summary>
         public int Mat_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la materia.
+        /// </summary>
         public DateTime Mat_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la materia.
+        /// </summary>
         public int? Mat_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la materia.
+        /// </summary>
         public DateTime? Mat_FechaModifica { get; set; }
 
         public virtual tbDuraciones Dur { get; set; }
         public virtual tbUsuarios Mat_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Mat_UsuarioRegistraNavigation { get; set; }
         public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
         public virtual ICollection<tbNotas> tbNotas { get; set; }
 
         public virtual ICollection<tbCursos> Cur { get; set; }
