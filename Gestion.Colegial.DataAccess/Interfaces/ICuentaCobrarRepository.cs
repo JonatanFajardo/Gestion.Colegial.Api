@@ -17,5 +17,8 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> GenerarCargosAlumno(int alumnoId, int anio);
         Task<Answer> AplicarDescuento(int cuentaCobrarId, int descuentoId, decimal monto, string justificacion);
         Task<Answer> CalcularMoratoria(int cuentaCobrarId);
+        Task<Answer> ListDeudores();
+        Task<Answer> GenerarCargosMasivos(object filtros);
+        Task<Answer> PrevisualizarCargos(object filtros);
     }
 }
