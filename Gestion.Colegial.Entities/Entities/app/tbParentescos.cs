@@ -23,10 +23,25 @@ namespace Gestion.Colegial.Entities.Entities
         /// Descripción sobre el parentesco sangíneo o no sangíneo del encargado.
         /// </summary>
         public string Par_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el parentesco ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Par_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el parentesco.
+        /// </summary>
         public int Par_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del parentesco.
+        /// </summary>
         public DateTime Par_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el parentesco.
+        /// </summary>
         public int? Par_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del parentesco.
+        /// </summary>
         public DateTime? Par_FechaModifica { get; set; }
 
         public virtual tbUsuarios Par_UsuarioModificaNavigation { get; set; }

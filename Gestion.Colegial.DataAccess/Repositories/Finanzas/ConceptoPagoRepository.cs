@@ -41,8 +41,7 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Cpa_Descripcion", DbType = DbType.String, Value = obj.Cpa_Descripcion },
                 new SqlParameter(){ParameterName= "@Cpa_EsRecurrente", DbType = DbType.Boolean, Value = obj.Cpa_EsRecurrente },
-                new SqlParameter(){ParameterName= "@Cpa_EsObligatorio", DbType = DbType.Boolean, Value = obj.Cpa_EsObligatorio },
-                new SqlParameter(){ParameterName= "@Cpa_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Cpa_UsuarioRegistra },
+                new SqlParameter(){ParameterName= "@Cpa_EsObligatorio", DbType = DbType.Boolean, Value = obj.Cpa_EsObligatorio }, 
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;
@@ -55,8 +54,7 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Cpa_Id", DbType = DbType.Int32, Value = obj.Cpa_Id },
                 new SqlParameter(){ParameterName= "@Cpa_Descripcion", DbType = DbType.String, Value = obj.Cpa_Descripcion },
                 new SqlParameter(){ParameterName= "@Cpa_EsRecurrente", DbType = DbType.Boolean, Value = obj.Cpa_EsRecurrente },
-                new SqlParameter(){ParameterName= "@Cpa_EsObligatorio", DbType = DbType.Boolean, Value = obj.Cpa_EsObligatorio },
-                new SqlParameter(){ParameterName= "@Cpa_UsuarioModifica", DbType = DbType.Int32, Value = obj.Cpa_UsuarioModifica },
+                new SqlParameter(){ParameterName= "@Cpa_EsObligatorio", DbType = DbType.Boolean, Value = obj.Cpa_EsObligatorio }, 
             };
             Answer answer = await Update(sql, sqlParameters);
             return answer;

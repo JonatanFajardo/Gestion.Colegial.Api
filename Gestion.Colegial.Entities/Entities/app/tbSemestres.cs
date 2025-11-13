@@ -12,6 +12,8 @@ namespace Gestion.Colegial.Entities.Entities
     {
         public tbSemestres()
         {
+            tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
             tbNotas = new HashSet<tbNotas>();
         }
 
@@ -23,15 +25,35 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información sobre cual es el semestre.
         /// </summary>
         public string Sem_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el semestre está activo (1) o no (0).
+        /// </summary>
         public bool Sem_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si el semestre ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Sem_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el semestre.
+        /// </summary>
         public int Sem_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del semestre.
+        /// </summary>
         public DateTime Sem_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el semestre.
+        /// </summary>
         public int? Sem_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del semestre.
+        /// </summary>
         public DateTime? Sem_FechaModifica { get; set; }
 
         public virtual tbUsuarios Sem_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Sem_UsuarioRegistraNavigation { get; set; }
+        public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
         public virtual ICollection<tbNotas> tbNotas { get; set; }
     }
 }

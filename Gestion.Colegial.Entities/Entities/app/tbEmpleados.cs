@@ -12,6 +12,8 @@ namespace Gestion.Colegial.Entities.Entities
     {
         public tbEmpleados()
         {
+            tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
             Mat = new HashSet<tbMaterias>();
         }
 
@@ -35,12 +37,17 @@ namespace Gestion.Colegial.Entities.Entities
         /// Identificador de la tabla tbCargos. 
         /// </summary>
         public int Car_Id { get; set; }
+        /// <summary>
+        /// Identificador único del departamento de empleados.
+        /// </summary>
         public int? Dep_Id { get; set; }
 
         public virtual tbCargos Car { get; set; }
         public virtual tbDepartamentoEmpleados Dep { get; set; }
         public virtual tbPersonas Per { get; set; }
         public virtual tbTitulos Tit { get; set; }
+        public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
 
         public virtual ICollection<tbMaterias> Mat { get; set; }
     }

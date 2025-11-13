@@ -23,10 +23,25 @@ namespace Gestion.Colegial.Entities.Entities
         /// Nombre que tiene el titulo.
         /// </summary>
         public string Tit_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el título ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Tit_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el título.
+        /// </summary>
         public int Tit_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del título.
+        /// </summary>
         public DateTime Tit_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el título.
+        /// </summary>
         public int? Tit_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del título.
+        /// </summary>
         public DateTime? Tit_FechaModifica { get; set; }
 
         public virtual tbUsuarios Tit_UsuarioModificaNavigation { get; set; }

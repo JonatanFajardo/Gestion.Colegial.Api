@@ -69,7 +69,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Cco_MontoOriginal", DbType = DbType.Decimal, Value = obj.Cco_MontoOriginal },
                 new SqlParameter(){ParameterName= "@Cco_FechaEmision", DbType = DbType.DateTime, Value = obj.Cco_FechaEmision },
                 new SqlParameter(){ParameterName= "@Cco_FechaVencimiento", DbType = DbType.DateTime, Value = obj.Cco_FechaVencimiento },
-                new SqlParameter(){ParameterName= "@Cco_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Cco_UsuarioRegistra },
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;
@@ -85,7 +84,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Cco_MontoMora", DbType = DbType.Decimal, Value = obj.Cco_MontoMora },
                 new SqlParameter(){ParameterName= "@Cco_FechaVencimiento", DbType = DbType.DateTime, Value = obj.Cco_FechaVencimiento },
                 new SqlParameter(){ParameterName= "@Epa_Id", DbType = DbType.Int32, Value = obj.Epa_Id },
-                new SqlParameter(){ParameterName= "@Cco_UsuarioModifica", DbType = DbType.Int32, Value = obj.Cco_UsuarioModifica },
             };
             Answer answer = await Update(sql, sqlParameters);
             return answer;

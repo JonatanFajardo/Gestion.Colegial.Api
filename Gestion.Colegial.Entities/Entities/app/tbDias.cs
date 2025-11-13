@@ -14,7 +14,6 @@ namespace Gestion.Colegial.Entities.Entities
         {
             tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
             tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
-            tbModalidad_tbDias = new HashSet<tbModalidad_tbDias>();
         }
 
         /// <summary>
@@ -25,16 +24,34 @@ namespace Gestion.Colegial.Entities.Entities
         /// Nombre del dia.
         /// </summary>
         public string Dia_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el día ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool Dia_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el día.
+        /// 
+        /// </summary>
         public int Dia_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del día.
+        /// 
+        /// </summary>
         public DateTime Dia_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el día.
+        /// 
+        /// </summary>
         public int? Dia_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del día.
+        /// </summary>
         public DateTime? Dia_FechaModifica { get; set; }
 
         public virtual tbUsuarios Dia_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Dia_UsuarioRegistraNavigation { get; set; }
         public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
         public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
-        public virtual ICollection<tbModalidad_tbDias> tbModalidad_tbDias { get; set; }
     }
 }

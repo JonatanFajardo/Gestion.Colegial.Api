@@ -40,7 +40,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
             const string sql = "finanza.PR_tbFormasPago_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Fpa_Descripcion", DbType = DbType.String, Value = obj.Fpa_Descripcion },
-                new SqlParameter(){ParameterName= "@Fpa_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Fpa_UsuarioRegistra },
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;
@@ -52,7 +51,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Fpa_Id", DbType = DbType.Int32, Value = obj.Fpa_Id },
                 new SqlParameter(){ParameterName= "@Fpa_Descripcion", DbType = DbType.String, Value = obj.Fpa_Descripcion },
-                new SqlParameter(){ParameterName= "@Fpa_UsuarioModifica", DbType = DbType.Int32, Value = obj.Fpa_UsuarioModifica },
             };
             Answer answer = await Update(sql, sqlParameters);
             return answer;

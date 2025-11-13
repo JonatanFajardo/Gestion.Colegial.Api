@@ -50,10 +50,25 @@ namespace Gestion.Colegial.Entities.Entities
         /// Estado de la nota.
         /// </summary>
         public bool Not_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si la nota ha sido eliminada (1) o no (0).
+        /// </summary>
         public bool Not_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la nota.
+        /// </summary>
         public int Not_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la nota.
+        /// </summary>
         public DateTime Not_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la nota.
+        /// </summary>
         public int? Not_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la nota.
+        /// </summary>
         public DateTime? Not_FechaModifica { get; set; }
 
         public virtual tbMaterias Mat { get; set; }

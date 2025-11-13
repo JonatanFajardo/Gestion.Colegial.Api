@@ -77,7 +77,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Pag_FechaPago", DbType = DbType.DateTime, Value = obj.Pag_FechaPago },
                 new SqlParameter(){ParameterName= "@Pag_NumeroReferencia", DbType = DbType.String, Value = (object)obj.Pag_NumeroReferencia ?? DBNull.Value },
                 new SqlParameter(){ParameterName= "@Pag_Observaciones", DbType = DbType.String, Value = (object)obj.Pag_Observaciones ?? DBNull.Value },
-                new SqlParameter(){ParameterName= "@Pag_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Pag_UsuarioRegistra },
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;

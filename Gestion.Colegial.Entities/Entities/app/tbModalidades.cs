@@ -13,7 +13,8 @@ namespace Gestion.Colegial.Entities.Entities
         public tbModalidades()
         {
             tbAlumnos = new HashSet<tbAlumnos>();
-            tbModalidad_tbDias = new HashSet<tbModalidad_tbDias>();
+            tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
             Cun = new HashSet<tbCursosNiveles>();
             Cur = new HashSet<tbCursos>();
         }
@@ -26,16 +27,32 @@ namespace Gestion.Colegial.Entities.Entities
         /// Descripción por el cual se conoce la modalidad.
         /// </summary>
         public string Mda_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si la modalidad ha sido eliminada (1) o no (0).
+        /// </summary>
         public bool Mda_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la modalidad.
+        /// </summary>
         public int Mda_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la modalidad.
+        /// </summary>
         public DateTime Mda_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la modalidad.
+        /// </summary>
         public int? Mda_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la modalidad.
+        /// </summary>
         public DateTime? Mda_FechaModifica { get; set; }
 
         public virtual tbUsuarios Mda_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Mda_UsuarioRegistraNavigation { get; set; }
         public virtual ICollection<tbAlumnos> tbAlumnos { get; set; }
-        public virtual ICollection<tbModalidad_tbDias> tbModalidad_tbDias { get; set; }
+        public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
 
         public virtual ICollection<tbCursosNiveles> Cun { get; set; }
         public virtual ICollection<tbCursos> Cur { get; set; }

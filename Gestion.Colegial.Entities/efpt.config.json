@@ -4,7 +4,7 @@
    "ContextNamespace": null,
    "FilterSchemas": false,
    "IncludeConnectionString": true,
-   "ModelNamespace": null,
+   "ModelNamespace": "Entities",
    "OutputContextPath": null,
    "OutputPath": "Entities",
    "PreserveCasingWithRegex": true,
@@ -107,10 +107,6 @@
          "ObjectType": 0
       },
       {
-         "Name": "[app].[tbModalidad_tbDias]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[app].[tbModalidades]",
          "ObjectType": 0
       },
@@ -179,11 +175,55 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[tbCursosDetalles]",
+         "Name": "[finanza].[tbConceptosPago]",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[tbEventoError]",
+         "Name": "[finanza].[tbCuentasCobrar]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbCuentasCobrarHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbDescuentos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbDescuentosAplicados]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbEstadosPago]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbFormasPago]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbMoratorias]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbPagos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbPagosDetalle]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbPagosHistorial]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbRecibos]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[finanza].[tbTarifas]",
          "ObjectType": 0
       },
       {
@@ -953,6 +993,294 @@
       {
          "Name": "[dbo].[PR_tbUsuarios_List_Segurity]",
          "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbConceptosPago_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbConceptosPago_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbConceptosPago_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbConceptosPago_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbConceptosPago_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentos_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_ListByCuenta]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbDescuentosAplicados_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbEstadosPago_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbFormasPago_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_ListByCuenta]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbMoratorias_Update]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagosDetalle_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagosDetalle_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbPagosDetalle_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbRecibos_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbRecibos_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbRecibos_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbRecibos_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbRecibos_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Delete]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Detail]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Dropdown]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Exist]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Find]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_GetByConceptoAndNivel]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Insert]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbTarifas_Update]",
+         "ObjectType": 1
       }
    ],
    "UiHint": null,
@@ -960,6 +1288,7 @@
    "UseAsyncStoredProcedureCalls": true,
    "UseBoolPropertiesWithoutDefaultSql": true,
    "UseDatabaseNames": true,
+   "UseDatabaseNamesForRoutines": true,
    "UseDateOnlyTimeOnly": false,
    "UseDbContextSplitting": false,
    "UseDecimalDataAnnotationForSprocResult": true,
@@ -967,6 +1296,7 @@
    "UseHandleBars": false,
    "UseHierarchyId": false,
    "UseInflector": false,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
    "UseLegacyPluralizer": false,
    "UseManyToManyEntity": false,
    "UseNoDefaultConstructor": false,
@@ -978,5 +1308,6 @@
    "UseSchemaFolders": true,
    "UseSchemaNamespaces": false,
    "UseSpatial": false,
-   "UseT4": false
+   "UseT4": false,
+   "UseT4Split": false
 }

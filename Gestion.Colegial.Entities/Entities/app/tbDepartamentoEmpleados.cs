@@ -12,7 +12,14 @@ namespace Gestion.Colegial.Entities.Entities
             tbEmpleados = new HashSet<tbEmpleados>();
         }
 
+        /// <summary>
+        /// Identificador único del departamento.
+        /// 
+        /// </summary>
         public int Dep_Id { get; set; }
+        /// <summary>
+        /// Nombre del departamento.
+        /// </summary>
         public string Nombre { get; set; }
 
         public virtual ICollection<tbEmpleados> tbEmpleados { get; set; }

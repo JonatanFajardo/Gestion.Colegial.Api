@@ -34,16 +34,48 @@ namespace Gestion.Colegial.Entities.Entities
         /// Identificador único.
         /// </summary>
         public int Dia_Id { get; set; }
+        /// <summary>
+        /// Indica si el horario del profesor ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool HoPr_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el horario del profesor.
+        /// 
+        /// </summary>
         public int HoPr_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del horario del profesor.
+        /// 
+        /// </summary>
         public DateTime HoPr_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el horario del profesor.
+        /// 
+        /// </summary>
         public int? HoPr_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del horario del profesor.
+        /// </summary>
         public DateTime? HoPr_FechaModifica { get; set; }
+        public int Mat_Id { get; set; }
+        public int Emp_Id { get; set; }
+        public int Sec_Id { get; set; }
+        public int Aul_Id { get; set; }
+        public int Sem_Id { get; set; }
+        public int? Mda_Id { get; set; }
+        public int HoPr_Año { get; set; }
 
+        public virtual tbAulas Aul { get; set; }
         public virtual tbCursosNiveles Cun { get; set; }
         public virtual tbCursos Cur { get; set; }
         public virtual tbDias Dia { get; set; }
+        public virtual tbEmpleados Emp { get; set; }
         public virtual tbHoras HoPr_HoraFinalizaNavigation { get; set; }
         public virtual tbHoras HoPr_HoraInicioNavigation { get; set; }
+        public virtual tbMaterias Mat { get; set; }
+        public virtual tbModalidades Mda { get; set; }
+        public virtual tbSecciones Sec { get; set; }
+        public virtual tbSemestres Sem { get; set; }
     }
 }

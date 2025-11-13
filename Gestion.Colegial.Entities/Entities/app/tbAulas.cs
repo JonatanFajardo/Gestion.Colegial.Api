@@ -13,6 +13,8 @@ namespace Gestion.Colegial.Entities.Entities
         public tbAulas()
         {
             tbCursos_tbSecciones = new HashSet<tbCursos_tbSecciones>();
+            tbHorarioAlumnos = new HashSet<tbHorarioAlumnos>();
+            tbHorarioProfesores = new HashSet<tbHorarioProfesores>();
         }
 
         /// <summary>
@@ -23,14 +25,35 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información de la aula.
         /// </summary>
         public string Aul_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el aula ha sido eliminada (1) o no (0).
+        /// 
+        /// </summary>
         public bool Aul_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el aula.
+        /// 
+        /// </summary>
         public int Aul_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del aula.
+        /// 
+        /// </summary>
         public DateTime Aul_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el aula.
+        /// 
+        /// </summary>
         public int? Aul_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del aula.
+        /// </summary>
         public DateTime? Aul_FechaModifica { get; set; }
 
         public virtual tbUsuarios Aul_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Aul_UsuarioRegistraNavigation { get; set; }
         public virtual ICollection<tbCursos_tbSecciones> tbCursos_tbSecciones { get; set; }
+        public virtual ICollection<tbHorarioAlumnos> tbHorarioAlumnos { get; set; }
+        public virtual ICollection<tbHorarioProfesores> tbHorarioProfesores { get; set; }
     }
 }
