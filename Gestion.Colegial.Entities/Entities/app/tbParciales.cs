@@ -23,10 +23,25 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información por el cual se conocera el parcial.
         /// </summary>
         public string Pac_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el parcial ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Pac_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el parcial.
+        /// </summary>
         public int Pac_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del parcial.
+        /// </summary>
         public DateTime Pac_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el parcial.
+        /// </summary>
         public int? Pac_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del parcial.
+        /// </summary>
         public DateTime? Pac_FechaModifica { get; set; }
 
         public virtual tbUsuarios Pac_UsuarioModificaNavigation { get; set; }

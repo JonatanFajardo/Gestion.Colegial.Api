@@ -23,10 +23,29 @@ namespace Gestion.Colegial.Entities.Entities
         /// Dato informativo del cargo.
         /// </summary>
         public string Car_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el cargo ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool Car_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el cargo.
+        /// 
+        /// </summary>
         public int Car_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del cargo.
+        /// 
+        /// </summary>
         public DateTime Car_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el cargo.
+        /// 
+        /// </summary>
         public int? Car_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del cargo.
+        /// </summary>
         public DateTime? Car_FechaModifica { get; set; }
 
         public virtual tbUsuarios Car_UsuarioModificaNavigation { get; set; }

@@ -36,19 +36,32 @@ namespace Gestion.Colegial.Entities.Entities
         /// Estado en el que se encuentra el curso.
         /// </summary>
         public bool Cur_EsActivo { get; set; }
+        /// <summary>
+        /// Indica si el curso ha sido eliminado (1) o no (0).
+        /// 
+        /// </summary>
         public bool Cur_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el curso.
+        /// 
+        /// </summary>
         public int Cur_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del curso.
+        /// 
+        /// </summary>
         public DateTime Cur_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el curso.
+        /// 
+        /// </summary>
         public int? Cur_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del curso.
+        /// </summary>
         public DateTime? Cur_FechaModifica { get; set; }
 
-		//Array de enteros para los id de los checkbox
-		public int[] Modalidades { get; set; }
-		public int[] CursoNiveles { get; set; }
-		public int[] Secciones { get; set; }
-		public int[] Materias { get; set; }
-
-		public virtual tbUsuarios Cur_UsuarioModificaNavigation { get; set; }
+        public virtual tbUsuarios Cur_UsuarioModificaNavigation { get; set; }
         public virtual tbUsuarios Cur_UsuarioRegistraNavigation { get; set; }
         public virtual tbNivelesEducativos Niv { get; set; }
         public virtual ICollection<tbAlumnos> tbAlumnos { get; set; }

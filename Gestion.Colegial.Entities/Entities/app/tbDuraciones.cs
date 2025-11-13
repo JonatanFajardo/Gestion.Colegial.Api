@@ -23,10 +23,29 @@ namespace Gestion.Colegial.Entities.Entities
         /// Información del tiempo designado para una materia.
         /// </summary>
         public string Dur_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si la duración ha sido eliminada (1) o no (0).
+        /// 
+        /// </summary>
         public bool Dur_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró la duración.
+        /// 
+        /// </summary>
         public int Dur_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro de la duración.
+        /// 
+        /// </summary>
         public DateTime Dur_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó la duración.
+        /// 
+        /// </summary>
         public int? Dur_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación de la duración.
+        /// </summary>
         public DateTime? Dur_FechaModifica { get; set; }
 
         public virtual tbUsuarios Dur_UsuarioModificaNavigation { get; set; }

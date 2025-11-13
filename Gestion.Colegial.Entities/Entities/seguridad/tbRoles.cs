@@ -7,13 +7,37 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class tbRoles
     {
+        /// <summary>
+        /// Identificador único del rol.
+        /// </summary>
         public int Rol_Id { get; set; }
+        /// <summary>
+        /// Descripción del rol.
+        /// </summary>
         public string Rol_Descripcion { get; set; }
+        /// <summary>
+        /// Indica si el rol está activo (1) o no (0).
+        /// </summary>
         public bool Rol_Estado { get; set; }
+        /// <summary>
+        /// Indica si el rol ha sido eliminado (1) o no (0).
+        /// </summary>
         public bool Rol_EsEliminado { get; set; }
+        /// <summary>
+        /// Identificador del usuario que registró el rol.
+        /// </summary>
         public int Rol_UsuarioRegistra { get; set; }
+        /// <summary>
+        /// Fecha y hora de registro del rol.
+        /// </summary>
         public DateTime Rol_FechaRegistra { get; set; }
+        /// <summary>
+        /// Identificador del usuario que modificó el rol.
+        /// </summary>
         public int? Rol_UsuarioModifica { get; set; }
+        /// <summary>
+        /// Fecha y hora de modificación del rol.
+        /// </summary>
         public DateTime? Rol_FechaModifica { get; set; }
     }
 }

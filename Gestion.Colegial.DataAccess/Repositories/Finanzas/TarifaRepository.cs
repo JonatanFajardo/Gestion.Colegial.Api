@@ -44,7 +44,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = (object)obj.Cun_Id ?? DBNull.Value },
                 new SqlParameter(){ParameterName= "@Tar_Monto", DbType = DbType.Decimal, Value = obj.Tar_Monto },
                 new SqlParameter(){ParameterName= "@Tar_AnioVigencia", DbType = DbType.Int32, Value = obj.Tar_AnioVigencia },
-                new SqlParameter(){ParameterName= "@Tar_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Tar_UsuarioRegistra },
             };
             Answer answer = await New(sql, sqlParameters);
             return answer;
@@ -60,7 +59,6 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = (object)obj.Cun_Id ?? DBNull.Value },
                 new SqlParameter(){ParameterName= "@Tar_Monto", DbType = DbType.Decimal, Value = obj.Tar_Monto },
                 new SqlParameter(){ParameterName= "@Tar_AnioVigencia", DbType = DbType.Int32, Value = obj.Tar_AnioVigencia },
-                new SqlParameter(){ParameterName= "@Tar_UsuarioModifica", DbType = DbType.Int32, Value = obj.Tar_UsuarioModifica },
             };
             Answer answer = await Update(sql, sqlParameters);
             return answer;
