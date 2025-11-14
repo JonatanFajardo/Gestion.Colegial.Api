@@ -30,6 +30,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY des.Des_Descripcion
+        ) AS [Fila],
         des.Des_Descripcion,
         des.Des_TipoDescuento,
         des.Des_Valor,
@@ -174,6 +177,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY da.Dap_Fecha DESC, da.Dap_Id DESC
+        ) AS [Fila],
         da.Dap_MontoAplicado,
         da.Dap_Fecha,
         -- Descripciones de relaciones
@@ -519,6 +525,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY m.Mor_FechaAplicacion DESC, m.Mor_Id DESC
+        ) AS [Fila],
         m.Mor_MontoMora,
         m.Mor_FechaAplicacion,
         m.Mor_Observaciones,
@@ -682,6 +691,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC
+        ) AS [Fila],
         p.Pag_MontoTotal,
         p.Pag_FechaPago,
         p.Pag_NumeroReferencia,
@@ -842,6 +854,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY pd.Pde_Id DESC
+        ) AS [Fila],
         pd.Pde_MontoAplicado,
         -- Descripciones de relaciones
         dbo.fn_FormatearNombreCompleto(
@@ -879,6 +894,9 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY t.Tar_AnioVigencia DESC, t.Tar_Id DESC
+        ) AS [Fila],
         t.Tar_Monto,
         t.Tar_AnioVigencia,
         t.Tar_EsActivo,
