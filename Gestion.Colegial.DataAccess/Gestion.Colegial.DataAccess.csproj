@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Remove="Repositories\EventoRepository.cs" />
     <Compile Remove="Repositories\HoraRepository.cs" />
+    <Compile Remove="Repositories\HorarioAlumnoRepository.cs" />
     <Compile Remove="Repositories\HorarioProfesorRepository.cs" />
     <Compile Remove="Repositories\ReporteFinancieroRepository.cs" />
   </ItemGroup>

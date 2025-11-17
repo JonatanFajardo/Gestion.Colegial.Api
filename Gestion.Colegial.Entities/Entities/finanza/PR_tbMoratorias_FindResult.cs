@@ -9,8 +9,16 @@ namespace Gestion.Colegial.Entities.Entities
     {
         public int Mor_Id { get; set; }
         public int Cco_Id { get; set; }
+        public int Mor_DiasAtraso { get; set; }
+        [Column("Mor_Porcentaje", TypeName = "decimal(9,4)")]
+        public decimal Mor_Porcentaje { get; set; }
         [Column("Mor_MontoMora", TypeName = "decimal(18,2)")]
         public decimal Mor_MontoMora { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public DateTime Mor_FechaCalculo { get; set; }
+        public bool Mor_EsEliminado { get; set; }
+        public int Mor_UsuarioRegistra { get; set; }
+        public DateTime Mor_FechaRegistra { get; set; }
+        public int? Mor_UsuarioModifica { get; set; }
+        public DateTime? Mor_FechaModifica { get; set; }
     }
 }

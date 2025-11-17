@@ -11,15 +11,16 @@ namespace Gestion.Colegial.Entities.Entities
         public int Alu_Id { get; set; }
         public int? Enc_Id { get; set; }
         public int Fpa_Id { get; set; }
-        public int Usu_Id { get; set; }
         [Column("Pag_MontoTotal", TypeName = "decimal(18,2)")]
         public decimal Pag_MontoTotal { get; set; }
         public DateTime Pag_FechaPago { get; set; }
         public string Pag_NumeroReferencia { get; set; }
         public string Pag_Observaciones { get; set; }
-        public string NombreCompletoAlumno { get; set; }
-        public string DescripcionFormaPago { get; set; }
-        public string NombreCompletoEncargado { get; set; }
-        public string NombreUsuarioRegistraPago { get; set; }
+        public int Usu_Id { get; set; }
+        public bool Pag_EsEliminado { get; set; }
+        public int Pag_UsuarioRegistra { get; set; }
+        public DateTime Pag_FechaRegistra { get; set; }
+        public int? Pag_UsuarioModifica { get; set; }
+        public DateTime? Pag_FechaModifica { get; set; }
     }
 }

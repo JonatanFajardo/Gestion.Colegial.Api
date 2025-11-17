@@ -22,11 +22,11 @@ namespace Gestion.Colegial.Entities.Entities
         public string Pag_NumeroReferencia { get; set; }
         public string Pag_Observaciones { get; set; }
         public int Usu_Id { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Pag_EsEliminado { get; set; }
+        public int Pag_UsuarioRegistra { get; set; }
+        public DateTime Pag_FechaRegistra { get; set; }
+        public int? Pag_UsuarioModifica { get; set; }
+        public DateTime? Pag_FechaModifica { get; set; }
 
         public virtual tbFormasPago Fpa { get; set; }
         public virtual ICollection<tbPagosDetalle> tbPagosDetalle { get; set; }

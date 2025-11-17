@@ -13,12 +13,13 @@ namespace Gestion.Colegial.Entities.Entities
         [Column("Des_Valor", TypeName = "decimal(18,2)")]
         public decimal Des_Valor { get; set; }
         public bool Des_EsActivo { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
+        public int? CantidadAplicaciones { get; set; }
+        public bool Des_EsEliminado { get; set; }
+        public int Des_UsuarioRegistra { get; set; }
         public string NombreCompletoUsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
+        public DateTime Des_FechaRegistra { get; set; }
+        public int? Des_UsuarioModifica { get; set; }
         public string NombreCompletoUsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public DateTime? Des_FechaModifica { get; set; }
     }
 }

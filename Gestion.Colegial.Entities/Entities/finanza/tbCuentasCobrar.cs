@@ -27,11 +27,11 @@ namespace Gestion.Colegial.Entities.Entities
         public DateTime Cco_FechaVencimiento { get; set; }
         public int Epa_Id { get; set; }
         public string Cco_Observaciones { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Cco_EsEliminado { get; set; }
+        public int Cco_UsuarioRegistra { get; set; }
+        public DateTime Cco_FechaRegistra { get; set; }
+        public int? Cco_UsuarioModifica { get; set; }
+        public DateTime? Cco_FechaModifica { get; set; }
 
         public virtual tbConceptosPago Cpa { get; set; }
         public virtual tbEstadosPago Epa { get; set; }

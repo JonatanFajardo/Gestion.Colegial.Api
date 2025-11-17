@@ -7,6 +7,9 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbConceptosPago_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Cpa_Id { get; set; }
         public string Cpa_Descripcion { get; set; }
         public bool Cpa_EsRecurrente { get; set; }
         public bool Cpa_EsObligatorio { get; set; }

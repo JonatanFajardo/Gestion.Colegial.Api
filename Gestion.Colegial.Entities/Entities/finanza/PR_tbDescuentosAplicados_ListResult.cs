@@ -7,9 +7,17 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbDescuentosAplicados_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Dap_Id { get; set; }
+        public int Cco_Id { get; set; }
+        public int Des_Id { get; set; }
         [Column("Dap_MontoAplicado", TypeName = "decimal(18,2)")]
         public decimal Dap_MontoAplicado { get; set; }
-        public string DescripcionDescuento { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public string Dap_Justificacion { get; set; }
+        public string Des_Descripcion { get; set; }
+        public string Des_TipoDescuento { get; set; }
+        [Column("Des_Valor", TypeName = "decimal(18,2)")]
+        public decimal Des_Valor { get; set; }
     }
 }
