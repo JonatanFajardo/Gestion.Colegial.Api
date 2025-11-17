@@ -13,10 +13,14 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
         public string NumeroReferencia { get; set; } = string.Empty;
         public string Observaciones { get; set; } = string.Empty;
         public int UsuarioId { get; set; }
+        public string FormaPagoDescripcion { get; set; } = string.Empty;
+        public decimal TotalDistribuido { get; set; }
         public bool EsEliminado { get; set; }
         public int UsuarioRegistraId { get; set; }
+        public string NombreCompletoUsuarioRegistra { get; set; } = string.Empty;
         public DateTime FechaRegistro { get; set; }
         public int? UsuarioModificaId { get; set; }
+        public string? NombreCompletoUsuarioModifica { get; set; }
         public DateTime? FechaModifica { get; set; }
     }
 }

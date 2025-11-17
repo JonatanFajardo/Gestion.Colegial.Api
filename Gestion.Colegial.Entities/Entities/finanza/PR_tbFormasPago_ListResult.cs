@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbFormasPago_ListResult
     {
-        [Column("# Fila")]
         public long? Fila { get; set; }
         public int Fpa_Id { get; set; }
         public string Fpa_Descripcion { get; set; }

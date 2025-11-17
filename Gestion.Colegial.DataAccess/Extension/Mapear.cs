@@ -47,7 +47,25 @@ namespace Gestion.Colegial.DataAccess.Extension
 					{
 						// si la columna y la propiedad del tipo de dato que se obtuvo son las mismas, se le asigna el nombre.
 						if (pro.Name == column.ColumnName)
-							pro.SetValue(obj, dr[column.ColumnName], null);
+						{
+							// Obtener el valor de la columna
+							var value = dr[column.ColumnName];
+
+							// Si el valor es DBNull, asignar null para tipos nullable o el valor por defecto del DTO
+							if (value == DBNull.Value)
+							{
+								// Solo asignamos null si la propiedad es nullable
+								if (Nullable.GetUnderlyingType(pro.PropertyType) != null || !pro.PropertyType.IsValueType)
+								{
+									pro.SetValue(obj, null, null);
+								}
+								// Si es un tipo valor no-nullable, dejamos el valor por defecto del constructor
+							}
+							else
+							{
+								pro.SetValue(obj, value, null);
+							}
+						}
 						else
 							continue;
 					}

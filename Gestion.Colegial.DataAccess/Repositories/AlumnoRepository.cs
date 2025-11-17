@@ -25,6 +25,16 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
+        public async Task<Answer> FindByIdentidad(string identidad)
+        {
+            const string sql = "PR_tbAlumnos_FindByIdentidad";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Per_Identidad", DbType = DbType.String, Value = identidad },
+            };
+            Answer answer = await Search<PR_tbAlumnos_FindByIdentidadResult>(sql, sqlParameters);
+            return answer;
+        }
+
         public async Task<Answer> Detail(int id)
         {
             const string sql = "PR_tbAlumnos_Detail";

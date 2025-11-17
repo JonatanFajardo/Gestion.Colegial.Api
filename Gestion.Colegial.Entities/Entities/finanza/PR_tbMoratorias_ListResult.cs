@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbMoratorias_ListResult
     {
-        [Column("# Fila")]
         public long? Fila { get; set; }
         public int Mor_Id { get; set; }
         public int Cco_Id { get; set; }
