@@ -85,7 +85,7 @@ ALTER PROCEDURE [finanza].[PR_tbConceptosPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY Cpa_Descripcion) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY Cpa_Descripcion) AS [Fila],
            Cpa_Id, Cpa_Descripcion, Cpa_EsRecurrente, Cpa_EsObligatorio, Cpa_EsActivo
     FROM finanza.tbConceptosPago
     WHERE Cpa_EsEliminado = 0
@@ -217,7 +217,7 @@ ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY cco.Cco_Id DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY cco.Cco_Id DESC) AS [Fila],
            cco.Cco_Id, cco.Alu_Id, cco.Cpa_Id, cco.Tar_Id,
            cco.Cco_MontoOriginal, cco.Cco_MontoDescuento, cco.Cco_MontoMora,
            cco.Cco_MontoTotal, cco.Cco_MontoPendiente,
@@ -382,7 +382,7 @@ ALTER PROCEDURE [finanza].[PR_tbDescuentos_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY Des_Descripcion) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY Des_Descripcion) AS [Fila],
            Des_Id, Des_Descripcion, Des_TipoDescuento, Des_Valor, Des_EsActivo
     FROM finanza.tbDescuentos
     WHERE Des_EsEliminado = 0
@@ -517,7 +517,7 @@ ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [Fila],
            da.Dap_Id, da.Cco_Id, da.Des_Id, da.Dap_MontoAplicado, da.Dap_Justificacion,
            d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor
     FROM finanza.tbDescuentosAplicados da
@@ -536,7 +536,7 @@ ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_ListByCuenta]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [Fila],
            da.Dap_Id, da.Cco_Id, da.Des_Id, da.Dap_MontoAplicado, da.Dap_Justificacion,
            da.Dap_EsEliminado, da.Dap_UsuarioRegistra, da.Dap_FechaRegistra, da.Dap_UsuarioModifica, da.Dap_FechaModifica,
            d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor
@@ -638,7 +638,7 @@ ALTER PROCEDURE [finanza].[PR_tbEstadosPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY Epa_Descripcion) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY Epa_Descripcion) AS [Fila],
            Epa_Id, Epa_Descripcion
     FROM finanza.tbEstadosPago
     WHERE Epa_EsEliminado = 0
@@ -778,7 +778,7 @@ ALTER PROCEDURE [finanza].[PR_tbFormasPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY Fpa_Descripcion) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY Fpa_Descripcion) AS [Fila],
            Fpa_Id, Fpa_Descripcion, Fpa_EsActivo
     FROM finanza.tbFormasPago
     WHERE Fpa_EsEliminado = 0
@@ -890,7 +890,7 @@ ALTER PROCEDURE [finanza].[PR_tbMoratorias_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY m.Mor_FechaCalculo DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY m.Mor_FechaCalculo DESC) AS [Fila],
            m.Mor_Id, m.Cco_Id, m.Mor_DiasAtraso, m.Mor_Porcentaje, m.Mor_MontoMora, m.Mor_FechaCalculo,
            cco.Cco_MontoOriginal, cco.Cco_FechaVencimiento
     FROM finanza.tbMoratorias m
@@ -986,7 +986,7 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        ROW_NUMBER() OVER (ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC) AS [# Fila],
+        ROW_NUMBER() OVER (ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC) AS [Fila],
         p.Pag_Id,
         p.Pag_FechaPago,
         p.Pag_MontoTotal,
@@ -1064,7 +1064,7 @@ ALTER PROCEDURE [finanza].[PR_tbPagosDetalle_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY pd.Pde_Id DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY pd.Pde_Id DESC) AS [Fila],
            pd.Pde_Id, pd.Pag_Id, pd.Cco_Id, pd.Pde_MontoAplicado,
            pd.Pde_EsEliminado, pd.Pde_UsuarioRegistra, pd.Pde_FechaRegistra, pd.Pde_UsuarioModifica, pd.Pde_FechaModifica
     FROM finanza.tbPagosDetalle pd
@@ -1113,7 +1113,7 @@ ALTER PROCEDURE [finanza].[PR_tbRecibos_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY Rec_FechaEmision DESC, Rec_Id DESC) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY Rec_FechaEmision DESC, Rec_Id DESC) AS [Fila],
            Rec_Id, Pag_Id, Rec_NumeroRecibo, Rec_FechaEmision, Rec_RutaArchivo,
            Rec_EsEliminado, Rec_UsuarioRegistra, Rec_FechaRegistra, Rec_UsuarioModifica, Rec_FechaModifica
     FROM finanza.tbRecibos
@@ -1296,7 +1296,7 @@ ALTER PROCEDURE [finanza].[PR_tbTarifas_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ROW_NUMBER() OVER (ORDER BY t.Tar_AnioVigencia DESC, cp.Cpa_Descripcion) AS [# Fila],
+    SELECT ROW_NUMBER() OVER (ORDER BY t.Tar_AnioVigencia DESC, cp.Cpa_Descripcion) AS [Fila],
            t.Tar_Id, t.Cpa_Id, t.Niv_Id, t.Cun_Id, t.Tar_Monto, t.Tar_AnioVigencia,
            cp.Cpa_Descripcion AS Concepto
     FROM finanza.tbTarifas t

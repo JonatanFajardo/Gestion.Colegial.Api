@@ -7,6 +7,7 @@ namespace Gestion.Colegial.Business.Interfaces
     {
         Task<Answer> List();
         Task<Answer> Find(int id);
+        Task<Answer> FindByIdentidad(string identidad);
         Task<Answer> Detail(int id);
         Task<Answer> Create(AlumnosFindDto obj);
         Task<Answer> Edit(AlumnosFindDto obj);
