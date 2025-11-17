@@ -64,6 +64,30 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
+        public async Task<Answer> FindByIdentidad(string identidad)
+        {
+            Answer answer = await _repository.FindByIdentidad(identidad);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Access = true;
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
+
         public async Task<Answer> Detail(int id)
         {
             Answer answer = await _repository.Detail(id);

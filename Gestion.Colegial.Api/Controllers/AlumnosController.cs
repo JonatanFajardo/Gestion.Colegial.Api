@@ -54,6 +54,25 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         /// <summary>
+        /// Obtiene un alumno por su número de identidad.
+        /// </summary>
+        /// <param name="value">Número de identidad del alumno.</param>
+        /// <returns>Objeto tbAlumnos.</returns>
+        /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
+        /// <response code="400">BadRequest. Conexión no establecida.</response>
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
+        [HttpGet("FindByIdentidadAsync")]
+        public async Task<IActionResult> FindByIdentidad(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return BadRequest("La identidad no puede estar vacía");
+            }
+            Answer answer = await _alumnoService.FindByIdentidad(value);
+            return Ok(answer.Data);
+        }
+
+        /// <summary>
         /// Obtiene un objeto por su id.
         /// </summary>
         /// <param name="value">Identificador único del objeto.</param>

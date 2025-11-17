@@ -267,6 +267,10 @@
          "ObjectType": 1
       },
       {
+         "Name": "[dbo].[PR_tbAlumnos_FindByIdentidad]",
+         "ObjectType": 1
+      },
+      {
          "Name": "[dbo].[PR_tbAlumnos_Insert]",
          "ObjectType": 1
       },

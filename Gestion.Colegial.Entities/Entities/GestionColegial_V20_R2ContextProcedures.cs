@@ -42,6 +42,7 @@ namespace Gestion.Colegial.Entities.Entities
             modelBuilder.Entity<PR_ObtenerPromedioCursoUltimosAnios_DashboardResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAlumnos_DetailResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAlumnos_FindResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PR_tbAlumnos_FindByIdentidadResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAlumnos_InsertResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAlumnos_ListResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAulas_DetailResult>().HasNoKey().ToView(null);
@@ -405,6 +406,33 @@ namespace Gestion.Colegial.Entities.Entities
                 parameterreturnValue,
             };
             var _ = await _context.SqlQueryAsync<PR_tbAlumnos_FindResult>("EXEC @returnValue = [dbo].[PR_tbAlumnos_Find] @Alu_Id = @Alu_Id", sqlParameters, cancellationToken);
+
+            returnValue?.SetValue(parameterreturnValue.Value);
+
+            return _;
+        }
+
+        public virtual async Task<List<PR_tbAlumnos_FindByIdentidadResult>> PR_tbAlumnos_FindByIdentidadAsync(string Per_Identidad, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        {
+            var parameterreturnValue = new SqlParameter
+            {
+                ParameterName = "returnValue",
+                Direction = System.Data.ParameterDirection.Output,
+                SqlDbType = System.Data.SqlDbType.Int,
+            };
+
+            var sqlParameters = new []
+            {
+                new SqlParameter
+                {
+                    ParameterName = "Per_Identidad",
+                    Size = 13,
+                    Value = Per_Identidad ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.VarChar,
+                },
+                parameterreturnValue,
+            };
+            var _ = await _context.SqlQueryAsync<PR_tbAlumnos_FindByIdentidadResult>("EXEC @returnValue = [dbo].[PR_tbAlumnos_FindByIdentidad] @Per_Identidad = @Per_Identidad", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 

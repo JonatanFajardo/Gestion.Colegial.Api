@@ -7,6 +7,7 @@ namespace Gestion.Colegial.DataAccess.Interfaces
     {
         Task<Answer> List();
         Task<Answer> Find(int id);
+        Task<Answer> FindByIdentidad(string identidad);
         Task<Answer> Detail(int id);
         Task<Answer> Create(tbAlumnos obj);
         Task<Answer> Edit(tbAlumnos obj);
