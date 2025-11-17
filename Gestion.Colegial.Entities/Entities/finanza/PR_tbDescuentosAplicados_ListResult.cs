@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbDescuentosAplicados_ListResult
     {
-        [Column("# Fila")]
         public long? Fila { get; set; }
         public int Dap_Id { get; set; }
         public int Cco_Id { get; set; }

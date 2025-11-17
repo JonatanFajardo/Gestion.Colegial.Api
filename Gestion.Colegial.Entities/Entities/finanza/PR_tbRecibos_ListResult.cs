@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbRecibos_ListResult
     {
-        [Column("# Fila")]
         public long? Fila { get; set; }
         public int Rec_Id { get; set; }
         public int Pag_Id { get; set; }

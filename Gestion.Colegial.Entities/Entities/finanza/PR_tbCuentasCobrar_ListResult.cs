@@ -7,7 +7,6 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbCuentasCobrar_ListResult
     {
-        [Column("# Fila")]
         public long? Fila { get; set; }
         public int Cco_Id { get; set; }
         public int Alu_Id { get; set; }
