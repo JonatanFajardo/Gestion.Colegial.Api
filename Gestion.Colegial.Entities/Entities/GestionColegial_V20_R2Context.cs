@@ -268,9 +268,9 @@ namespace Gestion.Colegial.Entities.Entities
                     .IsRequired()
                     .HasMaxLength(120);
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
+                entity.Property(e => e.Cpa_FechaModifica).HasPrecision(0);
 
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Cpa_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
             });
@@ -286,6 +286,12 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.Property(e => e.Cco_FechaEmision).HasColumnType("date");
 
+                entity.Property(e => e.Cco_FechaModifica).HasPrecision(0);
+
+                entity.Property(e => e.Cco_FechaRegistra)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysdatetime())");
+
                 entity.Property(e => e.Cco_FechaVencimiento).HasColumnType("date");
 
                 entity.Property(e => e.Cco_MontoDescuento).HasColumnType("decimal(18, 2)");
@@ -299,12 +305,6 @@ namespace Gestion.Colegial.Entities.Entities
                 entity.Property(e => e.Cco_MontoTotal).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.Cco_Observaciones).HasMaxLength(300);
-
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
-                    .HasPrecision(0)
-                    .HasDefaultValueSql("(sysdatetime())");
 
                 entity.HasOne(d => d.Cpa)
                     .WithMany(p => p.tbCuentasCobrar)
@@ -539,6 +539,12 @@ namespace Gestion.Colegial.Entities.Entities
                     .IsRequired()
                     .HasMaxLength(120);
 
+                entity.Property(e => e.Des_FechaModifica).HasPrecision(0);
+
+                entity.Property(e => e.Des_FechaRegistra)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysdatetime())");
+
                 entity.Property(e => e.Des_TipoDescuento)
                     .IsRequired()
                     .HasMaxLength(1)
@@ -546,12 +552,6 @@ namespace Gestion.Colegial.Entities.Entities
                     .IsFixedLength();
 
                 entity.Property(e => e.Des_Valor).HasColumnType("decimal(18, 2)");
-
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
-                    .HasPrecision(0)
-                    .HasDefaultValueSql("(sysdatetime())");
             });
 
             modelBuilder.Entity<tbDescuentosAplicados>(entity =>
@@ -561,15 +561,15 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.ToTable("tbDescuentosAplicados", "finanza");
 
+                entity.Property(e => e.Dap_FechaModifica).HasPrecision(0);
+
+                entity.Property(e => e.Dap_FechaRegistra)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysdatetime())");
+
                 entity.Property(e => e.Dap_Justificacion).HasMaxLength(300);
 
                 entity.Property(e => e.Dap_MontoAplicado).HasColumnType("decimal(18, 2)");
-
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
-                    .HasPrecision(0)
-                    .HasDefaultValueSql("(sysdatetime())");
 
                 entity.HasOne(d => d.Cco)
                     .WithMany(p => p.tbDescuentosAplicados)
@@ -873,9 +873,9 @@ namespace Gestion.Colegial.Entities.Entities
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
+                entity.Property(e => e.Epa_FechaModifica).HasPrecision(0);
 
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Epa_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
             });
@@ -891,9 +891,9 @@ namespace Gestion.Colegial.Entities.Entities
                     .IsRequired()
                     .HasMaxLength(80);
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
+                entity.Property(e => e.Fpa_FechaModifica).HasPrecision(0);
 
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Fpa_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
             });
@@ -1326,15 +1326,15 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.Property(e => e.Mor_FechaCalculo).HasColumnType("date");
 
+                entity.Property(e => e.Mor_FechaModifica).HasPrecision(0);
+
+                entity.Property(e => e.Mor_FechaRegistra)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysdatetime())");
+
                 entity.Property(e => e.Mor_MontoMora).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.Mor_Porcentaje).HasColumnType("decimal(9, 4)");
-
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
-                    .HasPrecision(0)
-                    .HasDefaultValueSql("(sysdatetime())");
 
                 entity.HasOne(d => d.Cco)
                     .WithMany(p => p.tbMoratorias)
@@ -1496,19 +1496,19 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.HasIndex(e => e.Pag_FechaPago, "IX_tbPagos_Fecha");
 
+                entity.Property(e => e.Pag_FechaModifica).HasPrecision(0);
+
                 entity.Property(e => e.Pag_FechaPago).HasPrecision(0);
+
+                entity.Property(e => e.Pag_FechaRegistra)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysdatetime())");
 
                 entity.Property(e => e.Pag_MontoTotal).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.Pag_NumeroReferencia).HasMaxLength(60);
 
                 entity.Property(e => e.Pag_Observaciones).HasMaxLength(300);
-
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
-                    .HasPrecision(0)
-                    .HasDefaultValueSql("(sysdatetime())");
 
                 entity.HasOne(d => d.Fpa)
                     .WithMany(p => p.tbPagos)
@@ -1524,13 +1524,13 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.ToTable("tbPagosDetalle", "finanza");
 
-                entity.Property(e => e.Pde_MontoAplicado).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.Pde_FechaModifica).HasPrecision(0);
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Pde_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
+
+                entity.Property(e => e.Pde_MontoAplicado).HasColumnType("decimal(18, 2)");
 
                 entity.HasOne(d => d.Cco)
                     .WithMany(p => p.tbPagosDetalle)
@@ -1814,13 +1814,13 @@ namespace Gestion.Colegial.Entities.Entities
                 entity.HasIndex(e => e.Rec_NumeroRecibo, "UQ__tbRecibo__A5EDFF0DA45CF2DC")
                     .IsUnique();
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
-
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Rec_FechaEmision)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
 
-                entity.Property(e => e.Rec_FechaEmision)
+                entity.Property(e => e.Rec_FechaModifica).HasPrecision(0);
+
+                entity.Property(e => e.Rec_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
 
@@ -1961,9 +1961,9 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.HasIndex(e => new { e.Cpa_Id, e.Tar_AnioVigencia }, "IX_tbTarifas_CpaAnio");
 
-                entity.Property(e => e.Per_FechaModifica).HasPrecision(0);
+                entity.Property(e => e.Tar_FechaModifica).HasPrecision(0);
 
-                entity.Property(e => e.Per_FechaRegistra)
+                entity.Property(e => e.Tar_FechaRegistra)
                     .HasPrecision(0)
                     .HasDefaultValueSql("(sysdatetime())");
 

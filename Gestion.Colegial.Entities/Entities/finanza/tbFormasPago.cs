@@ -15,11 +15,11 @@ namespace Gestion.Colegial.Entities.Entities
         public int Fpa_Id { get; set; }
         public string Fpa_Descripcion { get; set; }
         public bool Fpa_EsActivo { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Fpa_EsEliminado { get; set; }
+        public int Fpa_UsuarioRegistra { get; set; }
+        public DateTime Fpa_FechaRegistra { get; set; }
+        public int? Fpa_UsuarioModifica { get; set; }
+        public DateTime? Fpa_FechaModifica { get; set; }
 
         public virtual ICollection<tbPagos> tbPagos { get; set; }
     }

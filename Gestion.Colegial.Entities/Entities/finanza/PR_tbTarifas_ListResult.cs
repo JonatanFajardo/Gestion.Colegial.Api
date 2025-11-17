@@ -7,9 +7,15 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbTarifas_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Tar_Id { get; set; }
+        public int Cpa_Id { get; set; }
+        public int? Niv_Id { get; set; }
+        public int? Cun_Id { get; set; }
         [Column("Tar_Monto", TypeName = "decimal(18,2)")]
         public decimal Tar_Monto { get; set; }
         public short Tar_AnioVigencia { get; set; }
-        public string DescripcionConceptoPago { get; set; }
+        public string Concepto { get; set; }
     }
 }

@@ -12,11 +12,11 @@ namespace Gestion.Colegial.Entities.Entities
         public string Rec_NumeroRecibo { get; set; }
         public DateTime Rec_FechaEmision { get; set; }
         public string Rec_RutaArchivo { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Rec_EsEliminado { get; set; }
+        public int Rec_UsuarioRegistra { get; set; }
+        public DateTime Rec_FechaRegistra { get; set; }
+        public int? Rec_UsuarioModifica { get; set; }
+        public DateTime? Rec_FechaModifica { get; set; }
 
         public virtual tbPagos Pag { get; set; }
     }

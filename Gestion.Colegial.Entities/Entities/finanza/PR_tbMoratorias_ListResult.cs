@@ -7,8 +7,18 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbMoratorias_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Mor_Id { get; set; }
+        public int Cco_Id { get; set; }
+        public int Mor_DiasAtraso { get; set; }
+        [Column("Mor_Porcentaje", TypeName = "decimal(9,4)")]
+        public decimal Mor_Porcentaje { get; set; }
         [Column("Mor_MontoMora", TypeName = "decimal(18,2)")]
         public decimal Mor_MontoMora { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public DateTime Mor_FechaCalculo { get; set; }
+        [Column("Cco_MontoOriginal", TypeName = "decimal(18,2)")]
+        public decimal Cco_MontoOriginal { get; set; }
+        public DateTime Cco_FechaVencimiento { get; set; }
     }
 }

@@ -5,16 +5,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbConceptosPago_Delete]
+ALTER PROCEDURE [finanza].[PR_tbConceptosPago_Delete]
     @Cpa_Id int,
-    @Per_UsuarioModifica int
+    @Cpa_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbConceptosPago
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Per_UsuarioModifica,
-        Per_FechaModifica = sysdatetime()
+    SET Cpa_EsEliminado = 1,
+        Cpa_UsuarioModifica = @Cpa_UsuarioModifica,
+        Cpa_FechaModifica = sysdatetime()
     WHERE Cpa_Id = @Cpa_Id;
 END
 GO
@@ -23,16 +23,45 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbConceptosPago_Detail]
+ALTER PROCEDURE [finanza].[PR_tbConceptosPago_Detail]
     @Cpa_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT cp.*, COUNT(t.Tar_Id) AS CantTarifas
+    SELECT cp.Cpa_Id,
+           cp.Cpa_Descripcion,
+           cp.Cpa_EsRecurrente,
+           cp.Cpa_EsObligatorio,
+           cp.Cpa_EsActivo,
+           COUNT(t.Tar_Id) AS CantTarifas,
+           -- Campos de auditoría
+           cp.Cpa_EsEliminado,
+           cp.Cpa_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           cp.Cpa_FechaRegistra,
+           cp.Cpa_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           cp.Cpa_FechaModifica
     FROM finanza.tbConceptosPago cp
-    LEFT JOIN finanza.tbTarifas t ON t.Cpa_Id = cp.Cpa_Id AND t.Per_EsEliminado = 0
-    WHERE cp.Cpa_Id = @Cpa_Id AND cp.Per_EsEliminado = 0
+    LEFT JOIN finanza.tbTarifas t ON t.Cpa_Id = cp.Cpa_Id AND t.Tar_EsEliminado = 0
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON cp.Cpa_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON cp.Cpa_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE cp.Cpa_Id = @Cpa_Id AND cp.Cpa_EsEliminado = 0
     GROUP BY cp.Cpa_Id, cp.Cpa_Descripcion, cp.Cpa_EsRecurrente, cp.Cpa_EsObligatorio, cp.Cpa_EsActivo,
+             cp.Cpa_EsEliminado, cp.Cpa_UsuarioRegistra, usuarioRegistra.Usu_Name, cp.Cpa_FechaRegistra,
+             cp.Cpa_UsuarioModifica, usuarioModificacion.Usu_Name, cp.Cpa_FechaModifica;
+END
+GO
+/****** Object:  StoredProcedure [finanza].[PR_tbConceptosPago_Insert]    Script Date: 12/11/2025 22:25:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [finanza].[PR_tbConceptosPago_Insert]
+    @Cpa_Descripcion nvarchar(120),
     @Cpa_EsRecurrente  bit,
     @Cpa_EsObligatorio bit,
     @Cpa_EsActivo      bit,
@@ -41,7 +70,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     INSERT INTO finanza.tbConceptosPago (Cpa_Descripcion, Cpa_EsRecurrente, Cpa_EsObligatorio, Cpa_EsActivo,
-                                     Per_UsuarioRegistra)
+                                     Cpa_UsuarioRegistra)
     VALUES (@Cpa_Descripcion, @Cpa_EsRecurrente, @Cpa_EsObligatorio, @Cpa_EsActivo, @Per_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -52,13 +81,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbConceptosPago_List]
+ALTER PROCEDURE [finanza].[PR_tbConceptosPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT Cpa_Id, Cpa_Descripcion, Cpa_EsRecurrente, Cpa_EsObligatorio, Cpa_EsActivo
+    SELECT ROW_NUMBER() OVER (ORDER BY Cpa_Descripcion) AS [# Fila],
+           Cpa_Id, Cpa_Descripcion, Cpa_EsRecurrente, Cpa_EsObligatorio, Cpa_EsActivo
     FROM finanza.tbConceptosPago
-    WHERE Per_EsEliminado = 0
+    WHERE Cpa_EsEliminado = 0
     ORDER BY Cpa_Descripcion;
 END
 GO
@@ -67,16 +97,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbCuentasCobrar_Delete]
+ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_Delete]
     @Cco_Id int,
-    @Per_UsuarioModifica int
+    @Cco_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbCuentasCobrar
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Per_UsuarioModifica,
-        Per_FechaModifica = sysdatetime()
+    SET Cco_EsEliminado = 1,
+        Cco_UsuarioModifica = @Cco_UsuarioModifica,
+        Cco_FechaModifica = sysdatetime()
     WHERE Cco_Id = @Cco_Id;
 END
 GO
@@ -85,21 +115,50 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbCuentasCobrar_Detail]
+ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_Detail]
     @Cco_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT cco.*, cp.Cpa_Descripcion, epa.Epa_Descripcion,
-           ISNULL(SUM(pd.Pde_MontoAplicado),0) AS TotalPagado
+    SELECT cco.Cco_Id,
+           cco.Alu_Id,
+           cco.Cpa_Id,
+           cco.Tar_Id,
+           cco.Cco_MontoOriginal,
+           cco.Cco_MontoDescuento,
+           cco.Cco_MontoMora,
+           cco.Cco_MontoTotal,
+           cco.Cco_MontoPendiente,
+           cco.Cco_FechaEmision,
+           cco.Cco_FechaVencimiento,
+           cco.Epa_Id,
+           cco.Cco_Observaciones,
+           cp.Cpa_Descripcion,
+           epa.Epa_Descripcion,
+           ISNULL(SUM(pd.Pde_MontoAplicado),0) AS TotalPagado,
+           -- Campos de auditoría
+           cco.Cco_EsEliminado,
+           cco.Cco_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           cco.Cco_FechaRegistra,
+           cco.Cco_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           cco.Cco_FechaModifica
     FROM finanza.tbCuentasCobrar cco
     INNER JOIN finanza.tbConceptosPago cp ON cp.Cpa_Id = cco.Cpa_Id
     INNER JOIN finanza.tbEstadosPago epa ON epa.Epa_Id = cco.Epa_Id
-    LEFT  JOIN finanza.tbPagosDetalle pd ON pd.Cco_Id = cco.Cco_Id AND pd.Per_EsEliminado = 0
+    LEFT  JOIN finanza.tbPagosDetalle pd ON pd.Cco_Id = cco.Cco_Id AND pd.Pde_EsEliminado = 0
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON cco.Cco_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON cco.Cco_UsuarioModifica = usuarioModificacion.Usu_Id
     WHERE cco.Cco_Id = @Cco_Id
     GROUP BY cco.Cco_Id, cco.Alu_Id, cco.Cpa_Id, cco.Tar_Id, cco.Cco_MontoOriginal, cco.Cco_MontoDescuento,
              cco.Cco_MontoMora, cco.Cco_MontoTotal, cco.Cco_MontoPendiente, cco.Cco_FechaEmision, cco.Cco_FechaVencimiento,
-             cco.Epa_Id, cco.Cco_Observaciones, cp.Cpa_Descripcion, epa.Epa_Descripcion;
+             cco.Epa_Id, cco.Cco_Observaciones, cp.Cpa_Descripcion, epa.Epa_Descripcion,
+             cco.Cco_EsEliminado, cco.Cco_UsuarioRegistra, usuarioRegistra.Usu_Name, cco.Cco_FechaRegistra,
+             cco.Cco_UsuarioModifica, usuarioModificacion.Usu_Name, cco.Cco_FechaModifica;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbCuentasCobrar_Find]    Script Date: 12/11/2025 22:25:46 ******/
@@ -107,12 +166,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbCuentasCobrar_Find]
+ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_Find]
     @Cco_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT * FROM finanza.tbCuentasCobrar WHERE Cco_Id = @Cco_Id AND Per_EsEliminado = 0;
+    SELECT * FROM finanza.tbCuentasCobrar WHERE Cco_Id = @Cco_Id AND Cco_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbCuentasCobrar_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -120,7 +179,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbCuentasCobrar_Insert]
+ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_Insert]
     @Alu_Id int,
     @Cpa_Id int,
     @Tar_Id int = NULL,
@@ -140,7 +199,7 @@ BEGIN
     INSERT INTO finanza.tbCuentasCobrar (
         Alu_Id, Cpa_Id, Tar_Id, Cco_MontoOriginal, Cco_MontoDescuento, Cco_MontoMora,
         Cco_MontoTotal, Cco_MontoPendiente, Cco_FechaEmision, Cco_FechaVencimiento,
-        Epa_Id, Cco_Observaciones, Per_UsuarioRegistra)
+        Epa_Id, Cco_Observaciones, Cco_UsuarioRegistra)
     VALUES (
         @Alu_Id, @Cpa_Id, @Tar_Id, @Cco_MontoOriginal, @Cco_MontoDescuento, @Cco_MontoMora,
         @Cco_MontoTotal, @Cco_MontoPendiente, @Cco_FechaEmision, @Cco_FechaVencimiento,
@@ -154,15 +213,21 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbCuentasCobrar_List]
+ALTER PROCEDURE [finanza].[PR_tbCuentasCobrar_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT cco.Cco_Id, cco.Alu_Id, cco.Cpa_Id, cco.Tar_Id,
+    SELECT ROW_NUMBER() OVER (ORDER BY cco.Cco_Id DESC) AS [# Fila],
+           cco.Cco_Id, cco.Alu_Id, cco.Cpa_Id, cco.Tar_Id,
            cco.Cco_MontoOriginal, cco.Cco_MontoDescuento, cco.Cco_MontoMora,
            cco.Cco_MontoTotal, cco.Cco_MontoPendiente,
            cco.Cco_FechaEmision, cco.Cco_FechaVencimiento, cco.Epa_Id,
-           cp.Cpa_Descripcion, epa.Epa_Descripcion, cco.Cco_Id DESC;
+           cp.Cpa_Descripcion, epa.Epa_Descripcion
+    FROM finanza.tbCuentasCobrar cco
+    INNER JOIN finanza.tbConceptosPago cp ON cp.Cpa_Id = cco.Cpa_Id
+    INNER JOIN finanza.tbEstadosPago epa ON epa.Epa_Id = cco.Epa_Id
+    WHERE cco.Cco_EsEliminado = 0
+    ORDER BY cco.Cco_Id DESC;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbDescuentos_Delete]    Script Date: 12/11/2025 22:25:46 ******/
@@ -170,16 +235,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Delete]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Delete]
     @Des_Id int,
     @Des_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbDescuentos
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Des_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+    SET Des_EsEliminado = 1,
+        Des_UsuarioModifica = @Des_UsuarioModifica,
+        Des_FechaModifica = SYSDATETIME()
     WHERE Des_Id = @Des_Id;
 END
 GO
@@ -188,23 +253,55 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Detail]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Detail]
     @Des_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT d.*, COUNT(da.Dap_Id) AS CantidadAplicaciones
+    SELECT d.Des_Id,
+           d.Des_Descripcion,
+           d.Des_TipoDescuento,
+           d.Des_Valor,
+           d.Des_EsActivo,
+           COUNT(da.Dap_Id) AS CantidadAplicaciones,
+           -- Campos de auditoría
+           d.Des_EsEliminado,
+           d.Des_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           d.Des_FechaRegistra,
+           d.Des_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           d.Des_FechaModifica
     FROM finanza.tbDescuentos d
-    LEFT JOIN finanza.tbDescuentosAplicados da ON da.Des_Id = d.Des_Id AND da.Per_EsEliminado = 0
-    WHERE d.Des_Id = @Des_Id AND d.Per_EsEliminado = 0
+    LEFT JOIN finanza.tbDescuentosAplicados da ON da.Des_Id = d.Des_Id AND da.Dap_EsEliminado = 0
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON d.Des_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON d.Des_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE d.Des_Id = @Des_Id AND d.Des_EsEliminado = 0
     GROUP BY d.Des_Id, d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor, d.Des_EsActivo,
+             d.Des_EsEliminado, d.Des_UsuarioRegistra, usuarioRegistra.Usu_Name, d.Des_FechaRegistra,
+             d.Des_UsuarioModifica, usuarioModificacion.Usu_Name, d.Des_FechaModifica;
+END
+GO
+/****** Object:  StoredProcedure [finanza].[PR_tbDescuentos_Dropdown]    Script Date: 12/11/2025 22:25:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Dropdown]
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Des_Id,
            CONCAT(Des_Descripcion, ' (',
                   CASE Des_TipoDescuento
                       WHEN 'P' THEN CAST(Des_Valor AS nvarchar) + '%'
                       ELSE 'L.' + CAST(Des_Valor AS nvarchar)
                   END, ')') AS Texto
     FROM finanza.tbDescuentos
-    WHERE Per_EsEliminado = 0 AND Des_EsActivo = 1
+    WHERE Des_EsEliminado = 0 AND Des_EsActivo = 1
     ORDER BY Des_Descripcion;
 END
 GO
@@ -213,7 +310,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Exist]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Exist]
     @Des_Descripcion nvarchar(120),
     @Des_Id int = NULL
 AS
@@ -225,7 +322,7 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM finanza.tbDescuentos
         WHERE Des_Descripcion = @Des_Descripcion
-          AND Per_EsEliminado = 0
+          AND Des_EsEliminado = 0
           AND (@Des_Id IS NULL OR Des_Id <> @Des_Id)
     )
     BEGIN
@@ -246,14 +343,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Find]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Find]
     @Des_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbDescuentos
-    WHERE Des_Id = @Des_Id AND Per_EsEliminado = 0;
+    WHERE Des_Id = @Des_Id AND Des_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbDescuentos_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -261,7 +358,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Insert]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Insert]
     @Des_Descripcion nvarchar(120),
     @Des_TipoDescuento char(1),
     @Des_Valor decimal(18,2),
@@ -270,7 +367,7 @@ CREATE PROCEDURE [finanza].[PR_tbDescuentos_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbDescuentos (Des_Descripcion, Des_TipoDescuento, Des_Valor, Des_EsActivo, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbDescuentos (Des_Descripcion, Des_TipoDescuento, Des_Valor, Des_EsActivo, Des_UsuarioRegistra)
     VALUES (@Des_Descripcion, @Des_TipoDescuento, @Des_Valor, @Des_EsActivo, @Des_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -281,13 +378,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_List]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT Des_Id, Des_Descripcion, Des_TipoDescuento, Des_Valor, Des_EsActivo
+    SELECT ROW_NUMBER() OVER (ORDER BY Des_Descripcion) AS [# Fila],
+           Des_Id, Des_Descripcion, Des_TipoDescuento, Des_Valor, Des_EsActivo
     FROM finanza.tbDescuentos
-    WHERE Per_EsEliminado = 0
+    WHERE Des_EsEliminado = 0
     ORDER BY Des_Descripcion;
 END
 GO
@@ -296,7 +394,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentos_Update]
+ALTER PROCEDURE [finanza].[PR_tbDescuentos_Update]
     @Des_Id int,
     @Des_Descripcion nvarchar(120),
     @Des_TipoDescuento char(1),
@@ -311,8 +409,8 @@ BEGIN
         Des_TipoDescuento = @Des_TipoDescuento,
         Des_Valor = @Des_Valor,
         Des_EsActivo = @Des_EsActivo,
-        Per_UsuarioModifica = @Des_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+        Des_UsuarioModifica = @Des_UsuarioModifica,
+        Des_FechaModifica = SYSDATETIME()
     WHERE Des_Id = @Des_Id;
 
     SELECT @Des_Id AS UpdatedId;
@@ -323,16 +421,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_Delete]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_Delete]
     @Dap_Id int,
     @Dap_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbDescuentosAplicados
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Dap_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+    SET Dap_EsEliminado = 1,
+        Dap_UsuarioModifica = @Dap_UsuarioModifica,
+        Dap_FechaModifica = SYSDATETIME()
     WHERE Dap_Id = @Dap_Id;
 END
 GO
@@ -341,17 +439,38 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_Detail]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_Detail]
     @Dap_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT da.*, d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor,
-           cc.Cco_MontoOriginal, cc.Cco_MontoTotal
+    SELECT da.Dap_Id,
+           da.Cco_Id,
+           da.Des_Id,
+           da.Dap_MontoAplicado,
+           da.Dap_Justificacion,
+           d.Des_Descripcion,
+           d.Des_TipoDescuento,
+           d.Des_Valor,
+           cc.Cco_MontoOriginal,
+           cc.Cco_MontoTotal,
+           -- Campos de auditoría
+           da.Dap_EsEliminado,
+           da.Dap_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           da.Dap_FechaRegistra,
+           da.Dap_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           da.Dap_FechaModifica
     FROM finanza.tbDescuentosAplicados da
     INNER JOIN finanza.tbDescuentos d ON d.Des_Id = da.Des_Id
     INNER JOIN finanza.tbCuentasCobrar cc ON cc.Cco_Id = da.Cco_Id
-    WHERE da.Dap_Id = @Dap_Id AND da.Per_EsEliminado = 0;
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON da.Dap_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON da.Dap_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE da.Dap_Id = @Dap_Id AND da.Dap_EsEliminado = 0;
 END
 GO 
 /****** Object:  StoredProcedure [finanza].[PR_tbDescuentosAplicados_Find]    Script Date: 12/11/2025 22:25:46 ******/
@@ -359,14 +478,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_Find]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_Find]
     @Dap_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbDescuentosAplicados
-    WHERE Dap_Id = @Dap_Id AND Per_EsEliminado = 0;
+    WHERE Dap_Id = @Dap_Id AND Dap_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbDescuentosAplicados_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -374,7 +493,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_Insert]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_Insert]
     @Cco_Id int,
     @Des_Id int,
     @Dap_MontoAplicado decimal(18,2),
@@ -383,7 +502,7 @@ CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbDescuentosAplicados (Cco_Id, Des_Id, Dap_MontoAplicado, Dap_Justificacion, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbDescuentosAplicados (Cco_Id, Des_Id, Dap_MontoAplicado, Dap_Justificacion, Dap_UsuarioRegistra)
     VALUES (@Cco_Id, @Des_Id, @Dap_MontoAplicado, @Dap_Justificacion, @Dap_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -394,16 +513,17 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_List]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT da.Dap_Id, da.Cco_Id, da.Des_Id, da.Dap_MontoAplicado, da.Dap_Justificacion,
+    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [# Fila],
+           da.Dap_Id, da.Cco_Id, da.Des_Id, da.Dap_MontoAplicado, da.Dap_Justificacion,
            d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor
     FROM finanza.tbDescuentosAplicados da
     INNER JOIN finanza.tbDescuentos d ON d.Des_Id = da.Des_Id
-    WHERE da.Per_EsEliminado = 0
-    ORDER BY da.Per_FechaRegistra DESC;
+    WHERE da.Dap_EsEliminado = 0
+    ORDER BY da.Dap_FechaRegistra DESC;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbDescuentosAplicados_ListByCuenta]    Script Date: 12/11/2025 22:25:46 ******/
@@ -411,16 +531,19 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbDescuentosAplicados_ListByCuenta]
+ALTER PROCEDURE [finanza].[PR_tbDescuentosAplicados_ListByCuenta]
     @Cco_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT da.*, d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor
+    SELECT ROW_NUMBER() OVER (ORDER BY da.Dap_FechaRegistra DESC) AS [# Fila],
+           da.Dap_Id, da.Cco_Id, da.Des_Id, da.Dap_MontoAplicado, da.Dap_Justificacion,
+           da.Dap_EsEliminado, da.Dap_UsuarioRegistra, da.Dap_FechaRegistra, da.Dap_UsuarioModifica, da.Dap_FechaModifica,
+           d.Des_Descripcion, d.Des_TipoDescuento, d.Des_Valor
     FROM finanza.tbDescuentosAplicados da
     INNER JOIN finanza.tbDescuentos d ON d.Des_Id = da.Des_Id
-    WHERE da.Cco_Id = @Cco_Id AND da.Per_EsEliminado = 0
-    ORDER BY da.Per_FechaRegistra DESC;
+    WHERE da.Cco_Id = @Cco_Id AND da.Dap_EsEliminado = 0
+    ORDER BY da.Dap_FechaRegistra DESC;
 END
 GO 
 /****** Object:  StoredProcedure [finanza].[PR_tbEstadosPago_Detail]    Script Date: 12/11/2025 22:25:46 ******/
@@ -428,19 +551,34 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbEstadosPago_Detail]
+ALTER PROCEDURE [finanza].[PR_tbEstadosPago_Detail]
     @Epa_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT ep.*, COUNT(cc.Cco_Id) AS CantidadCuentas
+    SELECT ep.Epa_Id,
+           ep.Epa_Descripcion,
+           ep.Epa_EsActivo,
+           COUNT(cc.Cco_Id) AS CantidadCuentas,
+           -- Campos de auditoría
+           ep.Epa_EsEliminado,
+           ep.Epa_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           ep.Epa_FechaRegistra,
+           ep.Epa_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           ep.Epa_FechaModifica
     FROM finanza.tbEstadosPago ep
-    LEFT JOIN finanza.tbCuentasCobrar cc ON cc.Epa_Id = ep.Epa_Id AND cc.Per_EsEliminado = 0
-    WHERE ep.Epa_Id = @Epa_Id AND ep.Per_EsEliminado = 0
-    GROUP BY ep.Epa_Id, ep.Epa_Descripcion, Epa_Descripcion AS Texto
-    FROM finanza.tbEstadosPago
-    WHERE Per_EsEliminado = 0
-    ORDER BY Epa_Descripcion;
+    LEFT JOIN finanza.tbCuentasCobrar cc ON cc.Epa_Id = ep.Epa_Id AND cc.Cco_EsEliminado = 0
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON ep.Epa_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON ep.Epa_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE ep.Epa_Id = @Epa_Id AND ep.Epa_EsEliminado = 0
+    GROUP BY ep.Epa_Id, ep.Epa_Descripcion, ep.Epa_EsActivo,
+             ep.Epa_EsEliminado, ep.Epa_UsuarioRegistra, usuarioRegistra.Usu_Name, ep.Epa_FechaRegistra,
+             ep.Epa_UsuarioModifica, usuarioModificacion.Usu_Name, ep.Epa_FechaModifica;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbEstadosPago_Exist]    Script Date: 12/11/2025 22:25:46 ******/
@@ -448,7 +586,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbEstadosPago_Exist]
+ALTER PROCEDURE [finanza].[PR_tbEstadosPago_Exist]
     @Epa_Descripcion nvarchar(50),
     @Epa_Id int = NULL
 AS
@@ -460,7 +598,7 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM finanza.tbEstadosPago
         WHERE Epa_Descripcion = @Epa_Descripcion
-          AND Per_EsEliminado = 0
+          AND Epa_EsEliminado = 0
           AND (@Epa_Id IS NULL OR Epa_Id <> @Epa_Id)
     )
     BEGIN
@@ -481,14 +619,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbEstadosPago_Find]
+ALTER PROCEDURE [finanza].[PR_tbEstadosPago_Find]
     @Epa_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbEstadosPago
-    WHERE Epa_Id = @Epa_Id AND Per_EsEliminado = 0;
+    WHERE Epa_Id = @Epa_Id AND Epa_EsEliminado = 0;
 END
 GO 
 /****** Object:  StoredProcedure [finanza].[PR_tbEstadosPago_List]    Script Date: 12/11/2025 22:25:46 ******/
@@ -496,13 +634,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbEstadosPago_List]
+ALTER PROCEDURE [finanza].[PR_tbEstadosPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT Epa_Id, Epa_Descripcion
+    SELECT ROW_NUMBER() OVER (ORDER BY Epa_Descripcion) AS [# Fila],
+           Epa_Id, Epa_Descripcion
     FROM finanza.tbEstadosPago
-    WHERE Per_EsEliminado = 0
+    WHERE Epa_EsEliminado = 0
     ORDER BY Epa_Descripcion;
 END
 GO
@@ -516,16 +655,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Delete]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Delete]
     @Fpa_Id int,
     @Fpa_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbFormasPago
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Fpa_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+    SET Fpa_EsEliminado = 1,
+        Fpa_UsuarioModifica = @Fpa_UsuarioModifica,
+        Fpa_FechaModifica = SYSDATETIME()
     WHERE Fpa_Id = @Fpa_Id;
 END
 GO
@@ -534,19 +673,34 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Detail]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Detail]
     @Fpa_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT fp.*, COUNT(p.Pag_Id) AS CantidadPagos
+    SELECT fp.Fpa_Id,
+           fp.Fpa_Descripcion,
+           fp.Fpa_EsActivo,
+           COUNT(p.Pag_Id) AS CantidadPagos,
+           -- Campos de auditoría
+           fp.Fpa_EsEliminado,
+           fp.Fpa_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           fp.Fpa_FechaRegistra,
+           fp.Fpa_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           fp.Fpa_FechaModifica
     FROM finanza.tbFormasPago fp
-    LEFT JOIN finanza.tbPagos p ON p.Fpa_Id = fp.Fpa_Id AND p.Per_EsEliminado = 0
-    WHERE fp.Fpa_Id = @Fpa_Id AND fp.Per_EsEliminado = 0
-    GROUP BY fp.Fpa_Id, fp.Fpa_Descripcion, fp.Fpa_EsActivo, Fpa_Descripcion AS Texto
-    FROM finanza.tbFormasPago
-    WHERE Per_EsEliminado = 0 AND Fpa_EsActivo = 1
-    ORDER BY Fpa_Descripcion;
+    LEFT JOIN finanza.tbPagos p ON p.Fpa_Id = fp.Fpa_Id AND p.Pag_EsEliminado = 0
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON fp.Fpa_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON fp.Fpa_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE fp.Fpa_Id = @Fpa_Id AND fp.Fpa_EsEliminado = 0
+    GROUP BY fp.Fpa_Id, fp.Fpa_Descripcion, fp.Fpa_EsActivo,
+             fp.Fpa_EsEliminado, fp.Fpa_UsuarioRegistra, usuarioRegistra.Usu_Name, fp.Fpa_FechaRegistra,
+             fp.Fpa_UsuarioModifica, usuarioModificacion.Usu_Name, fp.Fpa_FechaModifica;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbFormasPago_Exist]    Script Date: 12/11/2025 22:25:46 ******/
@@ -554,7 +708,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Exist]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Exist]
     @Fpa_Descripcion nvarchar(80),
     @Fpa_Id int = NULL
 AS
@@ -566,7 +720,7 @@ BEGIN
     IF EXISTS (
         SELECT 1 FROM finanza.tbFormasPago
         WHERE Fpa_Descripcion = @Fpa_Descripcion
-          AND Per_EsEliminado = 0
+          AND Fpa_EsEliminado = 0
           AND (@Fpa_Id IS NULL OR Fpa_Id <> @Fpa_Id)
     )
     BEGIN
@@ -587,14 +741,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Find]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Find]
     @Fpa_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbFormasPago
-    WHERE Fpa_Id = @Fpa_Id AND Per_EsEliminado = 0;
+    WHERE Fpa_Id = @Fpa_Id AND Fpa_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbFormasPago_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -602,14 +756,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Insert]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Insert]
     @Fpa_Descripcion nvarchar(80),
     @Fpa_EsActivo bit,
     @Fpa_UsuarioRegistra int
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbFormasPago (Fpa_Descripcion, Fpa_EsActivo, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbFormasPago (Fpa_Descripcion, Fpa_EsActivo, Fpa_UsuarioRegistra)
     VALUES (@Fpa_Descripcion, @Fpa_EsActivo, @Fpa_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -620,13 +774,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_List]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT Fpa_Id, Fpa_Descripcion, Fpa_EsActivo
+    SELECT ROW_NUMBER() OVER (ORDER BY Fpa_Descripcion) AS [# Fila],
+           Fpa_Id, Fpa_Descripcion, Fpa_EsActivo
     FROM finanza.tbFormasPago
-    WHERE Per_EsEliminado = 0
+    WHERE Fpa_EsEliminado = 0
     ORDER BY Fpa_Descripcion;
 END
 GO
@@ -635,7 +790,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbFormasPago_Update]
+ALTER PROCEDURE [finanza].[PR_tbFormasPago_Update]
     @Fpa_Id int,
     @Fpa_Descripcion nvarchar(80),
     @Fpa_EsActivo bit,
@@ -646,8 +801,8 @@ BEGIN
     UPDATE finanza.tbFormasPago
     SET Fpa_Descripcion = @Fpa_Descripcion,
         Fpa_EsActivo = @Fpa_EsActivo,
-        Per_UsuarioModifica = @Fpa_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+        Fpa_UsuarioModifica = @Fpa_UsuarioModifica,
+        Fpa_FechaModifica = SYSDATETIME()
     WHERE Fpa_Id = @Fpa_Id;
 
     SELECT @Fpa_Id AS UpdatedId;
@@ -658,15 +813,36 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbMoratorias_Detail]
+ALTER PROCEDURE [finanza].[PR_tbMoratorias_Detail]
     @Mor_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT m.*, cc.Cco_MontoOriginal, cc.Cco_MontoTotal, cc.Cco_FechaVencimiento
+    SELECT m.Mor_Id,
+           m.Cco_Id,
+           m.Mor_DiasAtraso,
+           m.Mor_Porcentaje,
+           m.Mor_MontoMora,
+           m.Mor_FechaCalculo,
+           cc.Cco_MontoOriginal,
+           cc.Cco_MontoTotal,
+           cc.Cco_FechaVencimiento,
+           -- Campos de auditoría
+           m.Mor_EsEliminado,
+           m.Mor_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           m.Mor_FechaRegistra,
+           m.Mor_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           m.Mor_FechaModifica
     FROM finanza.tbMoratorias m
     INNER JOIN finanza.tbCuentasCobrar cc ON cc.Cco_Id = m.Cco_Id
-    WHERE m.Mor_Id = @Mor_Id AND m.Per_EsEliminado = 0;
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON m.Mor_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON m.Mor_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE m.Mor_Id = @Mor_Id AND m.Mor_EsEliminado = 0;
 END
 GO 
 /****** Object:  StoredProcedure [finanza].[PR_tbMoratorias_Find]    Script Date: 12/11/2025 22:25:46 ******/
@@ -674,14 +850,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbMoratorias_Find]
+ALTER PROCEDURE [finanza].[PR_tbMoratorias_Find]
     @Mor_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbMoratorias
-    WHERE Mor_Id = @Mor_Id AND Per_EsEliminado = 0;
+    WHERE Mor_Id = @Mor_Id AND Mor_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbMoratorias_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -689,7 +865,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbMoratorias_Insert]
+ALTER PROCEDURE [finanza].[PR_tbMoratorias_Insert]
     @Cco_Id int,
     @Mor_DiasAtraso int,
     @Mor_Porcentaje decimal(9,4),
@@ -699,7 +875,7 @@ CREATE PROCEDURE [finanza].[PR_tbMoratorias_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbMoratorias (Cco_Id, Mor_DiasAtraso, Mor_Porcentaje, Mor_MontoMora, Mor_FechaCalculo, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbMoratorias (Cco_Id, Mor_DiasAtraso, Mor_Porcentaje, Mor_MontoMora, Mor_FechaCalculo, Mor_UsuarioRegistra)
     VALUES (@Cco_Id, @Mor_DiasAtraso, @Mor_Porcentaje, @Mor_MontoMora, @Mor_FechaCalculo, @Mor_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -710,15 +886,56 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbMoratorias_List]
+ALTER PROCEDURE [finanza].[PR_tbMoratorias_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT m.Mor_Id, m.Cco_Id, m.Mor_DiasAtraso, m.Mor_Porcentaje, m.Mor_MontoMora, m.Mor_FechaCalculo, fp.Fpa_Descripcion,
-           (SELECT ISNULL(SUM(pd.Pde_MontoAplicado),0) FROM finanza.tbPagosDetalle pd WHERE pd.Pag_Id = p.Pag_Id AND pd.Per_EsEliminado = 0) AS TotalDistribuido
+    SELECT ROW_NUMBER() OVER (ORDER BY m.Mor_FechaCalculo DESC) AS [# Fila],
+           m.Mor_Id, m.Cco_Id, m.Mor_DiasAtraso, m.Mor_Porcentaje, m.Mor_MontoMora, m.Mor_FechaCalculo,
+           cco.Cco_MontoOriginal, cco.Cco_FechaVencimiento
+    FROM finanza.tbMoratorias m
+    INNER JOIN finanza.tbCuentasCobrar cco ON cco.Cco_Id = m.Cco_Id
+    WHERE m.Mor_EsEliminado = 0
+    ORDER BY m.Mor_FechaCalculo DESC;
+END
+GO
+/****** Object:  StoredProcedure [finanza].[PR_tbPagos_Detail]    Script Date: 12/11/2025 22:25:46 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [finanza].[PR_tbPagos_Detail]
+    @Pag_Id int
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT p.Pag_Id,
+           p.Alu_Id,
+           p.Enc_Id,
+           p.Fpa_Id,
+           p.Pag_MontoTotal,
+           p.Pag_FechaPago,
+           p.Pag_NumeroReferencia,
+           p.Pag_Observaciones,
+           p.Usu_Id,
+           fp.Fpa_Descripcion,
+           (SELECT ISNULL(SUM(pd.Pde_MontoAplicado),0) FROM finanza.tbPagosDetalle pd WHERE pd.Pag_Id = p.Pag_Id AND pd.Pde_EsEliminado = 0) AS TotalDistribuido,
+           -- Campos de auditoría
+           p.Pag_EsEliminado,
+           p.Pag_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           p.Pag_FechaRegistra,
+           p.Pag_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           p.Pag_FechaModifica
     FROM finanza.tbPagos p
     INNER JOIN finanza.tbFormasPago fp ON fp.Fpa_Id = p.Fpa_Id
-    WHERE p.Pag_Id = @Pag_Id AND p.Per_EsEliminado = 0;
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON p.Pag_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON p.Pag_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE p.Pag_Id = @Pag_Id AND p.Pag_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbPagos_Find]    Script Date: 12/11/2025 22:25:46 ******/
@@ -726,12 +943,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbPagos_Find]
+ALTER PROCEDURE [finanza].[PR_tbPagos_Find]
     @Pag_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT * FROM finanza.tbPagos WHERE Pag_Id = @Pag_Id AND Per_EsEliminado = 0;
+    SELECT * FROM finanza.tbPagos WHERE Pag_Id = @Pag_Id AND Pag_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbPagos_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -739,7 +956,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbPagos_Insert]
+ALTER PROCEDURE [finanza].[PR_tbPagos_Insert]
     @Alu_Id int,
     @Enc_Id int = NULL,
     @Fpa_Id int,
@@ -752,7 +969,7 @@ CREATE PROCEDURE [finanza].[PR_tbPagos_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbPagos (Alu_Id, Enc_Id, Fpa_Id, Pag_MontoTotal, Pag_FechaPago, Pag_NumeroReferencia, Pag_Observaciones, Usu_Id, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbPagos (Alu_Id, Enc_Id, Fpa_Id, Pag_MontoTotal, Pag_FechaPago, Pag_NumeroReferencia, Pag_Observaciones, Usu_Id, Pag_UsuarioRegistra)
     VALUES (@Alu_Id, @Enc_Id, @Fpa_Id, @Pag_MontoTotal, @Pag_FechaPago, @Pag_NumeroReferencia, @Pag_Observaciones, @Usu_Id, @Per_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -763,12 +980,13 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbPagos_List]
+ALTER PROCEDURE [finanza].[PR_tbPagos_List]
 AS
 BEGIN
     SET NOCOUNT ON;
 
     SELECT
+        ROW_NUMBER() OVER (ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC) AS [# Fila],
         p.Pag_Id,
         p.Pag_FechaPago,
         p.Pag_MontoTotal,
@@ -811,10 +1029,10 @@ BEGIN
                 r.Rec_NumeroRecibo,
                 r.Rec_FechaEmision
             FROM finanza.tbRecibos r
-            WHERE r.Pag_Id = p.Pag_Id AND r.Per_EsEliminado = 0
+            WHERE r.Pag_Id = p.Pag_Id AND r.Rec_EsEliminado = 0
             ORDER BY r.Rec_FechaEmision DESC, r.Rec_Id DESC
         ) r1
-    WHERE p.Per_EsEliminado = 0
+    WHERE p.Pag_EsEliminado = 0
     ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC;
 END
 GO 
@@ -823,7 +1041,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbPagosDetalle_Insert]
+ALTER PROCEDURE [finanza].[PR_tbPagosDetalle_Insert]
     @Pag_Id int,
     @Cco_Id int,
     @Pde_MontoAplicado decimal(18,2),
@@ -831,7 +1049,7 @@ CREATE PROCEDURE [finanza].[PR_tbPagosDetalle_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbPagosDetalle (Pag_Id, Cco_Id, Pde_MontoAplicado, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbPagosDetalle (Pag_Id, Cco_Id, Pde_MontoAplicado, Pde_UsuarioRegistra)
     VALUES (@Pag_Id, @Cco_Id, @Pde_MontoAplicado, @Per_UsuarioRegistra);
     SELECT SCOPE_IDENTITY() AS NewId;
 END
@@ -841,14 +1059,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbPagosDetalle_List]
+ALTER PROCEDURE [finanza].[PR_tbPagosDetalle_List]
     @Pag_Id int = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT pd.*
+    SELECT ROW_NUMBER() OVER (ORDER BY pd.Pde_Id DESC) AS [# Fila],
+           pd.Pde_Id, pd.Pag_Id, pd.Cco_Id, pd.Pde_MontoAplicado,
+           pd.Pde_EsEliminado, pd.Pde_UsuarioRegistra, pd.Pde_FechaRegistra, pd.Pde_UsuarioModifica, pd.Pde_FechaModifica
     FROM finanza.tbPagosDetalle pd
-    WHERE pd.Per_EsEliminado = 0
+    WHERE pd.Pde_EsEliminado = 0
       AND (@Pag_Id IS NULL OR pd.Pag_Id = @Pag_Id)
     ORDER BY pd.Pde_Id DESC;
 END
@@ -858,12 +1078,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbRecibos_Find]
+ALTER PROCEDURE [finanza].[PR_tbRecibos_Find]
     @Rec_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT * FROM finanza.tbRecibos WHERE Rec_Id = @Rec_Id AND Per_EsEliminado = 0;
+    SELECT * FROM finanza.tbRecibos WHERE Rec_Id = @Rec_Id AND Rec_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbRecibos_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -871,7 +1091,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbRecibos_Insert]
+ALTER PROCEDURE [finanza].[PR_tbRecibos_Insert]
     @Pag_Id int,
     @Rec_NumeroRecibo nvarchar(40),
     @Rec_RutaArchivo nvarchar(260) = NULL,
@@ -879,7 +1099,7 @@ CREATE PROCEDURE [finanza].[PR_tbRecibos_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbRecibos (Pag_Id, Rec_NumeroRecibo, Rec_RutaArchivo, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbRecibos (Pag_Id, Rec_NumeroRecibo, Rec_RutaArchivo, Rec_UsuarioRegistra)
     VALUES (@Pag_Id, @Rec_NumeroRecibo, @Rec_RutaArchivo, @Per_UsuarioRegistra);
     SELECT SCOPE_IDENTITY() AS NewId;
 END
@@ -889,11 +1109,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbRecibos_List]
+ALTER PROCEDURE [finanza].[PR_tbRecibos_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT * FROM finanza.tbRecibos WHERE Per_EsEliminado = 0 ORDER BY Rec_FechaEmision DESC, Rec_Id DESC;
+    SELECT ROW_NUMBER() OVER (ORDER BY Rec_FechaEmision DESC, Rec_Id DESC) AS [# Fila],
+           Rec_Id, Pag_Id, Rec_NumeroRecibo, Rec_FechaEmision, Rec_RutaArchivo,
+           Rec_EsEliminado, Rec_UsuarioRegistra, Rec_FechaRegistra, Rec_UsuarioModifica, Rec_FechaModifica
+    FROM finanza.tbRecibos
+    WHERE Rec_EsEliminado = 0
+    ORDER BY Rec_FechaEmision DESC, Rec_Id DESC;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbTarifas_Delete]    Script Date: 12/11/2025 22:25:46 ******/
@@ -901,16 +1126,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Delete]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Delete]
     @Tar_Id int,
     @Tar_UsuarioModifica int
 AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE finanza.tbTarifas
-    SET Per_EsEliminado = 1,
-        Per_UsuarioModifica = @Tar_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+    SET Tar_EsEliminado = 1,
+        Tar_UsuarioModifica = @Tar_UsuarioModifica,
+        Tar_FechaModifica = SYSDATETIME()
     WHERE Tar_Id = @Tar_Id;
 END
 GO
@@ -919,15 +1144,35 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Detail]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Detail]
     @Tar_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT t.*, cp.Cpa_Descripcion AS Concepto
+    SELECT t.Tar_Id,
+           t.Cpa_Id,
+           t.Niv_Id,
+           t.Cun_Id,
+           t.Tar_Monto,
+           t.Tar_AnioVigencia,
+           t.Tar_EsActivo,
+           cp.Cpa_Descripcion AS Concepto,
+           -- Campos de auditoría
+           t.Tar_EsEliminado,
+           t.Tar_UsuarioRegistra,
+           usuarioRegistra.Usu_Name AS NombreCompletoUsuarioRegistra,
+           t.Tar_FechaRegistra,
+           t.Tar_UsuarioModifica,
+           usuarioModificacion.Usu_Name AS NombreCompletoUsuarioModifica,
+           t.Tar_FechaModifica
     FROM finanza.tbTarifas t
     INNER JOIN finanza.tbConceptosPago cp ON cp.Cpa_Id = t.Cpa_Id
-    WHERE t.Tar_Id = @Tar_Id AND t.Per_EsEliminado = 0;
+    -- JOINs para auditoría
+    LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
+        ON t.Tar_UsuarioRegistra = usuarioRegistra.Usu_Id
+    LEFT JOIN seguridad.tbUsuarios AS usuarioModificacion
+        ON t.Tar_UsuarioModifica = usuarioModificacion.Usu_Id
+    WHERE t.Tar_Id = @Tar_Id AND t.Tar_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbTarifas_Dropdown]    Script Date: 12/11/2025 22:25:46 ******/
@@ -935,7 +1180,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Dropdown]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Dropdown]
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -943,7 +1188,7 @@ BEGIN
            CONCAT(cp.Cpa_Descripcion, ' - ', t.Tar_AnioVigencia, ' - L.', t.Tar_Monto) AS Texto
     FROM finanza.tbTarifas t
     INNER JOIN finanza.tbConceptosPago cp ON cp.Cpa_Id = t.Cpa_Id
-    WHERE t.Per_EsEliminado = 0
+    WHERE t.Tar_EsEliminado = 0
     ORDER BY t.Tar_AnioVigencia DESC, cp.Cpa_Descripcion;
 END
 GO
@@ -952,7 +1197,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Exist]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Exist]
     @Cpa_Id int,
     @Niv_Id int = NULL,
     @Cun_Id int = NULL,
@@ -970,7 +1215,7 @@ BEGIN
           AND (Niv_Id = @Niv_Id OR (Niv_Id IS NULL AND @Niv_Id IS NULL))
           AND (Cun_Id = @Cun_Id OR (Cun_Id IS NULL AND @Cun_Id IS NULL))
           AND Tar_AnioVigencia = @Tar_AnioVigencia
-          AND Per_EsEliminado = 0
+          AND Tar_EsEliminado = 0
           AND (@Tar_Id IS NULL OR Tar_Id <> @Tar_Id)
     )
     BEGIN
@@ -991,14 +1236,14 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Find]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Find]
     @Tar_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT *
     FROM finanza.tbTarifas
-    WHERE Tar_Id = @Tar_Id AND Per_EsEliminado = 0;
+    WHERE Tar_Id = @Tar_Id AND Tar_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbTarifas_GetByConceptoAndNivel]    Script Date: 12/11/2025 22:25:46 ******/
@@ -1006,7 +1251,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_GetByConceptoAndNivel]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_GetByConceptoAndNivel]
     @Cpa_Id int,
     @Niv_Id int,
     @Tar_AnioVigencia smallint
@@ -1018,7 +1263,7 @@ BEGIN
     WHERE Cpa_Id = @Cpa_Id
       AND Niv_Id = @Niv_Id
       AND Tar_AnioVigencia = @Tar_AnioVigencia
-      AND Per_EsEliminado = 0;
+      AND Tar_EsEliminado = 0;
 END
 GO
 /****** Object:  StoredProcedure [finanza].[PR_tbTarifas_Insert]    Script Date: 12/11/2025 22:25:46 ******/
@@ -1026,7 +1271,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Insert]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Insert]
     @Cpa_Id int,
     @Niv_Id int = NULL,
     @Cun_Id int = NULL,
@@ -1036,7 +1281,7 @@ CREATE PROCEDURE [finanza].[PR_tbTarifas_Insert]
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO finanza.tbTarifas (Cpa_Id, Niv_Id, Cun_Id, Tar_Monto, Tar_AnioVigencia, Per_UsuarioRegistra)
+    INSERT INTO finanza.tbTarifas (Cpa_Id, Niv_Id, Cun_Id, Tar_Monto, Tar_AnioVigencia, Tar_UsuarioRegistra)
     VALUES (@Cpa_Id, @Niv_Id, @Cun_Id, @Tar_Monto, @Tar_AnioVigencia, @Tar_UsuarioRegistra);
 
     SELECT SCOPE_IDENTITY() AS NewId;
@@ -1047,15 +1292,16 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_List]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_List]
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT t.Tar_Id, t.Cpa_Id, t.Niv_Id, t.Cun_Id, t.Tar_Monto, t.Tar_AnioVigencia,
+    SELECT ROW_NUMBER() OVER (ORDER BY t.Tar_AnioVigencia DESC, cp.Cpa_Descripcion) AS [# Fila],
+           t.Tar_Id, t.Cpa_Id, t.Niv_Id, t.Cun_Id, t.Tar_Monto, t.Tar_AnioVigencia,
            cp.Cpa_Descripcion AS Concepto
     FROM finanza.tbTarifas t
     INNER JOIN finanza.tbConceptosPago cp ON cp.Cpa_Id = t.Cpa_Id
-    WHERE t.Per_EsEliminado = 0
+    WHERE t.Tar_EsEliminado = 0
     ORDER BY t.Tar_AnioVigencia DESC, cp.Cpa_Descripcion;
 END
 GO
@@ -1064,7 +1310,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE PROCEDURE [finanza].[PR_tbTarifas_Update]
+ALTER PROCEDURE [finanza].[PR_tbTarifas_Update]
     @Tar_Id int,
     @Cpa_Id int,
     @Niv_Id int = NULL,
@@ -1081,8 +1327,8 @@ BEGIN
         Cun_Id = @Cun_Id,
         Tar_Monto = @Tar_Monto,
         Tar_AnioVigencia = @Tar_AnioVigencia,
-        Per_UsuarioModifica = @Tar_UsuarioModifica,
-        Per_FechaModifica = SYSDATETIME()
+        Tar_UsuarioModifica = @Tar_UsuarioModifica,
+        Tar_FechaModifica = SYSDATETIME()
     WHERE Tar_Id = @Tar_Id;
 
     SELECT @Tar_Id AS UpdatedId;

@@ -1145,7 +1145,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<int> PR_tbConceptosPago_DeleteAsync(int? Cpa_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<int> PR_tbConceptosPago_DeleteAsync(int? Cpa_Id, int? Cpa_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -1164,13 +1164,13 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 new SqlParameter
                 {
-                    ParameterName = "Per_UsuarioModifica",
-                    Value = Per_UsuarioModifica ?? Convert.DBNull,
+                    ParameterName = "Cpa_UsuarioModifica",
+                    Value = Cpa_UsuarioModifica ?? Convert.DBNull,
                     SqlDbType = System.Data.SqlDbType.Int,
                 },
                 parameterreturnValue,
             };
-            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbConceptosPago_Delete] @Cpa_Id = @Cpa_Id, @Per_UsuarioModifica = @Per_UsuarioModifica", sqlParameters, cancellationToken);
+            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbConceptosPago_Delete] @Cpa_Id = @Cpa_Id, @Cpa_UsuarioModifica = @Cpa_UsuarioModifica", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -1300,7 +1300,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<int> PR_tbCuentasCobrar_DeleteAsync(int? Cco_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<int> PR_tbCuentasCobrar_DeleteAsync(int? Cco_Id, int? Cco_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -1319,13 +1319,13 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 new SqlParameter
                 {
-                    ParameterName = "Per_UsuarioModifica",
-                    Value = Per_UsuarioModifica ?? Convert.DBNull,
+                    ParameterName = "Cco_UsuarioModifica",
+                    Value = Cco_UsuarioModifica ?? Convert.DBNull,
                     SqlDbType = System.Data.SqlDbType.Int,
                 },
                 parameterreturnValue,
             };
-            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbCuentasCobrar_Delete] @Cco_Id = @Cco_Id, @Per_UsuarioModifica = @Per_UsuarioModifica", sqlParameters, cancellationToken);
+            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbCuentasCobrar_Delete] @Cco_Id = @Cco_Id, @Cco_UsuarioModifica = @Cco_UsuarioModifica", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -6684,7 +6684,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<int> PR_tbPagosDetalle_DeleteAsync(int? Pde_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<int> PR_tbPagosDetalle_DeleteAsync(int? Pde_Id, int? Pde_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -6703,13 +6703,13 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 new SqlParameter
                 {
-                    ParameterName = "Per_UsuarioModifica",
-                    Value = Per_UsuarioModifica ?? Convert.DBNull,
+                    ParameterName = "Pde_UsuarioModifica",
+                    Value = Pde_UsuarioModifica ?? Convert.DBNull,
                     SqlDbType = System.Data.SqlDbType.Int,
                 },
                 parameterreturnValue,
             };
-            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbPagosDetalle_Delete] @Pde_Id = @Pde_Id, @Per_UsuarioModifica = @Per_UsuarioModifica", sqlParameters, cancellationToken);
+            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbPagosDetalle_Delete] @Pde_Id = @Pde_Id, @Pde_UsuarioModifica = @Pde_UsuarioModifica", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -6762,7 +6762,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<List<PR_tbPagosDetalle_ListResult>> PR_tbPagosDetalle_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<List<PR_tbPagosDetalle_ListResult>> PR_tbPagosDetalle_ListAsync(int? Pag_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -6773,9 +6773,15 @@ namespace Gestion.Colegial.Entities.Entities
 
             var sqlParameters = new []
             {
+                new SqlParameter
+                {
+                    ParameterName = "Pag_Id",
+                    Value = Pag_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
                 parameterreturnValue,
             };
-            var _ = await _context.SqlQueryAsync<PR_tbPagosDetalle_ListResult>("EXEC @returnValue = [finanza].[PR_tbPagosDetalle_List]", sqlParameters, cancellationToken);
+            var _ = await _context.SqlQueryAsync<PR_tbPagosDetalle_ListResult>("EXEC @returnValue = [finanza].[PR_tbPagosDetalle_List] @Pag_Id = @Pag_Id", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -7444,7 +7450,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<int> PR_tbRecibos_DeleteAsync(int? Rec_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<int> PR_tbRecibos_DeleteAsync(int? Rec_Id, int? Rec_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -7463,13 +7469,13 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 new SqlParameter
                 {
-                    ParameterName = "Per_UsuarioModifica",
-                    Value = Per_UsuarioModifica ?? Convert.DBNull,
+                    ParameterName = "Rec_UsuarioModifica",
+                    Value = Rec_UsuarioModifica ?? Convert.DBNull,
                     SqlDbType = System.Data.SqlDbType.Int,
                 },
                 parameterreturnValue,
             };
-            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbRecibos_Delete] @Rec_Id = @Rec_Id, @Per_UsuarioModifica = @Per_UsuarioModifica", sqlParameters, cancellationToken);
+            var _ = await _context.Database.ExecuteSqlRawAsync("EXEC @returnValue = [finanza].[PR_tbRecibos_Delete] @Rec_Id = @Rec_Id, @Rec_UsuarioModifica = @Rec_UsuarioModifica", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -8144,7 +8150,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<List<PR_tbTarifas_ExistResult>> PR_tbTarifas_ExistAsync(int? Cpa_Id, int? Niv_Id, int? Tar_AnioVigencia, int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<List<PR_tbTarifas_ExistResult>> PR_tbTarifas_ExistAsync(int? Cpa_Id, int? Niv_Id, int? Cun_Id, short? Tar_AnioVigencia, int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -8169,9 +8175,15 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 new SqlParameter
                 {
+                    ParameterName = "Cun_Id",
+                    Value = Cun_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                new SqlParameter
+                {
                     ParameterName = "Tar_AnioVigencia",
                     Value = Tar_AnioVigencia ?? Convert.DBNull,
-                    SqlDbType = System.Data.SqlDbType.Int,
+                    SqlDbType = System.Data.SqlDbType.SmallInt,
                 },
                 new SqlParameter
                 {
@@ -8181,7 +8193,7 @@ namespace Gestion.Colegial.Entities.Entities
                 },
                 parameterreturnValue,
             };
-            var _ = await _context.SqlQueryAsync<PR_tbTarifas_ExistResult>("EXEC @returnValue = [finanza].[PR_tbTarifas_Exist] @Cpa_Id = @Cpa_Id, @Niv_Id = @Niv_Id, @Tar_AnioVigencia = @Tar_AnioVigencia, @Tar_Id = @Tar_Id", sqlParameters, cancellationToken);
+            var _ = await _context.SqlQueryAsync<PR_tbTarifas_ExistResult>("EXEC @returnValue = [finanza].[PR_tbTarifas_Exist] @Cpa_Id = @Cpa_Id, @Niv_Id = @Niv_Id, @Cun_Id = @Cun_Id, @Tar_AnioVigencia = @Tar_AnioVigencia, @Tar_Id = @Tar_Id", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -8214,7 +8226,7 @@ namespace Gestion.Colegial.Entities.Entities
             return _;
         }
 
-        public virtual async Task<List<PR_tbTarifas_GetByConceptoAndNivelResult>> PR_tbTarifas_GetByConceptoAndNivelAsync(int? Cpa_Id, int? Niv_Id, int? Tar_AnioVigencia, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        public virtual async Task<List<PR_tbTarifas_GetByConceptoAndNivelResult>> PR_tbTarifas_GetByConceptoAndNivelAsync(int? Cpa_Id, int? Niv_Id, short? Tar_AnioVigencia, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
         {
             var parameterreturnValue = new SqlParameter
             {
@@ -8241,7 +8253,7 @@ namespace Gestion.Colegial.Entities.Entities
                 {
                     ParameterName = "Tar_AnioVigencia",
                     Value = Tar_AnioVigencia ?? Convert.DBNull,
-                    SqlDbType = System.Data.SqlDbType.Int,
+                    SqlDbType = System.Data.SqlDbType.SmallInt,
                 },
                 parameterreturnValue,
             };

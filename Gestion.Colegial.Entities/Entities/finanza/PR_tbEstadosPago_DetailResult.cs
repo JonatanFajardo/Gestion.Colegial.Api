@@ -9,11 +9,14 @@ namespace Gestion.Colegial.Entities.Entities
     {
         public int Epa_Id { get; set; }
         public string Epa_Descripcion { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Epa_EsActivo { get; set; }
         public int? CantidadCuentas { get; set; }
+        public bool Epa_EsEliminado { get; set; }
+        public int Epa_UsuarioRegistra { get; set; }
+        public string NombreCompletoUsuarioRegistra { get; set; }
+        public DateTime Epa_FechaRegistra { get; set; }
+        public int? Epa_UsuarioModifica { get; set; }
+        public string NombreCompletoUsuarioModifica { get; set; }
+        public DateTime? Epa_FechaModifica { get; set; }
     }
 }

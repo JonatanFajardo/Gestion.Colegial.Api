@@ -11,7 +11,6 @@ namespace Gestion.Colegial.Entities.Entities
         public int Alu_Id { get; set; }
         public int Cpa_Id { get; set; }
         public int? Tar_Id { get; set; }
-        public int Epa_Id { get; set; }
         [Column("Cco_MontoOriginal", TypeName = "decimal(18,2)")]
         public decimal Cco_MontoOriginal { get; set; }
         [Column("Cco_MontoDescuento", TypeName = "decimal(18,2)")]
@@ -24,9 +23,12 @@ namespace Gestion.Colegial.Entities.Entities
         public decimal Cco_MontoPendiente { get; set; }
         public DateTime Cco_FechaEmision { get; set; }
         public DateTime Cco_FechaVencimiento { get; set; }
+        public int Epa_Id { get; set; }
         public string Cco_Observaciones { get; set; }
-        public string DescripcionConceptoPago { get; set; }
-        public string DescripcionEstadoPago { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public bool Cco_EsEliminado { get; set; }
+        public int Cco_UsuarioRegistra { get; set; }
+        public DateTime Cco_FechaRegistra { get; set; }
+        public int? Cco_UsuarioModifica { get; set; }
+        public DateTime? Cco_FechaModifica { get; set; }
     }
 }

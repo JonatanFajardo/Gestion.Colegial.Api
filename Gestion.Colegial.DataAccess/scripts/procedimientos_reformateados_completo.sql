@@ -31,7 +31,7 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY des.Des_Descripcion
+            ORDER BY ISNULL(des.Per_FechaModifica, des.Per_FechaRegistra) DESC
         ) AS [Fila],
         des.Des_Descripcion,
         des.Des_TipoDescuento,
@@ -42,7 +42,7 @@ BEGIN
     WHERE
         des.Per_EsEliminado != 1
     ORDER BY
-        des.Des_Descripcion;
+        ISNULL(des.Per_FechaModifica, des.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -147,7 +147,7 @@ BEGIN
         SELECT 1
         FROM finanza.tbDescuentos
         WHERE Des_Descripcion = @Des_Descripcion
-          AND Per_EsEliminado != 1
+          AND Des_EsEliminado != 1
           AND (@Des_Id IS NULL OR Des_Id <> @Des_Id)
     )
     BEGIN
@@ -178,7 +178,7 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY da.Dap_Fecha DESC, da.Dap_Id DESC
+            ORDER BY ISNULL(da.Per_FechaModifica, da.Per_FechaRegistra) DESC
         ) AS [Fila],
         da.Dap_MontoAplicado,
         da.Dap_Fecha,
@@ -199,8 +199,7 @@ BEGIN
     WHERE
         da.Per_EsEliminado != 1
     ORDER BY
-        da.Dap_Fecha DESC,
-        da.Dap_Id DESC;
+        ISNULL(da.Per_FechaModifica, da.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -218,10 +217,11 @@ BEGIN
         da.Dap_Id,
         da.Cco_Id,
         da.Des_Id,
+        des.Des_Descripcion AS DescripcionDescuento,
         da.Dap_MontoAplicado,
         da.Dap_Fecha,
-        -- Descripciones de relaciones
-        des.Des_Descripcion AS DescripcionDescuento,
+        -- Información del alumno (para referencia)
+        a.Alu_Id,
         dbo.fn_FormatearNombreCompleto(
             per.Per_PrimerNombre,
             per.Per_SegundoNombre,
@@ -254,10 +254,11 @@ BEGIN
         da.Dap_Id,
         da.Cco_Id,
         da.Des_Id,
+        des.Des_Descripcion AS DescripcionDescuento,
         da.Dap_MontoAplicado,
         da.Dap_Fecha,
-        -- Descripciones de relaciones
-        des.Des_Descripcion AS DescripcionDescuento,
+        -- Información del alumno (para referencia)
+        a.Alu_Id,
         dbo.fn_FormatearNombreCompleto(
             per.Per_PrimerNombre,
             per.Per_SegundoNombre,
@@ -342,6 +343,30 @@ GO
    ============================================================================ */
 
 -- ============================================================================
+-- PR_tbEstadosPago_List
+-- Tipo: LIST - Sin IDs, sin auditoría, solo descripciones
+-- ============================================================================
+ALTER PROCEDURE [finanza].[PR_tbEstadosPago_List]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        ROW_NUMBER() OVER (
+            ORDER BY ISNULL(ep.Per_FechaModifica, ep.Per_FechaRegistra) DESC
+        ) AS [Fila],
+        ep.Epa_Descripcion,
+        ep.Epa_EsActivo
+    FROM
+        finanza.tbEstadosPago ep
+    WHERE
+        ep.Per_EsEliminado != 1
+    ORDER BY
+        ISNULL(ep.Per_FechaModifica, ep.Per_FechaRegistra) DESC;
+END
+GO
+
+-- ============================================================================
 -- PR_tbEstadosPago_Find
 -- Tipo: FIND - Con IDs y descripciones, sin auditoría
 -- ============================================================================
@@ -353,7 +378,8 @@ BEGIN
 
     SELECT
         ep.Epa_Id,
-        ep.Epa_Descripcion
+        ep.Epa_Descripcion,
+        ep.Epa_EsActivo
     FROM
         finanza.tbEstadosPago ep
     WHERE
@@ -375,6 +401,7 @@ BEGIN
     SELECT
         ep.Epa_Id,
         ep.Epa_Descripcion,
+        ep.Epa_EsActivo,
         -- Campos de auditoría
         ep.Per_EsEliminado,
         ep.Per_UsuarioRegistra,
@@ -412,6 +439,7 @@ BEGIN
         finanza.tbEstadosPago ep
     WHERE
         ep.Per_EsEliminado != 1
+        AND ep.Epa_EsActivo = 1
     ORDER BY
         ep.Epa_Descripcion;
 END
@@ -435,7 +463,7 @@ BEGIN
         SELECT 1
         FROM finanza.tbEstadosPago
         WHERE Epa_Descripcion = @Epa_Descripcion
-          AND Per_EsEliminado != 1
+          AND Epa_EsEliminado != 1
           AND (@Epa_Id IS NULL OR Epa_Id <> @Epa_Id)
     )
     BEGIN
@@ -526,11 +554,10 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY m.Mor_FechaAplicacion DESC, m.Mor_Id DESC
+            ORDER BY ISNULL(m.Per_FechaModifica, m.Per_FechaRegistra) DESC
         ) AS [Fila],
         m.Mor_MontoMora,
-        m.Mor_FechaAplicacion,
-        m.Mor_Observaciones,
+        m.Mor_FechaCalculo,
         -- Descripciones de relaciones
         dbo.fn_FormatearNombreCompleto(
             per.Per_PrimerNombre,
@@ -546,8 +573,7 @@ BEGIN
     WHERE
         m.Per_EsEliminado != 1
     ORDER BY
-        m.Mor_FechaAplicacion DESC,
-        m.Mor_Id DESC;
+        ISNULL(m.Per_FechaModifica, m.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -565,9 +591,9 @@ BEGIN
         m.Mor_Id,
         m.Cco_Id,
         m.Mor_MontoMora,
-        m.Mor_FechaAplicacion,
-        m.Mor_Observaciones,
-        -- Descripciones de relaciones
+        m.Mor_FechaCalculo,
+        -- Información del alumno (para referencia)
+        a.Alu_Id,
         dbo.fn_FormatearNombreCompleto(
             per.Per_PrimerNombre,
             per.Per_SegundoNombre,
@@ -599,9 +625,9 @@ BEGIN
         m.Mor_Id,
         m.Cco_Id,
         m.Mor_MontoMora,
-        m.Mor_FechaAplicacion,
-        m.Mor_Observaciones,
-        -- Descripciones de relaciones
+        m.Mor_FechaCalculo,
+        -- Información del alumno (para referencia)
+        a.Alu_Id,
         dbo.fn_FormatearNombreCompleto(
             per.Per_PrimerNombre,
             per.Per_SegundoNombre,
@@ -643,13 +669,13 @@ BEGIN
 
     SELECT
         m.Mor_Id,
-        CONCAT(FORMAT(m.Mor_MontoMora, 'C2'), ' - ', FORMAT(m.Mor_FechaAplicacion, 'dd/MM/yyyy')) AS Texto
+        CONCAT(FORMAT(m.Mor_MontoMora, 'C2'), ' - ', FORMAT(m.Mor_FechaCalculo, 'dd/MM/yyyy')) AS Texto
     FROM
         finanza.tbMoratorias m
     WHERE
         m.Per_EsEliminado != 1
     ORDER BY
-        m.Mor_FechaAplicacion DESC;
+        m.Mor_FechaCalculo DESC;
 END
 GO
 
@@ -665,7 +691,7 @@ BEGIN
 
     SELECT
         m.Mor_MontoMora,
-        m.Mor_FechaAplicacion,
+        m.Mor_FechaCalculo,
         m.Mor_Observaciones
     FROM
         finanza.tbMoratorias m
@@ -673,7 +699,7 @@ BEGIN
         m.Cco_Id = @Cco_Id
         AND m.Per_EsEliminado != 1
     ORDER BY
-        m.Mor_FechaAplicacion DESC;
+        m.Mor_FechaCalculo DESC;
 END
 GO
 
@@ -692,7 +718,7 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY p.Pag_FechaPago DESC, p.Pag_Id DESC
+            ORDER BY ISNULL(p.Per_FechaModifica, p.Per_FechaRegistra) DESC
         ) AS [Fila],
         p.Pag_MontoTotal,
         p.Pag_FechaPago,
@@ -724,8 +750,7 @@ BEGIN
     WHERE
         p.Per_EsEliminado != 1
     ORDER BY
-        p.Pag_FechaPago DESC,
-        p.Pag_Id DESC;
+        ISNULL(p.Per_FechaModifica, p.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -855,7 +880,7 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY pd.Pde_Id DESC
+            ORDER BY ISNULL(pd.Per_FechaModifica, pd.Per_FechaRegistra) DESC
         ) AS [Fila],
         pd.Pde_MontoAplicado,
         -- Descripciones de relaciones
@@ -876,7 +901,7 @@ BEGIN
     WHERE
         pd.Per_EsEliminado != 1
     ORDER BY
-        pd.Pde_Id DESC;
+        ISNULL(pd.Per_FechaModifica, pd.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -895,7 +920,7 @@ BEGIN
 
     SELECT
         ROW_NUMBER() OVER (
-            ORDER BY t.Tar_AnioVigencia DESC, t.Tar_Id DESC
+            ORDER BY ISNULL(t.Per_FechaModifica, t.Per_FechaRegistra) DESC
         ) AS [Fila],
         t.Tar_Monto,
         t.Tar_AnioVigencia,
@@ -908,8 +933,7 @@ BEGIN
     WHERE
         t.Per_EsEliminado != 1
     ORDER BY
-        t.Tar_AnioVigencia DESC,
-        t.Tar_Id DESC;
+        ISNULL(t.Per_FechaModifica, t.Per_FechaRegistra) DESC;
 END
 GO
 
@@ -926,15 +950,16 @@ BEGIN
     SELECT
         t.Tar_Id,
         t.Cpa_Id,
+        cp.Cpa_Descripcion AS DescripcionConceptoPago,
         t.Niv_Id,
+        niv.Niv_Descripcion AS DescripcionNivel,
         t.Tar_Monto,
         t.Tar_AnioVigencia,
-        t.Tar_EsActivo,
-        -- Descripciones de relaciones
-        cp.Cpa_Descripcion AS DescripcionConceptoPago
+        t.Tar_EsActivo
     FROM
         finanza.tbTarifas t
         INNER JOIN finanza.tbConceptosPago cp ON t.Cpa_Id = cp.Cpa_Id
+        LEFT JOIN app.tbNivelesEducativos niv ON t.Niv_Id = niv.Niv_Id
     WHERE
         t.Tar_Id = @Tar_Id
         AND t.Per_EsEliminado != 1;
@@ -954,12 +979,12 @@ BEGIN
     SELECT
         t.Tar_Id,
         t.Cpa_Id,
+        cp.Cpa_Descripcion AS DescripcionConceptoPago,
         t.Niv_Id,
+        niv.Niv_Descripcion AS DescripcionNivel,
         t.Tar_Monto,
         t.Tar_AnioVigencia,
         t.Tar_EsActivo,
-        -- Descripciones de relaciones
-        cp.Cpa_Descripcion AS DescripcionConceptoPago,
         -- Campos de auditoría
         t.Per_EsEliminado,
         t.Per_UsuarioRegistra,
@@ -971,6 +996,7 @@ BEGIN
     FROM
         finanza.tbTarifas t
         INNER JOIN finanza.tbConceptosPago cp ON t.Cpa_Id = cp.Cpa_Id
+        LEFT JOIN app.tbNivelesEducativos niv ON t.Niv_Id = niv.Niv_Id
         -- JOINs para auditoría
         LEFT JOIN seguridad.tbUsuarios AS usuarioRegistra
             ON t.Per_UsuarioRegistra = usuarioRegistra.Usu_Id
@@ -1028,7 +1054,7 @@ BEGIN
         WHERE Cpa_Id = @Cpa_Id
           AND (@Niv_Id IS NULL OR Niv_Id = @Niv_Id)
           AND Tar_AnioVigencia = @Tar_AnioVigencia
-          AND Per_EsEliminado != 1
+          AND Tar_EsEliminado != 1
           AND (@Tar_Id IS NULL OR Tar_Id <> @Tar_Id)
     )
     BEGIN
