@@ -7,6 +7,12 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbCuentasCobrar_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Cco_Id { get; set; }
+        public int Alu_Id { get; set; }
+        public int Cpa_Id { get; set; }
+        public int? Tar_Id { get; set; }
         [Column("Cco_MontoOriginal", TypeName = "decimal(18,2)")]
         public decimal Cco_MontoOriginal { get; set; }
         [Column("Cco_MontoDescuento", TypeName = "decimal(18,2)")]
@@ -19,9 +25,8 @@ namespace Gestion.Colegial.Entities.Entities
         public decimal Cco_MontoPendiente { get; set; }
         public DateTime Cco_FechaEmision { get; set; }
         public DateTime Cco_FechaVencimiento { get; set; }
-        public string Cco_Observaciones { get; set; }
-        public string DescripcionConceptoPago { get; set; }
-        public string DescripcionEstadoPago { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public int Epa_Id { get; set; }
+        public string Cpa_Descripcion { get; set; }
+        public string Epa_Descripcion { get; set; }
     }
 }

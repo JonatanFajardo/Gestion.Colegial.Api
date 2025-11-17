@@ -40,12 +40,12 @@ namespace Gestion.Colegial.Entities.Entities
         Task<int> PR_tbCargos_InsertAsync(string Car_Descripcion, int? Car_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCargos_ListResult>> PR_tbCargos_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<int> PR_tbCargos_UpdateAsync(int? Car_Id, string Car_Descripcion, int? Car_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<int> PR_tbConceptosPago_DeleteAsync(int? Cpa_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<int> PR_tbConceptosPago_DeleteAsync(int? Cpa_Id, int? Cpa_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbConceptosPago_DetailResult>> PR_tbConceptosPago_DetailAsync(int? Cpa_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbConceptosPago_FindResult>> PR_tbConceptosPago_FindAsync(int? Cpa_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbConceptosPago_InsertResult>> PR_tbConceptosPago_InsertAsync(string Cpa_Descripcion, bool? Cpa_EsRecurrente, bool? Cpa_EsObligatorio, bool? Cpa_EsActivo, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbConceptosPago_ListResult>> PR_tbConceptosPago_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<int> PR_tbCuentasCobrar_DeleteAsync(int? Cco_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<int> PR_tbCuentasCobrar_DeleteAsync(int? Cco_Id, int? Cco_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCuentasCobrar_DetailResult>> PR_tbCuentasCobrar_DetailAsync(int? Cco_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCuentasCobrar_FindResult>> PR_tbCuentasCobrar_FindAsync(int? Cco_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCuentasCobrar_InsertResult>> PR_tbCuentasCobrar_InsertAsync(int? Alu_Id, int? Cpa_Id, int? Tar_Id, decimal? Cco_MontoOriginal, decimal? Cco_MontoDescuento, decimal? Cco_MontoMora, decimal? Cco_MontoTotal, decimal? Cco_MontoPendiente, DateTime? Cco_FechaEmision, DateTime? Cco_FechaVencimiento, int? Epa_Id, string Cco_Observaciones, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
@@ -210,9 +210,9 @@ namespace Gestion.Colegial.Entities.Entities
         Task<List<PR_tbPagos_FindResult>> PR_tbPagos_FindAsync(int? Pag_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbPagos_InsertResult>> PR_tbPagos_InsertAsync(int? Alu_Id, int? Enc_Id, int? Fpa_Id, decimal? Pag_MontoTotal, DateTime? Pag_FechaPago, string Pag_NumeroReferencia, string Pag_Observaciones, int? Usu_Id, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbPagos_ListResult>> PR_tbPagos_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<int> PR_tbPagosDetalle_DeleteAsync(int? Pde_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<int> PR_tbPagosDetalle_DeleteAsync(int? Pde_Id, int? Pde_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbPagosDetalle_InsertResult>> PR_tbPagosDetalle_InsertAsync(int? Pag_Id, int? Cco_Id, decimal? Pde_MontoAplicado, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<List<PR_tbPagosDetalle_ListResult>> PR_tbPagosDetalle_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_tbPagosDetalle_ListResult>> PR_tbPagosDetalle_ListAsync(int? Pag_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<int> PR_tbParciales_DeleteAsync(int? Pac_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbParciales_DetailResult>> PR_tbParciales_DetailAsync(int? Pac_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbParciales_DropdownResult>> PR_tbParciales_DropdownAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
@@ -232,7 +232,7 @@ namespace Gestion.Colegial.Entities.Entities
         Task<int> PR_tbPersonas_DeleteAsync(int? Per_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbPersonas_InsertResult>> PR_tbPersonas_InsertAsync(string Per_Identidad, string Per_PrimerNombre, string Per_SegundoNombre, string Per_ApellidoPaterno, string Per_ApellidoMaterno, DateTime? Per_FechaNacimiento, string Per_CorreoElectronico, string Per_Telefono, string Per_Direccion, string Per_Sexo, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<int> PR_tbPersonas_UpdateAsync(int? Per_Id, string Per_Identidad, string Per_PrimerNombre, string Per_SegundoNombre, string Per_ApellidoPaterno, string Per_ApellidoMaterno, DateTime? Per_FechaNacimiento, string Per_CorreoElectronico, string Per_Telefono, string Per_Direccion, string Per_Sexo, bool? Per_EsActivo, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<int> PR_tbRecibos_DeleteAsync(int? Rec_Id, int? Per_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<int> PR_tbRecibos_DeleteAsync(int? Rec_Id, int? Rec_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbRecibos_DetailResult>> PR_tbRecibos_DetailAsync(int? Rec_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbRecibos_FindResult>> PR_tbRecibos_FindAsync(int? Rec_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbRecibos_InsertResult>> PR_tbRecibos_InsertAsync(int? Pag_Id, string Rec_NumeroRecibo, string Rec_RutaArchivo, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
@@ -257,9 +257,9 @@ namespace Gestion.Colegial.Entities.Entities
         Task<int> PR_tbTarifas_DeleteAsync(int? Tar_Id, int? Tar_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_DetailResult>> PR_tbTarifas_DetailAsync(int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_DropdownResult>> PR_tbTarifas_DropdownAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<List<PR_tbTarifas_ExistResult>> PR_tbTarifas_ExistAsync(int? Cpa_Id, int? Niv_Id, int? Tar_AnioVigencia, int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_tbTarifas_ExistResult>> PR_tbTarifas_ExistAsync(int? Cpa_Id, int? Niv_Id, int? Cun_Id, short? Tar_AnioVigencia, int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_FindResult>> PR_tbTarifas_FindAsync(int? Tar_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
-        Task<List<PR_tbTarifas_GetByConceptoAndNivelResult>> PR_tbTarifas_GetByConceptoAndNivelAsync(int? Cpa_Id, int? Niv_Id, int? Tar_AnioVigencia, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_tbTarifas_GetByConceptoAndNivelResult>> PR_tbTarifas_GetByConceptoAndNivelAsync(int? Cpa_Id, int? Niv_Id, short? Tar_AnioVigencia, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_InsertResult>> PR_tbTarifas_InsertAsync(int? Cpa_Id, int? Niv_Id, int? Cun_Id, decimal? Tar_Monto, short? Tar_AnioVigencia, int? Tar_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_ListResult>> PR_tbTarifas_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbTarifas_UpdateResult>> PR_tbTarifas_UpdateAsync(int? Tar_Id, int? Cpa_Id, int? Niv_Id, int? Cun_Id, decimal? Tar_Monto, short? Tar_AnioVigencia, int? Tar_UsuarioModifica, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);

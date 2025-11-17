@@ -11,11 +11,11 @@ namespace Gestion.Colegial.Entities.Entities
         public int Pag_Id { get; set; }
         public int Cco_Id { get; set; }
         public decimal Pde_MontoAplicado { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Pde_EsEliminado { get; set; }
+        public int Pde_UsuarioRegistra { get; set; }
+        public DateTime Pde_FechaRegistra { get; set; }
+        public int? Pde_UsuarioModifica { get; set; }
+        public DateTime? Pde_FechaModifica { get; set; }
 
         public virtual tbCuentasCobrar Cco { get; set; }
         public virtual tbPagos Pag { get; set; }

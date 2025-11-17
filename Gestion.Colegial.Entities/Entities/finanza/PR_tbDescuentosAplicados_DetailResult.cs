@@ -12,14 +12,21 @@ namespace Gestion.Colegial.Entities.Entities
         public int Des_Id { get; set; }
         [Column("Dap_MontoAplicado", TypeName = "decimal(18,2)")]
         public decimal Dap_MontoAplicado { get; set; }
-        public string DescripcionDescuento { get; set; }
-        public string NombreCompletoAlumno { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
+        public string Dap_Justificacion { get; set; }
+        public string Des_Descripcion { get; set; }
+        public string Des_TipoDescuento { get; set; }
+        [Column("Des_Valor", TypeName = "decimal(18,2)")]
+        public decimal Des_Valor { get; set; }
+        [Column("Cco_MontoOriginal", TypeName = "decimal(18,2)")]
+        public decimal Cco_MontoOriginal { get; set; }
+        [Column("Cco_MontoTotal", TypeName = "decimal(18,2)")]
+        public decimal Cco_MontoTotal { get; set; }
+        public bool Dap_EsEliminado { get; set; }
+        public int Dap_UsuarioRegistra { get; set; }
         public string NombreCompletoUsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
+        public DateTime Dap_FechaRegistra { get; set; }
+        public int? Dap_UsuarioModifica { get; set; }
         public string NombreCompletoUsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public DateTime? Dap_FechaModifica { get; set; }
     }
 }

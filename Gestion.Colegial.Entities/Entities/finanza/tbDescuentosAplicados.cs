@@ -12,11 +12,11 @@ namespace Gestion.Colegial.Entities.Entities
         public int Des_Id { get; set; }
         public decimal Dap_MontoAplicado { get; set; }
         public string Dap_Justificacion { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Dap_EsEliminado { get; set; }
+        public int Dap_UsuarioRegistra { get; set; }
+        public DateTime Dap_FechaRegistra { get; set; }
+        public int? Dap_UsuarioModifica { get; set; }
+        public DateTime? Dap_FechaModifica { get; set; }
 
         public virtual tbCuentasCobrar Cco { get; set; }
         public virtual tbDescuentos Des { get; set; }
