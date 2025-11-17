@@ -13,11 +13,11 @@ namespace Gestion.Colegial.Entities.Entities
         public decimal Mor_Porcentaje { get; set; }
         public decimal Mor_MontoMora { get; set; }
         public DateTime Mor_FechaCalculo { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Mor_EsEliminado { get; set; }
+        public int Mor_UsuarioRegistra { get; set; }
+        public DateTime Mor_FechaRegistra { get; set; }
+        public int? Mor_UsuarioModifica { get; set; }
+        public DateTime? Mor_FechaModifica { get; set; }
 
         public virtual tbCuentasCobrar Cco { get; set; }
     }

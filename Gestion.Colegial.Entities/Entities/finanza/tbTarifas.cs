@@ -18,11 +18,12 @@ namespace Gestion.Colegial.Entities.Entities
         public int? Cun_Id { get; set; }
         public decimal Tar_Monto { get; set; }
         public short Tar_AnioVigencia { get; set; }
-        public bool Per_EsEliminado { get; set; }
-        public int Per_UsuarioRegistra { get; set; }
-        public DateTime Per_FechaRegistra { get; set; }
-        public int? Per_UsuarioModifica { get; set; }
-        public DateTime? Per_FechaModifica { get; set; }
+        public bool Tar_EsEliminado { get; set; }
+        public int Tar_UsuarioRegistra { get; set; }
+        public DateTime Tar_FechaRegistra { get; set; }
+        public int? Tar_UsuarioModifica { get; set; }
+        public DateTime? Tar_FechaModifica { get; set; }
+        public bool Tar_EsActivo { get; set; }
 
         public virtual tbConceptosPago Cpa { get; set; }
         public virtual ICollection<tbCuentasCobrar> tbCuentasCobrar { get; set; }

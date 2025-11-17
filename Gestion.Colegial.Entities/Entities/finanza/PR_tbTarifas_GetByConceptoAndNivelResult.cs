@@ -10,9 +10,15 @@ namespace Gestion.Colegial.Entities.Entities
         public int Tar_Id { get; set; }
         public int Cpa_Id { get; set; }
         public int? Niv_Id { get; set; }
+        public int? Cun_Id { get; set; }
         [Column("Tar_Monto", TypeName = "decimal(18,2)")]
         public decimal Tar_Monto { get; set; }
         public short Tar_AnioVigencia { get; set; }
-        public string DescripcionConceptoPago { get; set; }
+        public bool Tar_EsEliminado { get; set; }
+        public int Tar_UsuarioRegistra { get; set; }
+        public DateTime Tar_FechaRegistra { get; set; }
+        public int? Tar_UsuarioModifica { get; set; }
+        public DateTime? Tar_FechaModifica { get; set; }
+        public bool Tar_EsActivo { get; set; }
     }
 }

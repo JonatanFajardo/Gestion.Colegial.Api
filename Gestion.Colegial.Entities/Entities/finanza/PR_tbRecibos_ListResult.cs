@@ -7,9 +7,17 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbRecibos_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Rec_Id { get; set; }
+        public int Pag_Id { get; set; }
         public string Rec_NumeroRecibo { get; set; }
         public DateTime Rec_FechaEmision { get; set; }
         public string Rec_RutaArchivo { get; set; }
-        public string NombreCompletoAlumno { get; set; }
+        public bool Rec_EsEliminado { get; set; }
+        public int Rec_UsuarioRegistra { get; set; }
+        public DateTime Rec_FechaRegistra { get; set; }
+        public int? Rec_UsuarioModifica { get; set; }
+        public DateTime? Rec_FechaModifica { get; set; }
     }
 }

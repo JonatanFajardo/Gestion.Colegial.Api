@@ -71,7 +71,7 @@ builder.Services.AddScoped<IEncargadoRepository, EncargadoRepository>();
 builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
 // builder.Services.AddScoped<IEventoRepository, EventoRepository>(); // tbEventos entity no existe
 builder.Services.AddScoped<IHomeAndChartsRepository, HomeAndChartsRepository>();
-builder.Services.AddScoped<IHorarioAlumnoRepository, HorarioAlumnoRepository>();
+//builder.Services.AddScoped<IHorarioAlumnoRepository, HorarioAlumnoRepository>();
 //builder.Services.AddScoped<IHoraRepository, HoraRepository>();
 builder.Services.AddScoped<IMateriaRepository, MateriaRepository>();
 builder.Services.AddScoped<IModalidadRepository, ModalidadRepository>();
@@ -106,7 +106,7 @@ builder.Services.AddScoped<IEncargadoService, EncargadoService>();
 builder.Services.AddScoped<IEstadoService, EstadoService>();
 // builder.Services.AddScoped<IEventoService, EventoService>(); // tbEventos entity no existe
 builder.Services.AddScoped<IHomeAndChartsService, HomeAndChartsService>();
-builder.Services.AddScoped<IHorarioAlumnosService, HorarioAlumnosService>();
+//builder.Services.AddScoped<IHorarioAlumnosService, HorarioAlumnosService>();
 //builder.Services.AddScoped<IHoraService, HoraService>();
 builder.Services.AddScoped<IMateriaService, MateriaService>();
 builder.Services.AddScoped<IModalidadService, ModalidadService>();

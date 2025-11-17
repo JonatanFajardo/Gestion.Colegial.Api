@@ -7,14 +7,19 @@ namespace Gestion.Colegial.Entities.Entities
 {
     public partial class PR_tbPagos_ListResult
     {
+        [Column("# Fila")]
+        public long? Fila { get; set; }
+        public int Pag_Id { get; set; }
+        public DateTime Pag_FechaPago { get; set; }
         [Column("Pag_MontoTotal", TypeName = "decimal(18,2)")]
         public decimal Pag_MontoTotal { get; set; }
-        public DateTime Pag_FechaPago { get; set; }
         public string Pag_NumeroReferencia { get; set; }
         public string Pag_Observaciones { get; set; }
-        public string NombreCompletoAlumno { get; set; }
-        public string DescripcionFormaPago { get; set; }
-        public string NombreCompletoEncargado { get; set; }
-        public string NombreUsuarioRegistraPago { get; set; }
+        public string FormaPago { get; set; }
+        public string Alumno { get; set; }
+        public string Encargado { get; set; }
+        public string Usuario { get; set; }
+        public string Rec_NumeroRecibo { get; set; }
+        public DateTime? Rec_FechaEmision { get; set; }
     }
 }
