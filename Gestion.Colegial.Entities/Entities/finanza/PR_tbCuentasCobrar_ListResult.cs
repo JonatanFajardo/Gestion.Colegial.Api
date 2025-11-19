@@ -9,23 +9,11 @@ namespace Gestion.Colegial.Entities.Entities
     {
         public long? Fila { get; set; }
         public int Cco_Id { get; set; }
-        public int Alu_Id { get; set; }
-        public int Cpa_Id { get; set; }
-        public int? Tar_Id { get; set; }
-        [Column("Cco_MontoOriginal", TypeName = "decimal(18,2)")]
-        public decimal Cco_MontoOriginal { get; set; }
-        [Column("Cco_MontoDescuento", TypeName = "decimal(18,2)")]
-        public decimal Cco_MontoDescuento { get; set; }
-        [Column("Cco_MontoMora", TypeName = "decimal(18,2)")]
-        public decimal Cco_MontoMora { get; set; }
-        [Column("Cco_MontoTotal", TypeName = "decimal(18,2)")]
-        public decimal Cco_MontoTotal { get; set; }
-        [Column("Cco_MontoPendiente", TypeName = "decimal(18,2)")]
-        public decimal Cco_MontoPendiente { get; set; }
-        public DateTime Cco_FechaEmision { get; set; }
-        public DateTime Cco_FechaVencimiento { get; set; }
-        public int Epa_Id { get; set; }
-        public string Cpa_Descripcion { get; set; }
-        public string Epa_Descripcion { get; set; }
+        public string Concepto { get; set; }
+        public string Alumno { get; set; }
+        [Column("Pendiente", TypeName = "decimal(18,2)")]
+        public decimal Pendiente { get; set; }
+        public DateTime FechaVence { get; set; }
+        public string EstadoPago { get; set; }
     }
 }

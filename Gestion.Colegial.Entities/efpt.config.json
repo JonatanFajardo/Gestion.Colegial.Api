@@ -999,6 +999,18 @@
          "ObjectType": 1
       },
       {
+         "Name": "[finanza].[PR_GenerarMensualidad]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_GenerarMensualidadesRango]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_MesesPendientesPorAlumno]",
+         "ObjectType": 1
+      },
+      {
          "Name": "[finanza].[PR_tbConceptosPago_Delete]",
          "ObjectType": 1
       },
@@ -1036,6 +1048,10 @@
       },
       {
          "Name": "[finanza].[PR_tbCuentasCobrar_List]",
+         "ObjectType": 1
+      },
+      {
+         "Name": "[finanza].[PR_tbCuentasCobrar_ListByAlumno]",
          "ObjectType": 1
       },
       {

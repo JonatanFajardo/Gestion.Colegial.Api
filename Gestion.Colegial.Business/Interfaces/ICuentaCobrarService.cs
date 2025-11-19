@@ -19,5 +19,8 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> ListDeudores();
         Task<Answer> GenerarCargosMasivos(object filtros);
         Task<Answer> PrevisualizarCargos(object filtros);
+        Task<Answer> GenerarMensualidad(object request);
+        Task<Answer> GenerarMensualidadesRango(object request);
+        Task<Answer> MesesPendientesPorAlumno(int alumnoId, short? anio = null);
     }
 }

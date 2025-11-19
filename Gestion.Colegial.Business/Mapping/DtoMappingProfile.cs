@@ -114,11 +114,13 @@ public class DtoMappingProfile : Profile
     private void ConfigureCuentasCobrar()
     {
         CreateMap<PR_tbCuentasCobrar_ListResult, CuentaCobrarListDto>()
+            .ForMember(dest => dest.Fila, opt => opt.MapFrom(src => src.Fila))
             .ForMember(dest => dest.CuentaCobrarId, opt => opt.MapFrom(src => src.Cco_Id))
-            .ForMember(dest => dest.AlumnoId, opt => opt.MapFrom(src => src.Alu_Id))
-            .ForMember(dest => dest.MontoTotal, opt => opt.MapFrom(src => src.Cco_MontoTotal))
-            .ForMember(dest => dest.MontoPendiente, opt => opt.MapFrom(src => src.Cco_MontoPendiente))
-            .ForMember(dest => dest.FechaVencimiento, opt => opt.MapFrom(src => src.Cco_FechaVencimiento));
+            .ForMember(dest => dest.Concepto, opt => opt.MapFrom(src => src.Concepto))
+            .ForMember(dest => dest.Alumno, opt => opt.MapFrom(src => src.Alumno))
+            .ForMember(dest => dest.Pendiente, opt => opt.MapFrom(src => src.Pendiente))
+            .ForMember(dest => dest.FechaVence, opt => opt.MapFrom(src => src.FechaVence))
+            .ForMember(dest => dest.EstadoPago, opt => opt.MapFrom(src => src.EstadoPago));
 
         CreateMap<PR_tbCuentasCobrar_FindResult, CuentaCobrarFindDto>()
             .ForMember(dest => dest.CuentaCobrarId, opt => opt.MapFrom(src => src.Cco_Id))
@@ -167,6 +169,14 @@ public class DtoMappingProfile : Profile
         CreateMap<PR_tbCuentasCobrar_ExistResult, CuentaCobrarExistDto>()
             .ForMember(dest => dest.Existe, opt => opt.MapFrom(src => src.Exists))
             .ForMember(dest => dest.Mensaje, opt => opt.MapFrom(src => src.Message));
+
+        // Mapeos para nuevos procedimientos de mensualidades
+        CreateMap<PR_GenerarMensualidadResult, GenerarMensualidadResponseDto>();
+
+        CreateMap<PR_GenerarMensualidadesRangoResult, GenerarMensualidadesRangoResponseDto>();
+
+        CreateMap<PR_MesesPendientesPorAlumnoResult, MesPendienteDto>()
+            .ForMember(dest => dest.FechaVencimiento, opt => opt.MapFrom(src => src.Cco_FechaVencimiento));
     }
 
     private void ConfigureDescuentos()

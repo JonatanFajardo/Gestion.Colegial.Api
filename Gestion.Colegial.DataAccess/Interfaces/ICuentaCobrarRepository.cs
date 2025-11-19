@@ -20,5 +20,8 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> ListDeudores();
         Task<Answer> GenerarCargosMasivos(object filtros);
         Task<Answer> PrevisualizarCargos(object filtros);
+        Task<Answer> GenerarMensualidad(byte mes, short anio, int usuarioId, int? conceptoMensualidadId = null);
+        Task<Answer> GenerarMensualidadesRango(byte mesInicio, byte mesFin, short anio, int usuarioId);
+        Task<Answer> MesesPendientesPorAlumno(int alumnoId, short? anio = null);
     }
 }
