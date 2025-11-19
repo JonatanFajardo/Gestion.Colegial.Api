@@ -8,13 +8,16 @@ namespace Gestion.Colegial.Business.Extensions
 {
     public static class Logs
     {
+        /// <summary>
+        /// Registra un error utilizando Serilog configurado globalmente.
+        /// </summary>
+        /// <param name="answer">Objeto Answer que contiene la información del error.</param>
         public static void Error(Answer answer)
         {
             try
             {
-                // Implementación con archivo de texto
-                //ErrorWithSerilog(answer);
-                ErrorToConsole(answer);
+                // Usar Serilog global configurado en Program.cs
+                LogWithSerilog(answer);
             }
             catch (Exception ex)
             {
@@ -31,29 +34,33 @@ namespace Gestion.Colegial.Business.Extensions
             }
         }
 
-        private static void LogToFile(Answer answer)
+        /// <summary>
+        /// Utiliza el logger global de Serilog para registrar errores.
+        /// </summary>
+        private static void LogWithSerilog(Answer answer)
         {
-            // Crear directorio de logs si no existe
-            string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
-            if (!Directory.Exists(logDirectory))
-            {
-                Directory.CreateDirectory(logDirectory);
-            }
+            string innerException = answer.InnerException?.ToString() ?? "No contiene";
+            string stackTrace = answer.StackTrace ?? "No disponible";
 
-            string logPath = Path.Combine(logDirectory, $"log_{DateTime.Now:yyyyMMdd}.txt");
-
-            string innerException = answer.InnerException?.ToString() ?? "No contiene.";
-
-            string logResult = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] " +
-                              $"[MENSAJE] {answer.Message} " +
-                              $"[MSJGENERAL] {answer.ErrorGeneral} " +
-                              $"[DETALLES] {answer.ErrorDetails} " +
-                              $"[MSJINTERNO] {innerException}{Environment.NewLine}";
-
-            // Escribir al archivo de log
-            File.AppendAllText(logPath, logResult);
+            // Logging estructurado con Serilog
+            Log.Error(
+                "Error en la aplicación. " +
+                "Mensaje: {Message}, " +
+                "Error General: {ErrorGeneral}, " +
+                "Detalles: {ErrorDetails}, " +
+                "StackTrace: {StackTrace}, " +
+                "InnerException: {InnerException}",
+                answer.Message,
+                answer.ErrorGeneral,
+                answer.ErrorDetails,
+                stackTrace,
+                innerException
+            );
         }
 
+        /// <summary>
+        /// Archivo de respaldo en caso de que falle el sistema de logging principal.
+        /// </summary>
         private static void LogToBackupFile(Exception loggingException, Answer answer)
         {
             string backupPath = Path.Combine(Path.GetTempPath(), "GestionColegial_ErrorLog.txt");
@@ -63,45 +70,6 @@ namespace Gestion.Colegial.Business.Extensions
                               $"{Environment.NewLine}---{Environment.NewLine}";
 
             File.AppendAllText(backupPath, backupLog);
-        }
-        public static void ErrorWithSerilog(Answer answer)
-        {
-            // Descomenta este código al usar Serilog
-
-            string logdirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-            if (!Directory.Exists(logdirectory))
-            {
-                Directory.CreateDirectory(logdirectory);
-            }
-
-            var logpath = Path.Combine(logdirectory, "log_.txt");
-            var log = new LoggerConfiguration()
-    .WriteTo.File(logpath, rollingInterval: RollingInterval.Day) // La propiedad es 'RollingInterval' y es un enum
-    .CreateLogger();
-
-            string innerexception = answer.InnerException?.ToString() ?? "no contiene.";
-
-            string logresult = $"[mensaje] {answer.Message} " +
-                              $"[msjgeneral] {answer.ErrorGeneral} " +
-                              $"[detalles] {answer.ErrorDetails} " +
-                              $"[msjinterno] {innerexception}";
-
-            log.Error(logresult);
-            log.Dispose();
-        }
-
-        // Método para logging en consola (útil para desarrollo)
-        public static void ErrorToConsole(Answer answer)
-        {
-            string innerException = answer.InnerException?.ToString() ?? "No contiene.";
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[ERROR - {DateTime.Now:yyyy-MM-dd HH:mm:ss}]");
-            Console.WriteLine($"Mensaje: {answer.Message}");
-            Console.WriteLine($"Error General: {answer.ErrorGeneral}");
-            Console.WriteLine($"Detalles: {answer.ErrorDetails}");
-            Console.WriteLine($"Excepción Interna: {innerException}");
-            Console.ResetColor();
         }
     }
 }

@@ -16,6 +16,9 @@ namespace Gestion.Colegial.Entities.Entities
         Task<List<ObtenerCantidadAlumnosResult>> ObtenerCantidadAlumnosAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_CardsInHome_DashboardResult>> PR_CardsInHome_DashboardAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_DiferenciaEntreCantidadAlumnosAnioPasado_DashboardResult>> PR_DiferenciaEntreCantidadAlumnosAnioPasado_DashboardAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_GenerarMensualidadResult>> PR_GenerarMensualidadAsync(byte? Mes, short? Anio, int? Usu_Id, int? ConceptoMensualidadId, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_GenerarMensualidadesRangoResult>> PR_GenerarMensualidadesRangoAsync(byte? MesInicio, byte? MesFin, short? Anio, int? Usu_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_MesesPendientesPorAlumnoResult>> PR_MesesPendientesPorAlumnoAsync(int? Alu_Id, short? Anio, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_ObtenerCantidadAlumnosPorCurso_DashboardResult>> PR_ObtenerCantidadAlumnosPorCurso_DashboardAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_ObtenerPromedioCursoUltimosAnios_DashboardResult>> PR_ObtenerPromedioCursoUltimosAnios_DashboardAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<int> PR_tbAlumnos_DeleteAsync(int? Alu_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
@@ -51,6 +54,7 @@ namespace Gestion.Colegial.Entities.Entities
         Task<List<PR_tbCuentasCobrar_FindResult>> PR_tbCuentasCobrar_FindAsync(int? Cco_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCuentasCobrar_InsertResult>> PR_tbCuentasCobrar_InsertAsync(int? Alu_Id, int? Cpa_Id, int? Tar_Id, decimal? Cco_MontoOriginal, decimal? Cco_MontoDescuento, decimal? Cco_MontoMora, decimal? Cco_MontoTotal, decimal? Cco_MontoPendiente, DateTime? Cco_FechaEmision, DateTime? Cco_FechaVencimiento, int? Epa_Id, string Cco_Observaciones, int? Per_UsuarioRegistra, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCuentasCobrar_ListResult>> PR_tbCuentasCobrar_ListAsync(OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
+        Task<List<PR_tbCuentasCobrar_ListByAlumnoResult>> PR_tbCuentasCobrar_ListByAlumnoAsync(int? Alu_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCursos_By_tbModalidades_DropdownResult>> PR_tbCursos_By_tbModalidades_DropdownAsync(int? Mda_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<int> PR_tbCursos_DeleteAsync(int? Cur_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);
         Task<List<PR_tbCursos_DetailResult>> PR_tbCursos_DetailAsync(int? Cur_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default);

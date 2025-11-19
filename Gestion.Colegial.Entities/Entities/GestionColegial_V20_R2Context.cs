@@ -284,6 +284,10 @@ namespace Gestion.Colegial.Entities.Entities
 
                 entity.HasIndex(e => new { e.Alu_Id, e.Epa_Id }, "IX_tbCuentasCobrar_AlumnoEstado");
 
+                entity.HasIndex(e => new { e.Alu_Id, e.Cco_Mes, e.Cco_Anio, e.Cpa_Id }, "UX_CuentaCobrar_AlumnoMesAnio")
+                    .IsUnique()
+                    .HasFilter("([Cco_EsEliminado]=(0))");
+
                 entity.Property(e => e.Cco_FechaEmision).HasColumnType("date");
 
                 entity.Property(e => e.Cco_FechaModifica).HasPrecision(0);

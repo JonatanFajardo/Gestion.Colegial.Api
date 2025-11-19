@@ -168,5 +168,42 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
             Answer answer = await Read<PR_tbCuentasCobrar_PrevisualizarCargosResult>(sql, sqlParameters);
             return answer;
         }
+
+        public async Task<Answer> GenerarMensualidad(byte mes, short anio, int usuarioId, int? conceptoMensualidadId = null)
+        {
+            const string sql = "finanza.PR_GenerarMensualidad";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Mes", DbType = DbType.Byte, Value = mes },
+                new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int16, Value = anio },
+                new SqlParameter(){ParameterName= "@Usu_Id", DbType = DbType.Int32, Value = usuarioId },
+                new SqlParameter(){ParameterName= "@ConceptoMensualidadId", DbType = DbType.Int32, Value = (object)conceptoMensualidadId ?? DBNull.Value },
+            };
+            Answer answer = await Read<PR_GenerarMensualidadResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> GenerarMensualidadesRango(byte mesInicio, byte mesFin, short anio, int usuarioId)
+        {
+            const string sql = "finanza.PR_GenerarMensualidadesRango";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@MesInicio", DbType = DbType.Byte, Value = mesInicio },
+                new SqlParameter(){ParameterName= "@MesFin", DbType = DbType.Byte, Value = mesFin },
+                new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int16, Value = anio },
+                new SqlParameter(){ParameterName= "@Usu_Id", DbType = DbType.Int32, Value = usuarioId },
+            };
+            Answer answer = await Read<PR_GenerarMensualidadesRangoResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> MesesPendientesPorAlumno(int alumnoId, short? anio = null)
+        {
+            const string sql = "finanza.PR_MesesPendientesPorAlumno";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
+                new SqlParameter(){ParameterName= "@Anio", DbType = DbType.Int16, Value = (object)anio ?? DBNull.Value },
+            };
+            Answer answer = await Read<PR_MesesPendientesPorAlumnoResult>(sql, sqlParameters);
+            return answer;
+        }
     }
 }

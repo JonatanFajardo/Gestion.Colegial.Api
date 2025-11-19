@@ -30,5 +30,7 @@ namespace Gestion.Colegial.Entities.Entities
         public DateTime Cco_FechaRegistra { get; set; }
         public int? Cco_UsuarioModifica { get; set; }
         public DateTime? Cco_FechaModifica { get; set; }
+        public byte? Cco_Mes { get; set; }
+        public short? Cco_Anio { get; set; }
     }
 }
