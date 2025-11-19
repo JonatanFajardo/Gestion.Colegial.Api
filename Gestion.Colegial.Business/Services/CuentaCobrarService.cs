@@ -9,7 +9,7 @@ using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
 namespace Gestion.Colegial.Business.Services
 {
-    public class CuentaCobrarService 
+    public class CuentaCobrarService : ICuentaCobrarService
     {
         private readonly ICuentaCobrarRepository _repository;
         private readonly IMapper _mapper;
@@ -125,7 +125,26 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> ListPendientes() => await ExecuteSimple(() => _repository.ListPendientes(), typeof(PR_tbCuentasCobrar_ListPendientesResult), typeof(CuentaCobrarListDto));
         public async Task<Answer> ListVencidas() => await ExecuteSimple(() => _repository.ListVencidas(), typeof(PR_tbCuentasCobrar_ListVencidasResult), typeof(CuentaCobrarListDto));
-        //public async Task<Answer> ListDeudores() => await ExecuteSimple(() => _repository.ListDeudores(), typeof(PR_tbCuentasCobrar_ListDeudoresResult), typeof(CuentaCobrarDeudorDto));
+
+        public async Task<Answer> ListDeudores()
+        {
+            Answer answer = await _repository.ListDeudores();
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
 
         public async Task<Answer> Create(object obj)
         {
@@ -279,8 +298,95 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
+        public async Task<Answer> GenerarMensualidad(object request)
+        {
+            dynamic req = request;
+            byte mes = req.mes;
+            short anio = req.anio;
+            int usuarioId = req.usuarioId;
+            int? conceptoMensualidadId = req.conceptoMensualidadId;
+
+            Answer answer = await _repository.GenerarMensualidad(mes, anio, usuarioId, conceptoMensualidadId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_GenerarMensualidadResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<GenerarMensualidadResponseDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> GenerarMensualidadesRango(object request)
+        {
+            dynamic req = request;
+            byte mesInicio = req.mesInicio;
+            byte mesFin = req.mesFin;
+            short anio = req.anio;
+            int usuarioId = req.usuarioId;
+
+            Answer answer = await _repository.GenerarMensualidadesRango(mesInicio, mesFin, anio, usuarioId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_GenerarMensualidadesRangoResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<GenerarMensualidadesRangoResponseDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> MesesPendientesPorAlumno(int alumnoId, short? anio = null)
+        {
+            Answer answer = await _repository.MesesPendientesPorAlumno(alumnoId, anio);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_MesesPendientesPorAlumnoResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<MesPendienteDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
         // ================================================
-        // MÉTODOS AUXILIARES
+        // Mï¿½TODOS AUXILIARES
         // ================================================
 
         private static Answer HandleException(Answer answer, Exception e)

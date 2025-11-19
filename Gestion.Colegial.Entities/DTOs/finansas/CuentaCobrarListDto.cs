@@ -4,22 +4,12 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
 {
     public class CuentaCobrarListDto
     {
+        public long? Fila { get; set; }
         public int CuentaCobrarId { get; set; }
-        public int AlumnoId { get; set; }
-        public int ConceptoPagoId { get; set; }
-        public int? TarifaId { get; set; }
-        public decimal MontoOriginal { get; set; }
-        public decimal MontoDescuento { get; set; }
-        public decimal MontoMora { get; set; }
-        public decimal MontoTotal { get; set; }
-        public decimal MontoPendiente { get; set; }
-        public DateTime FechaEmision { get; set; }
-        public DateTime FechaVencimiento { get; set; }
-        public int EstadoPagoId { get; set; }
-        public bool EsEliminado { get; set; }
-        public int UsuarioRegistraId { get; set; }
-        public DateTime FechaRegistro { get; set; }
-        public int? UsuarioModificaId { get; set; }
-        public DateTime? FechaModifica { get; set; }
+        public string Concepto { get; set; }
+        public string Alumno { get; set; }
+        public decimal Pendiente { get; set; }
+        public DateTime FechaVence { get; set; }
+        public string EstadoPago { get; set; }
     }
 }
