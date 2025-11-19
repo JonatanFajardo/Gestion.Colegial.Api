@@ -1,5 +1,6 @@
 ﻿using Gestion.Colegial.DataAccess.Extension;
 using Gestion.Colegial.Entities;
+using Serilog;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -40,6 +41,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			}
 			catch (SqlException ex) // Example: Catching a specific SQL exception
 			{
+				Log.Error(ex, "Error SQL en método Read<T>. Query: {QueryString}", queryString);
 				answer.Access = true;
 				answer.Incidents(ex); // Pass the exception itself
 				answer.Data = "";
@@ -47,6 +49,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			}
 			catch (Exception e)
 			{
+				Log.Error(e, "Error general en método Read<T>. Query: {QueryString}", queryString);
 				answer.Access = true;
 				answer.Incidents(e);
 				answer.Data = "";

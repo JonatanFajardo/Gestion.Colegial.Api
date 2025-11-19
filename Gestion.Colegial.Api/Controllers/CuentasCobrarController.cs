@@ -135,5 +135,29 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _cuentaCobrarService.PrevisualizarCargos(filtros);
             return Ok(answer.Data);
         }
+
+        [HttpPost]
+        [Route("GenerarMensualidadAsync")]
+        public async Task<IActionResult> GenerarMensualidad([FromBody] GenerarMensualidadRequestDto request)
+        {
+            Answer answer = await _cuentaCobrarService.GenerarMensualidad(request);
+            return Ok(answer.Data);
+        }
+
+        [HttpPost]
+        [Route("GenerarMensualidadesRangoAsync")]
+        public async Task<IActionResult> GenerarMensualidadesRango([FromBody] GenerarMensualidadesRangoRequestDto request)
+        {
+            Answer answer = await _cuentaCobrarService.GenerarMensualidadesRango(request);
+            return Ok(answer.Data);
+        }
+
+        [HttpGet]
+        [Route("MesesPendientesPorAlumnoAsync")]
+        public async Task<IActionResult> MesesPendientesPorAlumno(int alumnoId, short? anio = null)
+        {
+            Answer answer = await _cuentaCobrarService.MesesPendientesPorAlumno(alumnoId, anio);
+            return Ok(answer.Data);
+        }
     }
 }

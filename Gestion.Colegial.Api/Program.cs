@@ -7,9 +7,16 @@ using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.DataAccess.Repositories.Finanzas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+});
 
 // Add services to the container.
 
@@ -123,7 +130,7 @@ builder.Services.AddScoped<ITarifaService, TarifaService>();
 builder.Services.AddScoped<IFormaPagoService, FormaPagoService>();
 builder.Services.AddScoped<IDescuentoService, DescuentoService>();
 builder.Services.AddScoped<IEstadoPagoService, EstadoPagoService>();
-builder.Services.AddScoped<CuentaCobrarService>();
+builder.Services.AddScoped<ICuentaCobrarService, CuentaCobrarService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
 //builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
 

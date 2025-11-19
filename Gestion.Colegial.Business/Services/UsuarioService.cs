@@ -1,3 +1,4 @@
+using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
@@ -35,7 +36,7 @@ namespace Gestion.Colegial.Business.Services
                 // Autenticar usuario
                 var loginResult = await _usuarioRepository.LoginAsync(loginRequest.Username, loginRequest.Password);
 
-                // CORRECCIÓN: lógica invertida (debe ser !loginResult.Access)
+                // CORRECCIï¿½N: lï¿½gica invertida (debe ser !loginResult.Access)
                 if (loginResult.Access || loginResult.Data == null)
                 {
                     response.Access = false;
@@ -48,7 +49,7 @@ namespace Gestion.Colegial.Business.Services
                     return response;
                 }
 
-                // Ya no usamos FirstOrDefault porque el repositorio ya devuelve un único registro
+                // Ya no usamos FirstOrDefault porque el repositorio ya devuelve un ï¿½nico registro
                 var userData = loginResult.Data as UDP_tbUsuarios_LoginResult;
 
                 if (userData == null || userData.IsAuthenticated == 0)
@@ -57,7 +58,7 @@ namespace Gestion.Colegial.Business.Services
                     response.Data = new LoginResponseDTO
                     {
                         Success = false,
-                        Message = userData?.Message ?? "Usuario o contraseña incorrectos"
+                        Message = userData?.Message ?? "Usuario o contraseï¿½a incorrectos"
                     };
                     return response;
                 }
@@ -89,6 +90,8 @@ namespace Gestion.Colegial.Business.Services
             {
                 response.Access = false;
                 response.Message = $"Error: {ex.Message}";
+                response.Incidents(ex);
+                Logs.Error(response);
                 response.Data = new LoginResponseDTO
                 {
                     Success = false,
@@ -135,6 +138,8 @@ namespace Gestion.Colegial.Business.Services
             {
                 response.Access = false;
                 response.Message = $"Error: {ex.Message}";
+                response.Incidents(ex);
+                Logs.Error(response);
             }
 
             return response;

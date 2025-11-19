@@ -38,6 +38,9 @@ namespace Gestion.Colegial.Entities.Entities
             modelBuilder.Entity<ObtenerCantidadAlumnosResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_CardsInHome_DashboardResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_DiferenciaEntreCantidadAlumnosAnioPasado_DashboardResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PR_GenerarMensualidadResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PR_GenerarMensualidadesRangoResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PR_MesesPendientesPorAlumnoResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_ObtenerCantidadAlumnosPorCurso_DashboardResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_ObtenerPromedioCursoUltimosAnios_DashboardResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbAlumnos_DetailResult>().HasNoKey().ToView(null);
@@ -63,6 +66,7 @@ namespace Gestion.Colegial.Entities.Entities
             modelBuilder.Entity<PR_tbCuentasCobrar_FindResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbCuentasCobrar_InsertResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbCuentasCobrar_ListResult>().HasNoKey().ToView(null);
+            modelBuilder.Entity<PR_tbCuentasCobrar_ListByAlumnoResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbCursos_By_tbModalidades_DropdownResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbCursos_DetailResult>().HasNoKey().ToView(null);
             modelBuilder.Entity<PR_tbCursos_DropdownResult>().HasNoKey().ToView(null);
@@ -288,6 +292,126 @@ namespace Gestion.Colegial.Entities.Entities
                 parameterreturnValue,
             };
             var _ = await _context.SqlQueryAsync<PR_DiferenciaEntreCantidadAlumnosAnioPasado_DashboardResult>("EXEC @returnValue = [dbo].[PR_DiferenciaEntreCantidadAlumnosAnioPasado_Dashboard]", sqlParameters, cancellationToken);
+
+            returnValue?.SetValue(parameterreturnValue.Value);
+
+            return _;
+        }
+
+        public virtual async Task<List<PR_GenerarMensualidadResult>> PR_GenerarMensualidadAsync(byte? Mes, short? Anio, int? Usu_Id, int? ConceptoMensualidadId, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        {
+            var parameterreturnValue = new SqlParameter
+            {
+                ParameterName = "returnValue",
+                Direction = System.Data.ParameterDirection.Output,
+                SqlDbType = System.Data.SqlDbType.Int,
+            };
+
+            var sqlParameters = new []
+            {
+                new SqlParameter
+                {
+                    ParameterName = "Mes",
+                    Value = Mes ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.TinyInt,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "Anio",
+                    Value = Anio ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.SmallInt,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "Usu_Id",
+                    Value = Usu_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "ConceptoMensualidadId",
+                    Value = ConceptoMensualidadId ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                parameterreturnValue,
+            };
+            var _ = await _context.SqlQueryAsync<PR_GenerarMensualidadResult>("EXEC @returnValue = [finanza].[PR_GenerarMensualidad] @Mes = @Mes, @Anio = @Anio, @Usu_Id = @Usu_Id, @ConceptoMensualidadId = @ConceptoMensualidadId", sqlParameters, cancellationToken);
+
+            returnValue?.SetValue(parameterreturnValue.Value);
+
+            return _;
+        }
+
+        public virtual async Task<List<PR_GenerarMensualidadesRangoResult>> PR_GenerarMensualidadesRangoAsync(byte? MesInicio, byte? MesFin, short? Anio, int? Usu_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        {
+            var parameterreturnValue = new SqlParameter
+            {
+                ParameterName = "returnValue",
+                Direction = System.Data.ParameterDirection.Output,
+                SqlDbType = System.Data.SqlDbType.Int,
+            };
+
+            var sqlParameters = new []
+            {
+                new SqlParameter
+                {
+                    ParameterName = "MesInicio",
+                    Value = MesInicio ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.TinyInt,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "MesFin",
+                    Value = MesFin ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.TinyInt,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "Anio",
+                    Value = Anio ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.SmallInt,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "Usu_Id",
+                    Value = Usu_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                parameterreturnValue,
+            };
+            var _ = await _context.SqlQueryAsync<PR_GenerarMensualidadesRangoResult>("EXEC @returnValue = [finanza].[PR_GenerarMensualidadesRango] @MesInicio = @MesInicio, @MesFin = @MesFin, @Anio = @Anio, @Usu_Id = @Usu_Id", sqlParameters, cancellationToken);
+
+            returnValue?.SetValue(parameterreturnValue.Value);
+
+            return _;
+        }
+
+        public virtual async Task<List<PR_MesesPendientesPorAlumnoResult>> PR_MesesPendientesPorAlumnoAsync(int? Alu_Id, short? Anio, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        {
+            var parameterreturnValue = new SqlParameter
+            {
+                ParameterName = "returnValue",
+                Direction = System.Data.ParameterDirection.Output,
+                SqlDbType = System.Data.SqlDbType.Int,
+            };
+
+            var sqlParameters = new []
+            {
+                new SqlParameter
+                {
+                    ParameterName = "Alu_Id",
+                    Value = Alu_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                new SqlParameter
+                {
+                    ParameterName = "Anio",
+                    Value = Anio ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.SmallInt,
+                },
+                parameterreturnValue,
+            };
+            var _ = await _context.SqlQueryAsync<PR_MesesPendientesPorAlumnoResult>("EXEC @returnValue = [finanza].[PR_MesesPendientesPorAlumno] @Alu_Id = @Alu_Id, @Anio = @Anio", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
@@ -1535,6 +1659,32 @@ namespace Gestion.Colegial.Entities.Entities
                 parameterreturnValue,
             };
             var _ = await _context.SqlQueryAsync<PR_tbCuentasCobrar_ListResult>("EXEC @returnValue = [finanza].[PR_tbCuentasCobrar_List]", sqlParameters, cancellationToken);
+
+            returnValue?.SetValue(parameterreturnValue.Value);
+
+            return _;
+        }
+
+        public virtual async Task<List<PR_tbCuentasCobrar_ListByAlumnoResult>> PR_tbCuentasCobrar_ListByAlumnoAsync(int? Alu_Id, OutputParameter<int> returnValue = null, CancellationToken cancellationToken = default)
+        {
+            var parameterreturnValue = new SqlParameter
+            {
+                ParameterName = "returnValue",
+                Direction = System.Data.ParameterDirection.Output,
+                SqlDbType = System.Data.SqlDbType.Int,
+            };
+
+            var sqlParameters = new []
+            {
+                new SqlParameter
+                {
+                    ParameterName = "Alu_Id",
+                    Value = Alu_Id ?? Convert.DBNull,
+                    SqlDbType = System.Data.SqlDbType.Int,
+                },
+                parameterreturnValue,
+            };
+            var _ = await _context.SqlQueryAsync<PR_tbCuentasCobrar_ListByAlumnoResult>("EXEC @returnValue = [finanza].[PR_tbCuentasCobrar_ListByAlumno] @Alu_Id = @Alu_Id", sqlParameters, cancellationToken);
 
             returnValue?.SetValue(parameterreturnValue.Value);
 
