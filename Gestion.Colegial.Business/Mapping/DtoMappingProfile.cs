@@ -19,6 +19,7 @@ public class DtoMappingProfile : Profile
         ConfigurePagos();
         ConfigurePagosDetalle();
         ConfigureRecibos();
+        ConfigureEstadoCuenta();
     }
 
     private void ConfigureTarifas()
@@ -484,5 +485,20 @@ public class DtoMappingProfile : Profile
         CreateMap<PR_tbRecibos_ExistResult, ReciboExistDto>()
             .ForMember(dest => dest.Existe, opt => opt.MapFrom(src => src.Exists))
             .ForMember(dest => dest.Mensaje, opt => opt.MapFrom(src => src.Message));
+    }
+
+    private void ConfigureEstadoCuenta()
+    {
+        CreateMap<PR_ObtenerCargosPendientesResult, CargoPendienteDto>();
+        CreateMap<PR_ObtenerResumenFinancieroResult, ResumenFinancieroDto>();
+        CreateMap<PR_ObtenerHistoricoPagosResult, HistoricoPagoDto>()
+            .ForMember(dest => dest.pagoId, opt => opt.MapFrom(src => src.Pag_Id))
+            .ForMember(dest => dest.fechaPago, opt => opt.MapFrom(src => src.Pag_FechaPago))
+            .ForMember(dest => dest.montoTotal, opt => opt.MapFrom(src => src.Pag_MontoTotal))
+            .ForMember(dest => dest.formaPago, opt => opt.MapFrom(src => src.Fpa_Descripcion))
+            .ForMember(dest => dest.numeroReferencia, opt => opt.MapFrom(src => src.Pag_NumeroReferencia))
+            .ForMember(dest => dest.numeroRecibo, opt => opt.MapFrom(src => src.numeroRecibo))
+            .ForMember(dest => dest.usuario, opt => opt.MapFrom(src => src.Alumno))
+            .ForMember(dest => dest.observaciones, opt => opt.MapFrom(src => src.Pag_Observaciones));
     }
 }

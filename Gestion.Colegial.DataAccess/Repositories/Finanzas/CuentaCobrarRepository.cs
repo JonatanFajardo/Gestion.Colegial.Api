@@ -205,5 +205,35 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
             Answer answer = await Read<PR_MesesPendientesPorAlumnoResult>(sql, sqlParameters);
             return answer;
         }
+
+        public async Task<Answer> ObtenerCargosPendientes(int alumnoId)
+        {
+            const string sql = "finanza.PR_ObtenerCargosPendientes";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
+            };
+            Answer answer = await Read<PR_ObtenerCargosPendientesResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> ObtenerResumenFinanciero(int alumnoId)
+        {
+            const string sql = "finanza.PR_ObtenerResumenFinanciero";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
+            };
+            Answer answer = await Read<PR_ObtenerResumenFinancieroResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        public async Task<Answer> ObtenerHistoricoPagos(int alumnoId)
+        {
+            const string sql = "finanza.PR_ObtenerHistoricoPagos";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = alumnoId },
+            };
+            Answer answer = await Read<PR_ObtenerHistoricoPagosResult>(sql, sqlParameters);
+            return answer;
+        }
     }
 }

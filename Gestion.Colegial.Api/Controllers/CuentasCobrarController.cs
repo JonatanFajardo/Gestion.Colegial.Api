@@ -159,5 +159,29 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _cuentaCobrarService.MesesPendientesPorAlumno(alumnoId, anio);
             return Ok(answer.Data);
         }
+
+        [HttpGet]
+        [Route("ObtenerCargosPendientesAsync")]
+        public async Task<IActionResult> ObtenerCargosPendientes(int alumnoId)
+        {
+            Answer answer = await _cuentaCobrarService.ObtenerCargosPendientes(alumnoId);
+            return Ok(answer.Data);
+        }
+
+        [HttpGet]
+        [Route("ObtenerResumenFinancieroAsync")]
+        public async Task<IActionResult> ObtenerResumenFinanciero(int alumnoId)
+        {
+            Answer answer = await _cuentaCobrarService.ObtenerResumenFinanciero(alumnoId);
+            return Ok(answer.Data);
+        }
+
+        [HttpGet]
+        [Route("ObtenerHistoricoPagosAsync")]
+        public async Task<IActionResult> ObtenerHistoricoPagos(int alumnoId)
+        {
+            Answer answer = await _cuentaCobrarService.ObtenerHistoricoPagos(alumnoId);
+            return Ok(answer.Data);
+        }
     }
 }
