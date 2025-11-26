@@ -1,17 +1,22 @@
+using AutoMapper;
 using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.DTOs.finansas;
+using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
     public class ConceptoPagoService : IConceptoPagoService
     {
         private readonly IConceptoPagoRepository _repository;
+        private readonly IMapper _mapper;
 
-        public ConceptoPagoService(IConceptoPagoRepository repository)
+        public ConceptoPagoService(IConceptoPagoRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         public async Task<Answer> List()
@@ -23,7 +28,15 @@ namespace Gestion.Colegial.Business.Services
                 {
                     answer.Message = MessageShow.Error;
                     Logs.Error(answer);
+                    return answer;
                 }
+
+                // Mapear de PR_tbConceptosPago_ListResult a ConceptoPagoListDto
+                if (answer.Data is IEnumerable<PR_tbConceptosPago_ListResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<ConceptoPagoListDto>>(resultList);
+                }
+
                 return answer;
             }
             catch (Exception e)
@@ -45,7 +58,15 @@ namespace Gestion.Colegial.Business.Services
                 {
                     answer.Message = MessageShow.Error;
                     Logs.Error(answer);
+                    return answer;
                 }
+
+                // Mapear de PR_tbConceptosPago_FindResult a ConceptoPagoFindDto
+                if (answer.Data is PR_tbConceptosPago_FindResult result)
+                {
+                    answer.Data = _mapper.Map<ConceptoPagoFindDto>(result);
+                }
+
                 return answer;
             }
             catch (Exception e)
@@ -67,7 +88,15 @@ namespace Gestion.Colegial.Business.Services
                 {
                     answer.Message = MessageShow.Error;
                     Logs.Error(answer);
+                    return answer;
                 }
+
+                // Mapear de PR_tbConceptosPago_DetailResult a ConceptoPagoDetailDto
+                if (answer.Data is PR_tbConceptosPago_DetailResult result)
+                {
+                    answer.Data = _mapper.Map<ConceptoPagoDetailDto>(result);
+                }
+
                 return answer;
             }
             catch (Exception e)
@@ -161,7 +190,15 @@ namespace Gestion.Colegial.Business.Services
                 {
                     answer.Message = MessageShow.Error;
                     Logs.Error(answer);
+                    return answer;
                 }
+
+                // Mapear de PR_tbConceptosPago_DropdownResult a ConceptoPagoDropdownDto
+                if (answer.Data is IEnumerable<PR_tbConceptosPago_DropdownResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<ConceptoPagoDropdownDto>>(resultList);
+                }
+
                 return answer;
             }
             catch (Exception e)
