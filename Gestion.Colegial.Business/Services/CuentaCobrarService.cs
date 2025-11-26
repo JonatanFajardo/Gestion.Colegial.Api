@@ -385,6 +385,81 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
+        public async Task<Answer> ObtenerCargosPendientes(int alumnoId)
+        {
+            Answer answer = await _repository.ObtenerCargosPendientes(alumnoId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_ObtenerCargosPendientesResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<CargoPendienteDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> ObtenerResumenFinanciero(int alumnoId)
+        {
+            Answer answer = await _repository.ObtenerResumenFinanciero(alumnoId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_ObtenerResumenFinancieroResult> resultList && resultList.Any())
+                {
+                    answer.Data = _mapper.Map<ResumenFinancieroDto>(resultList.First());
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
+        public async Task<Answer> ObtenerHistoricoPagos(int alumnoId)
+        {
+            Answer answer = await _repository.ObtenerHistoricoPagos(alumnoId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+
+                if (answer.Data is IEnumerable<PR_ObtenerHistoricoPagosResult> resultList)
+                {
+                    answer.Data = _mapper.Map<List<HistoricoPagoDto>>(resultList);
+                }
+
+                return answer;
+            }
+            catch (Exception e)
+            {
+                return HandleException(answer, e);
+            }
+        }
+
         // ================================================
         // M�TODOS AUXILIARES
         // ================================================

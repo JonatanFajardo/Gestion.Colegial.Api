@@ -22,5 +22,8 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> GenerarMensualidad(object request);
         Task<Answer> GenerarMensualidadesRango(object request);
         Task<Answer> MesesPendientesPorAlumno(int alumnoId, short? anio = null);
+        Task<Answer> ObtenerCargosPendientes(int alumnoId);
+        Task<Answer> ObtenerResumenFinanciero(int alumnoId);
+        Task<Answer> ObtenerHistoricoPagos(int alumnoId);
     }
 }
