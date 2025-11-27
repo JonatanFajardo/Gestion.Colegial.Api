@@ -1,8 +1,8 @@
 using Gestion.Colegial.Entities;
 
-namespace Gestion.Colegial.Business.Interfaces
+namespace Gestion.Colegial.Business.Interfaces.ModuloFinanzas
 {
-    public interface IFormaPagoService
+    public interface IConceptoPagoService
     {
         Task<Answer> List();
         Task<Answer> Find(int id);

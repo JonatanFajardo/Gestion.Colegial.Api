@@ -1,6 +1,6 @@
 using Gestion.Colegial.Entities;
 
-namespace Gestion.Colegial.Business.Interfaces
+namespace Gestion.Colegial.Business.Interfaces.ModuloFinanzas
 {
     public interface IPagoService
     {

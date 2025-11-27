@@ -1,20 +1,20 @@
 using AutoMapper;
 using Gestion.Colegial.Business.Extensions;
-using Gestion.Colegial.Business.Interfaces;
-using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Gestion.Colegial.Entities.Entities;
 using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
-namespace Gestion.Colegial.Business.Services
+namespace Gestion.Colegial.Business.Services.ModuloFinanzas
 {
-    public class DescuentoService : IDescuentoService
+    public class FormaPagoService : IFormaPagoService
     {
-        private readonly IDescuentoRepository _repository;
+        private readonly IFormaPagoRepository _repository;
         private readonly IMapper _mapper;
 
-        public DescuentoService(IDescuentoRepository repository, IMapper mapper)
+        public FormaPagoService(IFormaPagoRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
@@ -36,10 +36,10 @@ namespace Gestion.Colegial.Business.Services
                     return answer;
                 }
 
-                // Mapear de PR_tbDescuentos_ListResult a DescuentoListDto
-                if (answer.Data is IEnumerable<PR_tbDescuentos_ListResult> resultList)
+                // Mapear de PR_tbFormasPago_ListResult a FormaPagoListDto
+                if (answer.Data is IEnumerable<PR_tbFormasPago_ListResult> resultList)
                 {
-                    answer.Data = _mapper.Map<List<DescuentoListDto>>(resultList);
+                    answer.Data = _mapper.Map<List<FormaPagoListDto>>(resultList);
                 }
 
                 return answer;
@@ -62,10 +62,10 @@ namespace Gestion.Colegial.Business.Services
                     return answer;
                 }
 
-                // Mapear de PR_tbDescuentos_FindResult a DescuentoFindDto
-                if (answer.Data is PR_tbDescuentos_FindResult result)
+                // Mapear de PR_tbFormasPago_FindResult a FormaPagoFindDto
+                if (answer.Data is PR_tbFormasPago_FindResult result)
                 {
-                    answer.Data = _mapper.Map<DescuentoFindDto>(result);
+                    answer.Data = _mapper.Map<FormaPagoFindDto>(result);
                 }
 
                 return answer;
@@ -88,10 +88,10 @@ namespace Gestion.Colegial.Business.Services
                     return answer;
                 }
 
-                // Mapear de PR_tbDescuentos_DetailResult a DescuentoDetailDto
-                if (answer.Data is PR_tbDescuentos_DetailResult result)
+                // Mapear de PR_tbFormasPago_DetailResult a FormaPagoDetailDto
+                if (answer.Data is PR_tbFormasPago_DetailResult result)
                 {
-                    answer.Data = _mapper.Map<DescuentoDetailDto>(result);
+                    answer.Data = _mapper.Map<FormaPagoDetailDto>(result);
                 }
 
                 return answer;
@@ -114,10 +114,10 @@ namespace Gestion.Colegial.Business.Services
                     return answer;
                 }
 
-                // Mapear de PR_tbDescuentos_DropdownResult a DescuentoDropdownDto
-                if (answer.Data is IEnumerable<PR_tbDescuentos_DropdownResult> resultList)
+                // Mapear de PR_tbFormasPago_DropdownResult a FormaPagoDropdownDto
+                if (answer.Data is IEnumerable<PR_tbFormasPago_DropdownResult> resultList)
                 {
-                    answer.Data = _mapper.Map<List<DescuentoDropdownDto>>(resultList);
+                    answer.Data = _mapper.Map<List<FormaPagoDropdownDto>>(resultList);
                 }
 
                 return answer;
@@ -134,7 +134,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Create(object obj)
         {
-            var ent = DescuentosConversion.Create(obj);
+            var ent = FormasPagoConversion.Create(obj);
             Answer answer = await _repository.Create(ent);
             try
             {
@@ -155,7 +155,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Edit(object obj)
         {
-            var ent = DescuentosConversion.Edit(obj);
+            var ent = FormasPagoConversion.Edit(obj);
             Answer answer = await _repository.Edit(ent);
             try
             {
