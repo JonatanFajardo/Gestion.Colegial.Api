@@ -1,8 +1,11 @@
 using Gestion.Colegial.Api.Controllers;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
 using Gestion.Colegial.Business.Mapping;
 using Gestion.Colegial.Business.Services;
+using Gestion.Colegial.Business.Services.ModuloFinanzas;
 using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.DataAccess.Repositories;
 using Gestion.Colegial.DataAccess.Repositories.Finanzas;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

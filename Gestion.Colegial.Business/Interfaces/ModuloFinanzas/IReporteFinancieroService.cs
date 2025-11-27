@@ -1,8 +1,8 @@
 using Gestion.Colegial.Entities;
 
-namespace Gestion.Colegial.DataAccess.Interfaces
+namespace Gestion.Colegial.Business.Interfaces.ModuloFinanzas
 {
-    public interface IReporteFinancieroRepository
+    public interface IReporteFinancieroService
     {
         Task<Answer> IngresosPorMes(int anio, int mes);
         Task<Answer> ProyeccionCobros(int anio, int mes);

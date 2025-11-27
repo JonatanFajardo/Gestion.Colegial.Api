@@ -1,13 +1,13 @@
 using AutoMapper;
 using Gestion.Colegial.Business.Extensions;
-using Gestion.Colegial.Business.Interfaces;
-using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Gestion.Colegial.Entities.Entities;
 using static Gestion.Colegial.Business.Extensions.CustomMapping;
 
-namespace Gestion.Colegial.Business.Services
+namespace Gestion.Colegial.Business.Services.ModuloFinanzas
 {
     public class TarifaService : ITarifaService
     {

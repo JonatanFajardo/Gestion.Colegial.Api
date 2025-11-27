@@ -1,6 +1,7 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
 
 namespace Gestion.Colegial.Api.Controllers
 {
