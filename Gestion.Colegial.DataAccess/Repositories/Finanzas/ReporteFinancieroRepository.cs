@@ -1,9 +1,10 @@
-using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Gestion.Colegial.DataAccess.Repositories
+namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
 {
     public class ReporteFinancieroRepository : RepositoryBase, IReporteFinancieroRepository
     {

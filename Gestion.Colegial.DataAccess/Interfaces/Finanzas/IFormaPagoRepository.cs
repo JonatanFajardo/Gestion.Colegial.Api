@@ -1,7 +1,7 @@
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 
-namespace Gestion.Colegial.DataAccess.Interfaces
+namespace Gestion.Colegial.DataAccess.Interfaces.Finanzas
 {
     public interface IFormaPagoRepository
     {
