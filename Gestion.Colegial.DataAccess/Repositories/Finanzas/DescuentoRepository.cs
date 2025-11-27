@@ -1,4 +1,4 @@
-using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using System.Data;

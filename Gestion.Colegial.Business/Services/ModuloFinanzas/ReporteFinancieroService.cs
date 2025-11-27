@@ -1,9 +1,9 @@
 using Gestion.Colegial.Business.Extensions;
-using Gestion.Colegial.Business.Interfaces;
-using Gestion.Colegial.DataAccess.Interfaces;
+using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
+using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 
-namespace Gestion.Colegial.Business.Services
+namespace Gestion.Colegial.Business.Services.ModuloFinanzas
 {
     public class ReporteFinancieroService : IReporteFinancieroService
     {

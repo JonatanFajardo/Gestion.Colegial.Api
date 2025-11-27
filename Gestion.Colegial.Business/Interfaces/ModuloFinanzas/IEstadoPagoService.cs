@@ -1,9 +1,8 @@
 using Gestion.Colegial.Entities;
-using Gestion.Colegial.Entities.Entities;
 
-namespace Gestion.Colegial.DataAccess.Interfaces
+namespace Gestion.Colegial.Business.Interfaces.ModuloFinanzas
 {
-    public interface IEstadoPagoRepository
+    public interface IEstadoPagoService
     {
         Task<Answer> List();
         Task<Answer> Find(int id);
