@@ -1,73 +1,84 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Entities;
+using Gestion.Colegial.Entities.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Gestion.Colegial.Api.Controllers
 {
-    //[ApiController]
-    //[Route("api/v1/[controller]")]
-    ////[Route("api/Aulas")]
+    [ApiController]
+    [Route("api/v1/[controller]")]
     public class AulasController : ControllerBase
     {
-        //private AulaService aulaService = new AulaService();
+        private readonly IAulaService _aulaService;
 
-        //[HttpPost]
-        ////[ResponseType(typeof(tbAulas))]
-        //    [Route("CreateAsync")]
-        //public async Task<IActionResult> Create(tbAulas entity)
-        //{
-        //    if (entity == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    Answer answer = await aulaService.Create(entity);
-        //    return Ok(answer.Data);
-        //}
+        public AulasController(IAulaService aulaService)
+        {
+            _aulaService = aulaService;
+        }
 
-        ////[ResponseType(typeof(tbAulas))]
-        //[HttpPut]
-        //    [Route("EditAsync")]
-        //public async Task<IActionResult> Edit(tbAulas entity)
-        //{
-        //    if (entity == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    Answer answer = await aulaService.Edit(entity);
-        //    return Ok(answer.Data);
-        //}
+        [HttpGet]
+        [Route("ListAsync")]
+        public async Task<IActionResult> List()
+        {
+            Answer answer = await _aulaService.List();
+            return Ok(answer.Data);
+        }
 
-        //[HttpGet]
-        ////[ResponseType(typeof(tbAulas))]
-        //    [Route("ListAsync")]
-        //public async Task<IActionResult> List()
-        //{
-        //    Answer answer = await aulaService.List();
-        //    return Ok(answer.Data);
-        //}
+        [HttpGet]
+        [Route("FindAsync")]
+        public async Task<IActionResult> Find(int value)
+        {
+            Answer answer = await _aulaService.Find(value);
+            return Ok(answer.Data);
+        }
 
-        //[HttpGet]
-        ////[ResponseType(typeof(tbAulas))]
-        //    [Route("FindAsync")]
-        //public async Task<IActionResult> Find(int value)
-        //{
-        //    if (value == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    Answer answer = await aulaService.Find(value);
-        //    return Ok(answer.Data);
-        //}
+        [HttpGet]
+        [Route("DetailAsync")]
+        public async Task<IActionResult> Detail(int value)
+        {
+            Answer answer = await _aulaService.Detail(value);
+            return Ok(answer.Data);
+        }
 
-        //[HttpPut]
-        ////[ResponseType(typeof(tbAulas))]
-        //    [Route("RemoveAsync")]
-        //public async Task<IActionResult> Remove(int value)
-        //{
-        //    if (value == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    Answer answer = await aulaService.Delete(value);
-        //    return Ok(answer.Data);
-        //}
+        [HttpPost]
+        [Route("CreateAsync")]
+        public async Task<IActionResult> Create(tbAulas entity)
+        {
+            Answer answer = await _aulaService.Create(entity);
+            return Ok(answer.Data);
+        }
+
+        [HttpPut]
+        [Route("EditAsync")]
+        public async Task<IActionResult> Edit(tbAulas entity)
+        {
+            Answer answer = await _aulaService.Edit(entity);
+            return Ok(answer.Data);
+        }
+
+        [HttpGet]
+        [Route("ExistAsync")]
+        public async Task<IActionResult> Exist(string value)
+        {
+            if (value == null)
+            {
+                return NotFound();
+            }
+            Answer answer = await _aulaService.Exist(value);
+
+            if (answer.Access)
+            {
+                return BadRequest(answer.Message);
+            }
+            return Ok(answer.Data);
+        }
+
+        [HttpPut]
+        [Route("RemoveAsync")]
+        public async Task<IActionResult> Remove(int value)
+        {
+            Answer answer = await _aulaService.Delete(value);
+            return Ok(answer.Data);
+        }
     }
 }

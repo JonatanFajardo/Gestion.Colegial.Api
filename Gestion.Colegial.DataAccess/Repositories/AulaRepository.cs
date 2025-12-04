@@ -59,16 +59,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
-        //public async Task<PR_tbAulas_ExistResult> Exist(string value)
-        //{
-        //    const string sql = "PR_tbAulas_Exist";
-        //    await db.SaveChangesAsync();
-        //    if (resultado == null)
-        //    {
-        //        return null;
-        //    }
-        //    return resultado;
-        //}
+        public async Task<Answer> Exist(string value)
+        {
+            const string sql = "PR_tbAulas_Exist";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Aul_Descripcion", DbType = DbType.String, Value = value}
+            };
+            Answer answer = await Exist<PR_tbAulas_ExistResult>(sql, sqlParameters);
+            return answer;
+        }
 
         public async Task<Answer> Delete(int id)
         {
