@@ -71,6 +71,7 @@ builder.Services.AddCors(options =>
 // Repositories
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAlumnoRepository, AlumnoRepository>();
+builder.Services.AddScoped<AulaRepository>();
 builder.Services.AddScoped<ICargoRepository, CargoRepository>();
 builder.Services.AddScoped<ICursoNivelRepository, CursoNivelRepository>();
 builder.Services.AddScoped<ICursoRepository, CursoRepository>();
@@ -106,6 +107,7 @@ builder.Services.AddScoped<IPagoRepository, PagoRepository>();
 builder.Services.AddTransient<ApiBaseController>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IAlumnoService, AlumnoService>();
+builder.Services.AddScoped<IAulaService, AulaService>();
 builder.Services.AddScoped<ICargoService, CargoService>();
 builder.Services.AddScoped<ICursoNivelService, CursoNivelService>();
 builder.Services.AddScoped<ICursoService, CursoService>();
