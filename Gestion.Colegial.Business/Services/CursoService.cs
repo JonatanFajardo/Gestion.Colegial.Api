@@ -708,5 +708,29 @@ namespace Gestion.Colegial.Business.Services
         }
 
         #endregion CursosSecciones
+
+        public async Task<Answer> CursosDropdown(int id)
+        {
+            Answer answer = await _repository.CursosDropdown(id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Access = true;
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
     }
 }

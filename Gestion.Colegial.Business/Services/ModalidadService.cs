@@ -187,5 +187,29 @@ namespace Gestion.Colegial.Business.Services
                 return answer;
             }
         }
+
+        public async Task<Answer> ModalidadesDropdown(int id)
+        {
+            Answer answer = await _repository.ModalidadesDropdown(id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Access = true;
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
     }
 }

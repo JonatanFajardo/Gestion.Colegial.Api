@@ -80,5 +80,12 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			Answer answer = await Delete(sql, sqlParameters);
 			return answer;
 		}
+
+		public async Task<Answer> NivelesEducativosDropdown()
+		{
+			const string sql = "PR_tbNivelesEducativos_Dropdown";
+			Answer answer = await Read<PR_tbNivelesEducativos_DropdownResult>(sql);
+			return answer;
+		}
 	}
 }

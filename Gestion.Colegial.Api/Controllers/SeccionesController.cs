@@ -122,5 +122,25 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _seccionService.Delete(value);
             return Ok(answer.Data);
         }
+
+        #region Dropdown
+
+        /// <summary>
+        /// Obtiene un objeto.
+        /// </summary>
+        /// <returns>Estado de la peticion completada.</returns>
+        /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
+        /// <response code="400">BadRequest. Conexión no establecida.</response>
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
+        [HttpGet("SeccionesDropdown")]
+        //[ResponseType(typeof(PR_tbSecciones_DropdownResult))]
+        //[Route("SeccionesDropdown")]
+        public async Task<IActionResult> SeccionesDropdown(int id)
+        {
+            Answer answer = await _seccionService.SeccionesDropdown(id);
+            return Ok(answer.Data);
+        }
+
+        #endregion Dropdown
     }
 }
