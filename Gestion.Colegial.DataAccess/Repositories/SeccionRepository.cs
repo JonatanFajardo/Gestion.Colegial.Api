@@ -78,5 +78,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Delete(sql, sqlParameters);
             return answer;
         }
+
+        public async Task<Answer> SeccionesDropdown(int id)
+        {
+            const string sql = "PR_tbSecciones_By_tbCursos_Dropdown";
+            SqlParameter[] sqlParameters = {
+            new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = id }
+            };
+            Answer answer = await Read<PR_tbSecciones_DropdownResult>(sql, sqlParameters);
+            return answer;
+        }
     }
 }

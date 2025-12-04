@@ -12,5 +12,6 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> Edit(tbCursosNiveles obj);
         Task<Answer> Exist(string value);
         Task<Answer> Delete(int id);
+        Task<Answer> CursosNivelesDropdown(int id);
     }
 }

@@ -31,5 +31,6 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> CursosSeccionesCreate(tbCursos obj);
         Task<Answer> CursosSeccionesEdit(tbCursos obj);
         Task<Answer> CursosSeccionesDelete(int id);
+        Task<Answer> CursosDropdown(int id);
     }
 }
