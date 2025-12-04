@@ -147,6 +147,22 @@ namespace Gestion.Colegial.Api.Controllers
             return Ok(answer.Data);
         }
 
+        /// <summary>
+        /// Obtiene un objeto.
+        /// </summary>
+        /// <returns>Estado de la peticion completada.</returns>
+        /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
+        /// <response code="400">BadRequest. Conexión no establecida.</response>
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
+        [HttpGet("CursosDropdown")]
+        //[ResponseType(typeof(PR_tbCursos_DropdownResult))]
+        //[Route("CursosDropdown")]
+        public async Task<IActionResult> CursosDropdown(int id)
+        {
+            Answer answer = await _cursoService.CursosDropdown(id);
+            return Ok(answer.Data);
+        }
+
         #endregion Dropdown
 
         #region CheckList
