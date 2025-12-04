@@ -79,5 +79,12 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Delete(sql, sqlParameters);
             return answer;
         }
+
+        public async Task<Answer> EstadosDropdown()
+        {
+            const string sql = "PR_tbEstados_Dropdown";
+            Answer answer = await Read<PR_tbEstados_DropdownResult>(sql);
+            return answer;
+        }
     }
 }

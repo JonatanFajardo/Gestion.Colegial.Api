@@ -12,5 +12,6 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Edit(tbEstados obj);
         Task<Answer> Exist(string value);
         Task<Answer> Delete(int id);
+        Task<Answer> EstadosDropdown();
     }
 }

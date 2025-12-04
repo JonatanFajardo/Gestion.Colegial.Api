@@ -347,5 +347,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
 		}
 
 		#endregion CursosNiveles
+
+		public async Task<Answer> CursosDropdown(int id)
+		{
+			const string sql = "PR_tbCursos_By_tbModalidades_Dropdown";
+			SqlParameter[] sqlParameters = {
+			new SqlParameter(){ParameterName= "@Mda_Id", DbType = DbType.Int32, Value = id }
+			};
+			Answer answer = await Read<PR_tbCursos_DropdownResult>(sql, sqlParameters);
+			return answer;
+		}
 	}
 }

@@ -163,5 +163,25 @@ namespace Gestion.Colegial.Api.Controllers
             //}
             //return Ok(answer.Access);
         }
+
+        #region Dropdown
+
+        /// <summary>
+        /// Obtiene un objeto.
+        /// </summary>
+        /// <returns>Estado de la peticion completada.</returns>
+        /// <response code="200">Ok. Devuelve el objeto solicitado.</response>
+        /// <response code="400">BadRequest. Conexión no establecida.</response>
+        /// <response code="404">NotFound. No se ha encontrado el objeto solicitado.</response>
+        [HttpGet("CursosNivelesDropdown")]
+        //[ResponseType(typeof(PR_tbCursosNiveles_DropdownResult))]
+        //[Route("CursosNivelesDropdown")]
+        public async Task<IActionResult> CursosNivelesDropdown(int id)
+        {
+            Answer answer = await _cursoNivelService.CursosNivelesDropdown(id);
+            return Ok(answer.Data);
+        }
+
+        #endregion Dropdown
     }
 }
