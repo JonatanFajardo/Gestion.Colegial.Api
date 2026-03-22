@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Colegial API -- Guia de Arquitectura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0ea5e9',
+                        secondary: '#6366f1',
+                        accent: '#06b6d4',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Light/Dark CSS custom properties */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(209, 213, 219, 0.6);
+            --glass-shadow: rgba(0, 0, 0, 0.05);
+            --tree-line-color: #cbd5e1;
+            --hover-shadow-1: rgba(14, 165, 233, 0.15);
+            --hover-shadow-2: rgba(0, 0, 0, 0.08);
+        }
+        html.dark {
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(14, 165, 233, 0.15);
+            --glass-shadow: rgba(0, 0, 0, 0.2);
+            --tree-line-color: #334155;
+            --hover-shadow-1: rgba(14, 165, 233, 0.2);
+            --hover-shadow-2: rgba(0, 0, 0, 0.3);
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 1px 3px var(--glass-shadow);
+        }
+        .layer-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .layer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px var(--hover-shadow-1), 0 4px 12px var(--hover-shadow-2);
+        }
+        .arrow-down {
+            width: 2px; height: 40px;
+            background: linear-gradient(to bottom, #0ea5e9, #06b6d4);
+            margin: 0 auto; position: relative;
+        }
+        .arrow-down::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #06b6d4;
+        }
+        .flow-step { position: relative; }
+        .flow-step:not(:last-child)::after {
+            content: '\2192'; position: absolute; right: -24px; top: 50%; transform: translateY(-50%);
+            color: #0ea5e9; font-size: 1.25rem; font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .flow-step:not(:last-child)::after {
+                content: '\2193'; right: auto; left: 50%; top: auto; bottom: -28px; transform: translateX(-50%);
+            }
+        }
+        .tree-line { border-left: 2px solid var(--tree-line-color); margin-left: 1rem; padding-left: 1rem; }
+    </style>
+</head>
+<body class="bg-white dark:bg-slate-950 text-gray-700 dark:text-gray-300 min-h-screen transition-colors duration-300">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#hero" class="text-xl font-bold gradient-text flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-primary"></i> Gestion Colegial API
+            </a>
+            <div class="hidden md:flex gap-6 text-sm">
+                <a href="#stack" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Stack</a>
+                <a href="#architecture" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Arquitectura</a>
+                <a href="#patterns" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Patrones</a>
+                <a href="#modules" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Modulos</a>
+                <a href="#database" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Base de Datos</a>
+                <a href="#dataflow" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Flujo de Datos</a>
+                <a href="#endpoints" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Endpoints</a>
+                <a href="#structure" class="text-gray-600 dark:text-gray-400 hover:text-primary transition">Estructura</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:text-primary transition" title="Cambiar tema">
+                    <i class="fas fa-moon text-lg" id="theme-icon"></i>
+                </button>
+                <button id="menu-toggle" class="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-4 pb-4 space-y-2 text-sm">
+            <a href="#stack" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Stack</a>
+            <a href="#architecture" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Arquitectura</a>
+            <a href="#patterns" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Patrones</a>
+            <a href="#modules" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Modulos</a>
+            <a href="#database" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Base de Datos</a>
+            <a href="#dataflow" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Flujo de Datos</a>
+            <a href="#endpoints" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Endpoints</a>
+            <a href="#structure" class="block text-gray-600 dark:text-gray-400 hover:text-primary">Estructura</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero" class="pt-32 pb-20 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-500 dark:text-gray-400 mb-6">
+                <i class="fas fa-server"></i> REST API &bull; Documentacion de Arquitectura
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                <span class="gradient-text">Gestion Colegial</span>
+                <span class="block text-2xl md:text-3xl text-gray-500 dark:text-gray-400 mt-2">API</span>
+            </h1>
+            <p class="text-xl text-gray-500 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+                API RESTful para la gestion integral de centros educativos. Administra alumnos, empleados, cursos, calificaciones, horarios y un modulo financiero completo.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <span class="px-3 py-1 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 text-sm border border-sky-500/20">.NET 6.0</span>
+                <span class="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-sm border border-cyan-500/20">Web API</span>
+                <span class="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm border border-indigo-500/20">SQL Server</span>
+                <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-sm border border-amber-500/20">JWT Auth</span>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm border border-emerald-500/20">Swagger</span>
+                <span class="px-3 py-1 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm border border-rose-500/20">4 Capas</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="stack" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Stack Tecnologico</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Tecnologias y herramientas del backend</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-server text-3xl text-sky-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">.NET 6.0</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Runtime Framework</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-plug text-3xl text-cyan-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">ASP.NET Core API</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Web API Framework</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-database text-3xl text-indigo-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">SQL Server</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Base de Datos</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-bolt text-3xl text-emerald-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">ADO.NET + SP</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Data Access</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-exchange-alt text-3xl text-amber-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">AutoMapper 12</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Object Mapping</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-file-alt text-3xl text-rose-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Serilog 4.3</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Structured Logging</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-shield-alt text-3xl text-purple-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">JWT Bearer</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Authentication</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-book-open text-3xl text-teal-400 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Swagger</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">API Documentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Layers -->
+    <section id="architecture" class="py-20 px-4 bg-gray-50 dark:bg-slate-900/50">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Arquitectura por Capas</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">4 capas con separacion clara de responsabilidades</p>
+
+            <!-- Layer 4: API -->
+            <div class="layer-card glass rounded-xl p-6 mb-2">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-10 h-10 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 font-bold text-sm">04</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Gestion.Colegial.Api</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">03_Api</span>
+                    </div>
+                    <span class="ml-auto px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 text-xs">API REST</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Controladores Web API, autenticacion JWT, Swagger, CORS, middleware pipeline y configuracion de la aplicacion.</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">35 Controllers</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">JWT Bearer Auth</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Swagger UI</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">CORS AllowAll</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Serilog</span>
+                </div>
+            </div>
+            <div class="arrow-down"></div>
+
+            <!-- Layer 3: Business -->
+            <div class="layer-card glass rounded-xl p-6 mb-2">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-sm">03</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Gestion.Colegial.Business</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">02_Business</span>
+                    </div>
+                    <span class="ml-auto px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs">Logica de Negocio</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Servicios de negocio, AutoMapper profiles, DTOs de negocio, logging y mensajes estandar.</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">33+ Services</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">AutoMapper 12</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">DTOs</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Serilog</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">CustomMapping</span>
+                </div>
+            </div>
+            <div class="arrow-down"></div>
+
+            <!-- Layer 2: DataAccess -->
+            <div class="layer-card glass rounded-xl p-6 mb-2">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-sm">02</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Gestion.Colegial.DataAccess</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">01_DataAccess</span>
+                    </div>
+                    <span class="ml-auto px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs">Acceso a Datos</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Repositorios con interfaces, RepositoryBase generico, ADO.NET con SqlClient, mapeo DataTable -> Entidad.</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">38+ Repositories</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">RepositoryBase</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">ADO.NET</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Connection.cs</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Mapear.cs</span>
+                </div>
+            </div>
+            <div class="arrow-down"></div>
+
+            <!-- Layer 1: Entities -->
+            <div class="layer-card glass rounded-xl p-6">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">01</span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Gestion.Colegial.Entities</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">00_Entities</span>
+                    </div>
+                    <span class="ml-auto px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs">Entidades / DTOs</span>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Entidades del dominio, clases resultado de SP, DTOs financieros, clase Answer y DbContext (scaffolded).</p>
+                <div class="flex flex-wrap gap-2 text-xs">
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">130+ Entities</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">60+ SP Results</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">60+ DTOs</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">Answer.cs</span>
+                    <span class="px-2 py-1 rounded bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400">EF Core DbContext</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Design Patterns -->
+    <section id="patterns" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Patrones de Diseno</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Patrones implementados en la arquitectura</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Repository Base -->
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-sky-500/20 flex items-center justify-center">
+                            <i class="fas fa-layer-group text-sky-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Repository Base</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Clase generica que provee operaciones CRUD estandar via ADO.NET y stored procedures.</p>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 text-sm font-mono">
+                        <span class="text-purple-400">public class</span> <span class="text-cyan-600 dark:text-cyan-300">RepositoryBase</span><br>
+                        {<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">Read</span>&lt;T&gt;(query);<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">Search</span>&lt;T&gt;(query, param);<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">New</span>(query, param);<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">Update</span>(query, param);<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">Delete</span>(query, param);<br>
+                        }
+                    </div>
+                </div>
+
+                <!-- Answer Response Pattern -->
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                            <i class="fas fa-reply text-indigo-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Answer Response Pattern</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Objeto estandar de respuesta que envuelve todas las operaciones con tipo, mensaje y datos.</p>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 text-sm font-mono">
+                        <span class="text-purple-400">public class</span> <span class="text-cyan-600 dark:text-cyan-300">Answer</span><br>
+                        {<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">ServiceResultType</span> <span class="text-gray-900 dark:text-white">Type</span>; <span class="text-gray-500 dark:text-gray-500">// 200, 404, 500</span><br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">bool</span> <span class="text-gray-900 dark:text-white">Access</span>; <span class="text-gray-500 dark:text-gray-500">// Error flag</span><br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">string</span> <span class="text-gray-900 dark:text-white">Message</span>; <span class="text-gray-500 dark:text-gray-500">// User message</span><br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">dynamic</span> <span class="text-gray-900 dark:text-white">Data</span>; <span class="text-gray-500 dark:text-gray-500">// Result payload</span><br>
+                        }
+                    </div>
+                </div>
+
+                <!-- Service Layer -->
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                            <i class="fas fa-cogs text-cyan-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Service Layer</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Servicios encapsulan la logica de negocio. Coordinan repositorios y transforman datos con AutoMapper.</p>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 text-sm font-mono">
+                        <span class="text-purple-400">public class</span> <span class="text-cyan-600 dark:text-cyan-300">AlumnoService</span><br>
+                        {<br>
+                        &nbsp;&nbsp;<span class="text-gray-500 dark:text-gray-500">// Repository + Mapper injected</span><br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">ListAsync</span>();<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">FindAsync</span>(id);<br>
+                        &nbsp;&nbsp;<span class="text-emerald-400">Task</span>&lt;Answer&gt; <span class="text-gray-900 dark:text-white">CreateAsync</span>(entity);<br>
+                        }
+                    </div>
+                </div>
+
+                <!-- JWT Authentication -->
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i class="fas fa-key text-purple-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">JWT Authentication</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Autenticacion basada en tokens JWT con validacion de issuer, audience y signing key.</p>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 text-sm font-mono">
+                        <span class="text-gray-500 dark:text-gray-500">// JWT Configuration</span><br>
+                        <span class="text-amber-600 dark:text-amber-300">Issuer</span>: <span class="text-emerald-600 dark:text-emerald-300">"GestionColegialAPI"</span><br>
+                        <span class="text-amber-600 dark:text-amber-300">Audience</span>: <span class="text-emerald-600 dark:text-emerald-300">"GestionColegialUI"</span><br>
+                        <span class="text-amber-600 dark:text-amber-300">Validate</span>: Issuer, Audience,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lifetime, SigningKey
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Patterns -->
+            <div class="grid md:grid-cols-3 gap-4 mt-6">
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-syringe text-sky-400 text-2xl mb-3"></i>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Dependency Injection</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Todos los repositorios y servicios se registran como <code class="text-gray-500 dark:text-gray-400">Scoped</code> en Program.cs.</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-trash-alt text-amber-400 text-2xl mb-3"></i>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Soft Delete</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Eliminacion logica con campo <code class="text-gray-500 dark:text-gray-400">EsEliminado</code>. Los registros nunca se borran fisicamente.</p>
+                </div>
+                <div class="glass rounded-xl p-5 text-center layer-card">
+                    <i class="fas fa-user-clock text-cyan-400 text-2xl mb-3"></i>
+                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Audit Trail</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Todas las entidades registran <code class="text-gray-500 dark:text-gray-400">UsuarioCrea</code>, <code class="text-gray-500 dark:text-gray-400">FechaCrea</code>, <code class="text-gray-500 dark:text-gray-400">UsuarioModifica</code>, <code class="text-gray-500 dark:text-gray-400">FechaModifica</code>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Modules -->
+    <section id="modules" class="py-20 px-4 bg-gray-50 dark:bg-slate-900/50">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Modulos del Sistema</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Dominios funcionales organizados por schema de base de datos</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-sky-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-user-graduate text-2xl text-sky-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Academico</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-users text-sky-400/50 mr-2"></i>Alumnos</li>
+                        <li><i class="fas fa-book text-sky-400/50 mr-2"></i>Cursos</li>
+                        <li><i class="fas fa-chalkboard text-sky-400/50 mr-2"></i>Materias</li>
+                        <li><i class="fas fa-star text-sky-400/50 mr-2"></i>Notas / Parciales</li>
+                        <li><i class="fas fa-layer-group text-sky-400/50 mr-2"></i>Niveles Educativos</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-indigo-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-user-tie text-2xl text-indigo-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Personal</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-id-card text-indigo-400/50 mr-2"></i>Empleados</li>
+                        <li><i class="fas fa-briefcase text-indigo-400/50 mr-2"></i>Cargos</li>
+                        <li><i class="fas fa-graduation-cap text-indigo-400/50 mr-2"></i>Titulos</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-purple-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-people-arrows text-2xl text-purple-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Encargados</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-user-friends text-purple-400/50 mr-2"></i>Encargados / Padres</li>
+                        <li><i class="fas fa-heart text-purple-400/50 mr-2"></i>Parentescos</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-emerald-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-coins text-2xl text-emerald-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Financiero</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-money-bill text-emerald-400/50 mr-2"></i>Pagos</li>
+                        <li><i class="fas fa-file-invoice-dollar text-emerald-400/50 mr-2"></i>Cuentas por Cobrar</li>
+                        <li><i class="fas fa-tags text-emerald-400/50 mr-2"></i>Tarifas</li>
+                        <li><i class="fas fa-receipt text-emerald-400/50 mr-2"></i>Conceptos de Pago</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-amber-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-percent text-2xl text-amber-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Descuentos</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-tag text-amber-400/50 mr-2"></i>Descuentos</li>
+                        <li><i class="fas fa-clock text-amber-400/50 mr-2"></i>Moratorias</li>
+                        <li><i class="fas fa-credit-card text-amber-400/50 mr-2"></i>Formas de Pago</li>
+                        <li><i class="fas fa-check-circle text-amber-400/50 mr-2"></i>Estados de Pago</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-teal-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-calendar-alt text-2xl text-teal-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Horarios</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-clock text-teal-400/50 mr-2"></i>Horarios de Alumnos</li>
+                        <li><i class="fas fa-school text-teal-400/50 mr-2"></i>Aulas</li>
+                        <li><i class="fas fa-calendar-day text-teal-400/50 mr-2"></i>Dias</li>
+                        <li><i class="fas fa-hourglass text-teal-400/50 mr-2"></i>Duraciones</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-rose-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-chart-bar text-2xl text-rose-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Dashboard</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-chart-line text-rose-400/50 mr-2"></i>Estadisticas</li>
+                        <li><i class="fas fa-chart-pie text-rose-400/50 mr-2"></i>Alumnos por Curso</li>
+                        <li><i class="fas fa-chart-area text-rose-400/50 mr-2"></i>Notas Promedio</li>
+                        <li><i class="fas fa-balance-scale text-rose-400/50 mr-2"></i>Comparacion Anual</li>
+                    </ul>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card border-l-4 border-red-500">
+                    <div class="flex items-center gap-3 mb-3">
+                        <i class="fas fa-shield-alt text-2xl text-red-400"></i>
+                        <h3 class="font-bold text-gray-900 dark:text-white">Seguridad</h3>
+                    </div>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1.5">
+                        <li><i class="fas fa-user-lock text-red-400/50 mr-2"></i>Usuarios</li>
+                        <li><i class="fas fa-user-tag text-red-400/50 mr-2"></i>Roles</li>
+                        <li><i class="fas fa-key text-red-400/50 mr-2"></i>JWT Tokens</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Database Schema -->
+    <section id="database" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Diagrama de Base de Datos</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Entidades principales y relaciones organizadas por schema</p>
+
+            <div class="glass rounded-xl p-8">
+                <!-- Central Entity -->
+                <div class="text-center mb-8">
+                    <div class="inline-block bg-sky-500/20 border-2 border-sky-500 rounded-xl p-5">
+                        <i class="fas fa-user-graduate text-sky-400 text-2xl mb-2"></i>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">tbAlumnos</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Entidad Central del Sistema</p>
+                        <div class="flex flex-wrap gap-1.5 mt-3 justify-center text-xs">
+                            <span class="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">Alu_Id</span>
+                            <span class="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">Per_Nombre</span>
+                            <span class="px-2 py-0.5 bg-sky-500/20 rounded text-sky-600 dark:text-sky-300">Cur_Id (FK)</span>
+                            <span class="px-2 py-0.5 bg-sky-500/20 rounded text-sky-600 dark:text-sky-300">Sec_Id (FK)</span>
+                            <span class="px-2 py-0.5 bg-sky-500/20 rounded text-sky-600 dark:text-sky-300">Niv_Id (FK)</span>
+                            <span class="px-2 py-0.5 bg-sky-500/20 rounded text-sky-600 dark:text-sky-300">Est_Id (FK)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relationships -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Academic -->
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-semibold text-sky-400 text-center mb-4">
+                            <i class="fas fa-arrow-up mr-1"></i> Catalogos Academicos
+                        </h4>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-sky-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbCursos</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Cursos del alumno</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-sky-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbSecciones</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Seccion asignada</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-sky-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbNivelesEducativos</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Nivel educativo</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-sky-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbModalidades</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Modalidad educativa</span>
+                        </div>
+                    </div>
+
+                    <!-- Financial Flow -->
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-semibold text-emerald-400 text-center mb-4">
+                            <i class="fas fa-arrow-down mr-1"></i> Flujo Financiero
+                        </h4>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-emerald-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbCuentasCobrar</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Cargos mensuales (1:N)</span>
+                        </div>
+                        <div class="text-center text-emerald-400"><i class="fas fa-arrow-down"></i></div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-emerald-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbPagos</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Pagos realizados</span>
+                        </div>
+                        <div class="text-center text-emerald-400"><i class="fas fa-arrow-down"></i></div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-emerald-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbPagosDetalle</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Detalle linea por linea</span>
+                        </div>
+                    </div>
+
+                    <!-- Grades -->
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-semibold text-purple-400 text-center mb-4">
+                            <i class="fas fa-arrow-down mr-1"></i> Calificaciones
+                        </h4>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-purple-500/20">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbNotas</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Calificaciones (1:N)</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-2 border border-purple-500/20 flex-1 text-center">
+                                <span class="text-xs font-semibold text-gray-900 dark:text-white">tbMaterias</span>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-2 border border-purple-500/20 flex-1 text-center">
+                                <span class="text-xs font-semibold text-gray-900 dark:text-white">tbParciales</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-3 border border-purple-500/20 mt-2">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">tbHorarioAlumnos</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400 block">Horarios del alumno</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schema Legend -->
+                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-slate-700">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                        <i class="fas fa-database mr-1"></i> Schemas de Base de Datos
+                    </h4>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-semibold">app -- Academico (28 tablas)</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">finanza -- Financiero (12 tablas)</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold">seguridad -- Auth (2 tablas)</span>
+                        <span class="px-3 py-1.5 rounded-lg bg-gray-500/10 border border-gray-500/20 text-gray-500 dark:text-gray-400 text-xs font-semibold">dbo -- Stored Procedures</span>
+                    </div>
+                </div>
+
+                <!-- SP Convention -->
+                <div class="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                        <i class="fas fa-code mr-1"></i> Convencion de Stored Procedures
+                    </h4>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 font-mono text-sm">
+                        <span class="text-gray-500 dark:text-gray-500">-- Patron: PR_tb{Tabla}_{Operacion}</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbAlumnos_List</span> <span class="text-gray-500 dark:text-gray-500">-- Listar todos</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbAlumnos_Find</span> <span class="text-gray-500 dark:text-gray-500">-- Buscar por ID</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbAlumnos_Detail</span> <span class="text-gray-500 dark:text-gray-500">-- Detalle con auditoria</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbAlumnos_Insert</span> <span class="text-gray-500 dark:text-gray-500">-- Crear registro</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbAlumnos_Update</span> <span class="text-gray-500 dark:text-gray-500">-- Actualizar registro</span><br>
+                        <span class="text-cyan-600 dark:text-cyan-300">PR_tbCuentasCobrar_FindByAlumno</span> <span class="text-gray-500 dark:text-gray-500">-- Consulta especifica</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Flow -->
+    <section id="dataflow" class="py-20 px-4 bg-gray-50 dark:bg-slate-900/50">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Flujo de Datos</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Como viaja una peticion HTTP a traves de las capas</p>
+
+            <!-- Request -->
+            <div class="glass rounded-xl p-8 mb-6">
+                <h3 class="text-sm font-semibold text-emerald-400 mb-6 text-center">
+                    <i class="fas fa-arrow-right mr-1"></i> Request (Ida)
+                </h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4">
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-globe text-sky-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Client</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">HTTP Request</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-route text-indigo-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Controller</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Recibe Entity/DTO</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-cogs text-cyan-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Service</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Business Logic</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-layer-group text-emerald-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Repository</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">SqlCommand</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-database text-amber-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">SQL Server</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Stored Procedure</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response -->
+            <div class="glass rounded-xl p-8 mb-8">
+                <h3 class="text-sm font-semibold text-cyan-400 mb-6 text-center">
+                    <i class="fas fa-arrow-left mr-1"></i> Response (Vuelta)
+                </h3>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4">
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-database text-amber-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">SQL Server</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">DataTable</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-layer-group text-emerald-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Repository</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Mapear -> Entity</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-cogs text-cyan-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Service</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">AutoMapper -> DTO</p>
+                    </div>
+                    <div class="flow-step bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-route text-indigo-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Controller</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Answer Object</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 text-center min-w-[130px]">
+                        <i class="fas fa-globe text-sky-400 text-xl mb-2"></i>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">Client</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">JSON Response</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass rounded-xl p-6">
+                    <h4 class="text-sm font-semibold text-amber-400 mb-4">
+                        <i class="fas fa-exchange-alt mr-2"></i>AutoMapper Transformations
+                    </h4>
+                    <div class="space-y-3 text-xs font-mono">
+                        <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                            <span class="text-gray-500 dark:text-gray-500">// SP Result -> DTO (List)</span><br>
+                            <span class="text-amber-600 dark:text-amber-300">PR_tbTarifas_ListResult</span>
+                            <span class="text-gray-500 dark:text-gray-500"> -></span>
+                            <span class="text-cyan-600 dark:text-cyan-300"> TarifaListDto</span>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                            <span class="text-gray-500 dark:text-gray-500">// SP Result -> DTO (Detail)</span><br>
+                            <span class="text-amber-600 dark:text-amber-300">PR_tbPagos_DetailResult</span>
+                            <span class="text-gray-500 dark:text-gray-500"> -></span>
+                            <span class="text-cyan-600 dark:text-cyan-300"> PagoDetailDto</span>
+                        </div>
+                        <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                            <span class="text-gray-500 dark:text-gray-500">// Entity -> DTO (Find)</span><br>
+                            <span class="text-amber-600 dark:text-amber-300">PR_tbCuentasCobrar_FindResult</span>
+                            <span class="text-gray-500 dark:text-gray-500"> -></span>
+                            <span class="text-cyan-600 dark:text-cyan-300"> CuentaCobrarFindDto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-6">
+                    <h4 class="text-sm font-semibold text-emerald-400 mb-4">
+                        <i class="fas fa-plug mr-2"></i>Dependency Injection
+                    </h4>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-4 text-xs font-mono space-y-2">
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-500">// Program.cs -- Repositories</span><br>
+                            <span class="text-purple-400">builder.Services</span>.<span class="text-gray-900 dark:text-white">AddScoped</span>&lt;<br>
+                            &nbsp;&nbsp;<span class="text-cyan-600 dark:text-cyan-300">IAlumnoRepository</span>,<br>
+                            &nbsp;&nbsp;<span class="text-emerald-600 dark:text-emerald-300">AlumnoRepository</span>&gt;();<br>
+                            <span class="text-gray-500 dark:text-gray-500">// ... 38+ repositories</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 dark:text-gray-500">// Program.cs -- Services</span><br>
+                            <span class="text-purple-400">builder.Services</span>.<span class="text-gray-900 dark:text-white">AddScoped</span>&lt;<br>
+                            &nbsp;&nbsp;<span class="text-cyan-600 dark:text-cyan-300">IAlumnoService</span>,<br>
+                            &nbsp;&nbsp;<span class="text-emerald-600 dark:text-emerald-300">AlumnoService</span>&gt;();<br>
+                            <span class="text-gray-500 dark:text-gray-500">// ... 33+ services</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Endpoints -->
+    <section id="endpoints" class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">API Endpoints</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Endpoints RESTful organizados por modulo -- Base: <code class="text-sky-400">/api/v1/</code></p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Academic -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-sky-400 mb-4"><i class="fas fa-graduation-cap mr-2"></i>Modulo Academico</h3>
+                    <div class="space-y-2 text-xs font-mono">
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Alumnos/ListAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Alumnos/FindAsync?value={id}</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">POST</span><span class="text-gray-600 dark:text-gray-400">/Alumnos/CreateAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">PUT</span><span class="text-gray-600 dark:text-gray-400">/Alumnos/EditAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400">PUT</span><span class="text-gray-600 dark:text-gray-400">/Alumnos/RemoveAsync?value={id}</span></div>
+                        <div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Cursos, /Materias, /Notas</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Secciones, /NivelesEducativos</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/HorarioAlumnos, /Modalidades</span></div>
+                    </div>
+                </div>
+
+                <!-- Financial -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-emerald-400 mb-4"><i class="fas fa-coins mr-2"></i>Modulo Financiero</h3>
+                    <div class="space-y-2 text-xs font-mono">
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/CuentasCobrar/ListAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">POST</span><span class="text-gray-600 dark:text-gray-400">/Pagos/CreateAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Tarifas/ListAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/ConceptosPago/ListAsync</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Descuentos, /FormasPago</span></div>
+                        <div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/ReportesFinancieros/Ingresos</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/ReportesFinancieros/Morosos</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/ReportesFinancieros/EstadoCuenta</span></div>
+                    </div>
+                </div>
+
+                <!-- Auth -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-purple-400 mb-4"><i class="fas fa-key mr-2"></i>Autenticacion</h3>
+                    <div class="space-y-2 text-xs font-mono">
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">POST</span><span class="text-gray-600 dark:text-gray-400">/Account/Login</span><span class="text-gray-500 dark:text-gray-500 ml-2">-> JWT Token</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400">POST</span><span class="text-gray-600 dark:text-gray-400">/Account/Logout</span><span class="text-gray-500 dark:text-gray-500 ml-2">-> Log session</span></div>
+                    </div>
+                </div>
+
+                <!-- Catalogs & Dashboard -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-amber-400 mb-4"><i class="fas fa-th-list mr-2"></i>Catalogos y Dashboard</h3>
+                    <div class="space-y-2 text-xs font-mono">
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Cargos, /Estados, /Titulos</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Dias, /Duraciones, /Parciales</span></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/Semestres, /Parentescos, /Aulas</span></div>
+                        <div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>
+                        <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">GET</span><span class="text-gray-600 dark:text-gray-400">/HomeAndCharts/Dashboard</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Endpoint Pattern -->
+            <div class="glass rounded-xl p-6 mt-6">
+                <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3"><i class="fas fa-info-circle mr-1"></i> Patron de Endpoints por Controller</h4>
+                <div class="grid md:grid-cols-3 gap-3 text-xs font-mono">
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                        <span class="text-emerald-400">GET</span> <span class="text-gray-600 dark:text-gray-400">/ListAsync</span><br>
+                        <span class="text-emerald-400">GET</span> <span class="text-gray-600 dark:text-gray-400">/DetailAsync?value={id}</span>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                        <span class="text-emerald-400">GET</span> <span class="text-gray-600 dark:text-gray-400">/FindAsync?value={id}</span><br>
+                        <span class="text-emerald-400">GET</span> <span class="text-gray-600 dark:text-gray-400">/{Entity}Dropdown</span>
+                    </div>
+                    <div class="bg-gray-100 dark:bg-slate-800 rounded-lg p-3">
+                        <span class="text-sky-400">POST</span> <span class="text-gray-600 dark:text-gray-400">/CreateAsync</span><br>
+                        <span class="text-amber-400">PUT</span> <span class="text-gray-600 dark:text-gray-400">/EditAsync, /RemoveAsync</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Structure -->
+    <section id="structure" class="py-20 px-4 bg-gray-50 dark:bg-slate-900/50">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-2 gradient-text">Estructura del Proyecto</h2>
+            <p class="text-center text-gray-500 dark:text-gray-400 mb-12">Organizacion de la solucion y metricas</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Tree -->
+                <div class="glass rounded-xl p-6">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="fas fa-folder-open text-amber-400"></i> Gestion.Colegial.Api.sln
+                    </h3>
+                    <div class="font-mono text-sm space-y-1">
+                        <div class="text-emerald-600 dark:text-emerald-300"><i class="fas fa-folder text-emerald-400/60 mr-2"></i>Gestion.Colegial.Entities/</div>
+                        <div class="tree-line space-y-1 text-gray-500 dark:text-gray-400 text-xs">
+                            <div><i class="fas fa-folder mr-2"></i>Entities/app/ <span class="text-gray-600 dark:text-gray-500">-- 28 entidades</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Entities/finanza/ <span class="text-gray-600 dark:text-gray-500">-- 100+ archivos</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Entities/seguridad/ <span class="text-gray-600 dark:text-gray-500">-- Usuarios, Roles</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Entities/dbo/ <span class="text-gray-600 dark:text-gray-500">-- 100+ SP Results</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>DTOs/finansas/ <span class="text-gray-600 dark:text-gray-500">-- 60+ DTOs</span></div>
+                            <div><i class="fas fa-file-code mr-2"></i>Answer.cs, DbContext</div>
+                        </div>
+
+                        <div class="text-cyan-600 dark:text-cyan-300 mt-4"><i class="fas fa-folder text-cyan-400/60 mr-2"></i>Gestion.Colegial.DataAccess/</div>
+                        <div class="tree-line space-y-1 text-gray-500 dark:text-gray-400 text-xs">
+                            <div><i class="fas fa-folder mr-2"></i>Repositories/ <span class="text-gray-600 dark:text-gray-500">-- 30+ repositorios</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Repositories/Finanzas/ <span class="text-gray-600 dark:text-gray-500">-- 8 financieros</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Interfaces/ <span class="text-gray-600 dark:text-gray-500">-- 30+ interfaces</span></div>
+                            <div><i class="fas fa-file-code mr-2"></i>RepositoryBase.cs, Connection.cs</div>
+                        </div>
+
+                        <div class="text-indigo-600 dark:text-indigo-300 mt-4"><i class="fas fa-folder text-indigo-400/60 mr-2"></i>Gestion.Colegial.Business/</div>
+                        <div class="tree-line space-y-1 text-gray-500 dark:text-gray-400 text-xs">
+                            <div><i class="fas fa-folder mr-2"></i>Services/ <span class="text-gray-600 dark:text-gray-500">-- 25+ servicios</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Services/ModuloFinanzas/ <span class="text-gray-600 dark:text-gray-500">-- 8 financieros</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Mapping/ <span class="text-gray-600 dark:text-gray-500">-- DtoMappingProfile</span></div>
+                            <div><i class="fas fa-folder mr-2"></i>Extensions/ <span class="text-gray-600 dark:text-gray-500">-- Helpers, Logs</span></div>
+                        </div>
+
+                        <div class="text-sky-600 dark:text-sky-300 mt-4"><i class="fas fa-folder text-sky-400/60 mr-2"></i>Gestion.Colegial.Api/</div>
+                        <div class="tree-line space-y-1 text-gray-500 dark:text-gray-400 text-xs">
+                            <div><i class="fas fa-folder mr-2"></i>Controllers/ <span class="text-gray-600 dark:text-gray-500">-- 35 controllers</span></div>
+                            <div><i class="fas fa-file-code mr-2"></i>Program.cs, appsettings.json</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="space-y-4">
+                    <div class="glass rounded-xl p-6">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-cyan-400"></i> Metricas del Proyecto
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center"><div class="text-3xl font-bold text-sky-400">5</div><div class="text-xs text-gray-500 dark:text-gray-400">Proyectos</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-indigo-400">4</div><div class="text-xs text-gray-500 dark:text-gray-400">Capas</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-cyan-400">35</div><div class="text-xs text-gray-500 dark:text-gray-400">Controllers</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-emerald-400">33+</div><div class="text-xs text-gray-500 dark:text-gray-400">Services</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-amber-400">38+</div><div class="text-xs text-gray-500 dark:text-gray-400">Repositories</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-rose-400">130+</div><div class="text-xs text-gray-500 dark:text-gray-400">Entities</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-purple-400">60+</div><div class="text-xs text-gray-500 dark:text-gray-400">DTOs</div></div>
+                            <div class="text-center"><div class="text-3xl font-bold text-teal-400">4</div><div class="text-xs text-gray-500 dark:text-gray-400">DB Schemas</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Logging -->
+                    <div class="glass rounded-xl p-6">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-alt text-rose-400"></i> Serilog Logging
+                        </h3>
+                        <div class="space-y-2 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-sky-500"></span>
+                                <span class="text-gray-600 dark:text-gray-400"><strong class="text-gray-900 dark:text-white">Console Sink</strong> -- Todos los ambientes</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                <span class="text-gray-600 dark:text-gray-400"><strong class="text-gray-900 dark:text-white">File Sink</strong> -- Logs/gestion-colegial-log-.txt</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                                <span class="text-gray-600 dark:text-gray-400"><strong class="text-gray-900 dark:text-white">Enrichers</strong> -- LogContext, MachineName, ThreadId</span>
+                            </div>
+                            <div class="mt-3 p-3 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-500 dark:text-gray-400 font-mono">
+                                {Timestamp} [{Level}] [{SourceContext}] {Message}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middleware -->
+                    <div class="glass rounded-xl p-6">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-stream text-purple-400"></i> Middleware Pipeline
+                        </h3>
+                        <div class="space-y-1.5 text-xs font-mono">
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">1. Swagger (Dev only)</div>
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">2. HTTPS Redirection</div>
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">3. CORS (AllowAll)</div>
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">4. Authentication (JWT)</div>
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">5. Authorization</div>
+                            <div class="px-3 py-1.5 bg-gray-100 dark:bg-slate-800 rounded text-gray-600 dark:text-gray-400">6. MapControllers</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200 dark:border-slate-700">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-left">
+                    <h3 class="text-xl font-bold gradient-text flex items-center gap-2 justify-center md:justify-start">
+                        <i class="fas fa-graduation-cap"></i> Gestion Colegial API
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">REST API para Gestion de Centros Educativos</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 text-xs">
+                    <span class="px-3 py-1.5 glass rounded-full text-gray-500 dark:text-gray-400"><i class="fas fa-code mr-1 text-sky-400"></i> .NET 6.0</span>
+                    <span class="px-3 py-1.5 glass rounded-full text-gray-500 dark:text-gray-400"><i class="fas fa-database mr-1 text-indigo-400"></i> SQL Server</span>
+                    <span class="px-3 py-1.5 glass rounded-full text-gray-500 dark:text-gray-400"><i class="fas fa-shield-alt mr-1 text-purple-400"></i> JWT</span>
+                    <span class="px-3 py-1.5 glass rounded-full text-gray-500 dark:text-gray-400"><i class="fas fa-exchange-alt mr-1 text-amber-400"></i> AutoMapper</span>
+                    <span class="px-3 py-1.5 glass rounded-full text-gray-500 dark:text-gray-400"><i class="fas fa-book-open mr-1 text-teal-400"></i> Swagger</span>
+                </div>
+            </div>
+            <div class="text-center mt-8 text-xs text-gray-600 dark:text-gray-500">
+                Documentacion de Arquitectura &bull; Gestion Colegial API &copy; 2026
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+        document.querySelectorAll('#mobile-menu a').forEach(function(link) {
+            link.addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('hidden'); });
+        });
+
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+
+        // Check saved preference, default to light
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            html.classList.add('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+
+        themeToggle.addEventListener('click', function() {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeIcon.classList.replace(
+                isDark ? 'fa-moon' : 'fa-sun',
+                isDark ? 'fa-sun' : 'fa-moon'
+            );
+        });
+    </script>
+</body>
+</html>
