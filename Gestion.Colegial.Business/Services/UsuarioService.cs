@@ -66,6 +66,18 @@ namespace Gestion.Colegial.Business.Services
                 // Registrar login
                 var loginInResult = await _usuarioRepository.LoginInAsync(userData.Usu_Id, userIp);
 
+                // Obtener pantallas/permisos del rol
+                var pantallasResult = await _usuarioRepository.GetPantallasByRolAsync(userData.Rol_Id);
+                var pantallas = new List<string>();
+                if (!pantallasResult.Access && pantallasResult.Data != null)
+                {
+                    var pantallasList = pantallasResult.Data as List<UDP_tbRolesPantallas_ByRolIdResult>;
+                    if (pantallasList != null)
+                    {
+                        pantallas = pantallasList.Select(p => p.Pan_Descripcion).ToList();
+                    }
+                }
+
                 // Generar token JWT
                 var token = GenerateJwtToken(userData, loginRequest.RememberMe);
 
@@ -83,7 +95,8 @@ namespace Gestion.Colegial.Business.Services
                         Emp_Id = userData.Emp_Id,
                         Rol_Id = userData.Rol_Id,
                         Rol_Nombre = userData.Rol_Nombre
-                    }
+                    },
+                    Pantallas = pantallas
                 };
             }
             catch (Exception ex)
@@ -143,6 +156,99 @@ namespace Gestion.Colegial.Business.Services
             }
 
             return response;
+        }
+
+        // ==================== CRUD ====================
+
+        public async Task<Answer> List()
+        {
+            Answer answer = await _usuarioRepository.List();
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Find(int id)
+        {
+            Answer answer = await _usuarioRepository.Find(id);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Detail(int id)
+        {
+            Answer answer = await _usuarioRepository.Detail(id);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Create(tbUsuarios obj)
+        {
+            Answer answer = await _usuarioRepository.Create(obj);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                answer.Message = "Registro guardado exitosamente";
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Edit(tbUsuarios obj)
+        {
+            Answer answer = await _usuarioRepository.Edit(obj);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                answer.Message = "Registro editado exitosamente";
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Exist(string value)
+        {
+            Answer answer = await _usuarioRepository.Exist(value);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> Delete(int id)
+        {
+            Answer answer = await _usuarioRepository.Delete(id);
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                answer.Message = "Registro eliminado exitosamente";
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
+        public async Task<Answer> RolesDropdown()
+        {
+            Answer answer = await _usuarioRepository.RolesDropdown();
+            try
+            {
+                if (answer.Access) { answer.Access = true; answer.Message = "Error"; Logs.Error(answer); return answer; }
+                return answer;
+            }
+            catch (Exception e) { answer.Access = true; answer.Message = "Error"; answer.Incidents(e); Logs.Error(answer); return answer; }
         }
 
         private string GenerateJwtToken(UDP_tbUsuarios_LoginResult user, bool rememberMe)

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Gestion.Colegial.Entities.DTOs
 {
     public class LoginResponseDTO
@@ -6,6 +8,7 @@ namespace Gestion.Colegial.Entities.DTOs
         public string Message { get; set; }
         public string Token { get; set; }
         public UserInfoDTO User { get; set; }
+        public List<string> Pantallas { get; set; }
     }
 
     public class UserInfoDTO
