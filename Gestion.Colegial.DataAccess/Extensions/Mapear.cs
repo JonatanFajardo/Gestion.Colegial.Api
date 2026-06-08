@@ -40,7 +40,11 @@ namespace Gestion.Colegial.DataAccess.Extensions
                     {
                         // si la columna y la propiedad del tipo de dato que se obtuvo son las mismas, se le asigna el nombre.
                         if (pro.Name == column.ColumnName)
-                            pro.SetValue(obj, dr[column.ColumnName], null);
+                        {
+                            var value = dr[column.ColumnName];
+                            // DBNull → null (necesario para propiedades nullable/reference; SetValue no lo hace solo)
+                            pro.SetValue(obj, value == DBNull.Value ? null : value, null);
+                        }
                         else
                             continue;
                     }
