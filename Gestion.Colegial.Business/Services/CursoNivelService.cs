@@ -188,7 +188,7 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
-        public async Task<Answer> CursosNivelesDropdown(int id)
+        public async Task<Answer> CursosNivelesDropdown(int? id = null)
         {
             Answer answer = await _repository.CursosNivelesDropdown(id);
             try
