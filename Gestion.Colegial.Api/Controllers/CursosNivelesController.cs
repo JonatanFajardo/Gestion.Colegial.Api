@@ -176,7 +176,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpGet("CursosNivelesDropdown")]
         //[ResponseType(typeof(PR_tbCursosNiveles_DropdownResult))]
         //[Route("CursosNivelesDropdown")]
-        public async Task<IActionResult> CursosNivelesDropdown(int id)
+        public async Task<IActionResult> CursosNivelesDropdown(int? id = null)
         {
             Answer answer = await _cursoNivelService.CursosNivelesDropdown(id);
             return Ok(answer.Data);
