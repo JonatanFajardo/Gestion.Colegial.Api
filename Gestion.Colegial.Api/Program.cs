@@ -161,6 +161,8 @@ builder.Services.AddScoped<IAnalisisIngresosRepository, AnalisisIngresosReposito
 builder.Services.AddScoped<IOrganigramaRepository, OrganigramaRepository>();
 // Repositorios Fase 10 - Configuración del sistema
 builder.Services.AddScoped<IConfiguracionRepository, ConfiguracionRepository>();
+// Repositorio Graduacion (modulo Academico)
+builder.Services.AddScoped<IGraduacionRepository, GraduacionRepository>();
 // Repositorio Dev Tools
 builder.Services.AddScoped<IDevToolsRepository, DevToolsRepository>();
 
@@ -262,6 +264,8 @@ builder.Services.AddScoped<IAnalisisIngresosService, AnalisisIngresosService>();
 builder.Services.AddScoped<IOrganigramaService, OrganigramaService>();
 // Servicios Fase 10 - Configuración del sistema
 builder.Services.AddScoped<IConfiguracionService, ConfiguracionService>();
+// Servicio Graduacion (modulo Academico)
+builder.Services.AddScoped<IGraduacionService, GraduacionService>();
 // Servicio Dev Tools
 builder.Services.AddScoped<IDevToolsService, DevToolsService>();
 
