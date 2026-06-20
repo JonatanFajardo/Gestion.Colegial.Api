@@ -7,5 +7,7 @@ namespace Gestion.Colegial.Business.Interfaces
     {
         Task<Answer> List();
         Task<Answer> Update(int Con_Id, string Con_Valor, int UsuarioModifica);
+        Task<Answer> GetNotaMinimaAprobacion();
+        Task<Answer> SetNotaMinimaAprobacion(decimal valor, int usuarioId);
     }
 }

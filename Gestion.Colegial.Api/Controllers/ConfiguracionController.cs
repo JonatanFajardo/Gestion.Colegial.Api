@@ -25,6 +25,31 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _service.Update(request.Con_Id, request.Con_Valor, request.UsuarioModifica);
             return Ok(answer);
         }
+
+        /// <summary>
+        /// Devuelve { Clave, Valor } para nota_minima_aprobacion (consumido por el MVC).
+        /// </summary>
+        [HttpGet("NotaMinimaAprobacionAsync")]
+        public async Task<IActionResult> GetNotaMinimaAprobacion()
+        {
+            Answer answer = await _service.GetNotaMinimaAprobacion();
+            if (answer.Access) return BadRequest(answer.Message ?? "Error consultando nota minima.");
+            return Ok(answer.Data);
+        }
+
+        /// <summary>
+        /// Persiste el valor de nota_minima_aprobacion (0-100). UPSERT por Con_Clave.
+        /// </summary>
+        [HttpPut("NotaMinimaAprobacionAsync")]
+        public async Task<IActionResult> SetNotaMinimaAprobacion([FromQuery] decimal valor, [FromQuery] int usuarioId)
+        {
+            if (valor < 0m || valor > 100m) return BadRequest("El valor debe estar en el rango 0-100.");
+            if (usuarioId <= 0) return BadRequest("usuarioId requerido.");
+
+            Answer answer = await _service.SetNotaMinimaAprobacion(valor, usuarioId);
+            if (answer.Access) return BadRequest(answer.Message ?? "Error guardando nota minima.");
+            return Ok(new { Clave = "nota_minima_aprobacion", Valor = valor.ToString(System.Globalization.CultureInfo.InvariantCulture) });
+        }
     }
 
     public class ConfiguracionUpdateRequest

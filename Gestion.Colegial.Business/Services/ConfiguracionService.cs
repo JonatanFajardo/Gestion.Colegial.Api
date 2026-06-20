@@ -23,5 +23,14 @@ namespace Gestion.Colegial.Business.Services
 
         public Task<Answer> Update(int Con_Id, string Con_Valor, int UsuarioModifica)
             => Wrap(_r.Update(Con_Id, Con_Valor, UsuarioModifica), MessageShow.SuccessSave);
+
+        public Task<Answer> GetNotaMinimaAprobacion()
+            => Wrap(_r.GetValorPorClave("nota_minima_aprobacion"));
+
+        public Task<Answer> SetNotaMinimaAprobacion(decimal valor, int usuarioId)
+            => Wrap(_r.SetValorPorClave("nota_minima_aprobacion",
+                                       valor.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                       usuarioId),
+                    MessageShow.SuccessSave);
     }
 }
