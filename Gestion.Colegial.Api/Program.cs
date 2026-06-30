@@ -110,6 +110,7 @@ builder.Services.AddScoped<IDashboardFinancieroRepository, DashboardFinancieroRe
 builder.Services.AddScoped<IDashboardConsultaRepository, DashboardConsultaRepository>();
 builder.Services.AddScoped<IEmpleadosAntiguedadRepository, EmpleadosAntiguedadRepository>();
 builder.Services.AddScoped<IAlumnosEnRiesgoRepository, AlumnosEnRiesgoRepository>();
+builder.Services.AddScoped<IPromediosAlumnosRepository, PromediosAlumnosRepository>();
 builder.Services.AddScoped<IAgingCuentasRepository, AgingCuentasRepository>();
 builder.Services.AddScoped<ITopDeudoresRepository, TopDeudoresRepository>();
 builder.Services.AddScoped<IMorosidadPorNivelRepository, MorosidadPorNivelRepository>();
@@ -213,6 +214,7 @@ builder.Services.AddScoped<IDashboardFinancieroService, DashboardFinancieroServi
 builder.Services.AddScoped<IDashboardConsultaService, DashboardConsultaService>();
 builder.Services.AddScoped<IEmpleadosAntiguedadService, EmpleadosAntiguedadService>();
 builder.Services.AddScoped<IAlumnosEnRiesgoService, AlumnosEnRiesgoService>();
+builder.Services.AddScoped<IPromediosAlumnosService, PromediosAlumnosService>();
 builder.Services.AddScoped<IAgingCuentasService, AgingCuentasService>();
 builder.Services.AddScoped<ITopDeudoresService, TopDeudoresService>();
 builder.Services.AddScoped<IMorosidadPorNivelService, MorosidadPorNivelService>();
