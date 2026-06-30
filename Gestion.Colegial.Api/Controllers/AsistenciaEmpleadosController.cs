@@ -14,9 +14,9 @@ namespace Gestion.Colegial.Api.Controllers
         public AsistenciaEmpleadosController(IAsistenciaEmpleadosService service) { _service = service; }
 
         [HttpGet("ListAsync")]
-        public async Task<IActionResult> List(int? Emp_Id, DateTime? Fecha)
+        public async Task<IActionResult> List(int? Emp_Id, DateTime? Fecha, DateTime? FechaDesde, DateTime? FechaHasta)
         {
-            Answer answer = await _service.List(Emp_Id, Fecha);
+            Answer answer = await _service.List(Emp_Id, Fecha, FechaDesde, FechaHasta);
             return Ok(answer.Data);
         }
 

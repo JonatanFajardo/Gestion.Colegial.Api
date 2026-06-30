@@ -10,13 +10,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class AsistenciaEmpleadosRepository : RepositoryBase, IAsistenciaEmpleadosRepository
     {
-        public async Task<Answer> List(int? Emp_Id, DateTime? Fecha)
+        public async Task<Answer> List(int? Emp_Id, DateTime? Fecha, DateTime? FechaDesde, DateTime? FechaHasta)
         {
             const string sql = "app.PR_Empleados_Asistencia_List";
             SqlParameter[] parameters =
             {
-                new SqlParameter { ParameterName = "@Emp_Id", DbType = DbType.Int32,   Value = (object)Emp_Id ?? DBNull.Value },
-                new SqlParameter { ParameterName = "@Fecha",  DbType = DbType.Date,    Value = (object)Fecha  ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@Emp_Id",     DbType = DbType.Int32, Value = (object)Emp_Id     ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@Fecha",      DbType = DbType.Date,  Value = (object)Fecha      ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@FechaDesde", DbType = DbType.Date,  Value = (object)FechaDesde ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@FechaHasta", DbType = DbType.Date,  Value = (object)FechaHasta ?? DBNull.Value },
             };
             return await SearchAll<PR_Empleados_Asistencia_ListResult>(sql, parameters);
         }
