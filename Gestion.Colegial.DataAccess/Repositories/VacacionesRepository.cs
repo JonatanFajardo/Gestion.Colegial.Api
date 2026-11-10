@@ -20,6 +20,16 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await SearchAll<PR_tbVacaciones_ListResult>(sql, parameters);
         }
 
+        public async Task<Answer> Saldo(int Emp_Id)
+        {
+            const string sql = "app.PR_tbVacaciones_Saldo";
+            SqlParameter[] parameters =
+            {
+                new SqlParameter { ParameterName = "@Emp_Id", DbType = DbType.Int32, Value = Emp_Id },
+            };
+            return await SearchAll<VacacionesSaldoResult>(sql, parameters);
+        }
+
         public async Task<Answer> Insert(int Emp_Id, string Vac_Tipo, DateTime Vac_FechaInicio, DateTime Vac_FechaFin, string Vac_Motivo, int usuarioRegistra)
         {
             const string sql = "app.PR_tbVacaciones_Insert";

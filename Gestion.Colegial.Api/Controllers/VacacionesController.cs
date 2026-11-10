@@ -20,6 +20,13 @@ namespace Gestion.Colegial.Api.Controllers
             return Ok(answer.Data);
         }
 
+        [HttpGet("SaldoAsync")]
+        public async Task<IActionResult> Saldo(int Emp_Id)
+        {
+            Answer answer = await _service.Saldo(Emp_Id);
+            return Ok(answer.Data);
+        }
+
         [HttpPost("CreateAsync")]
         public async Task<IActionResult> Create([FromBody] VacacionesRequest request)
         {

@@ -20,6 +20,7 @@ namespace Gestion.Colegial.Business.Services
         }
 
         public Task<Answer> List(int? Emp_Id) => Wrap(_r.List(Emp_Id));
+        public Task<Answer> Saldo(int Emp_Id) => Wrap(_r.Saldo(Emp_Id));
         public Task<Answer> Insert(int Emp_Id, string Vac_Tipo, DateTime Vac_FechaInicio, DateTime Vac_FechaFin, string Vac_Motivo, int usuarioRegistra)
             => Wrap(_r.Insert(Emp_Id, Vac_Tipo, Vac_FechaInicio, Vac_FechaFin, Vac_Motivo, usuarioRegistra), MessageShow.SuccessSave);
         public Task<Answer> Approve(int Vac_Id, string Vac_Estado, int usuarioModifica)
