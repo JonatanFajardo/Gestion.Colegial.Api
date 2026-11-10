@@ -1,4 +1,5 @@
-﻿using Gestion.Colegial.Business.Services;
+﻿using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Services;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Gestion.Colegial.Entities.Entities.app;
@@ -11,9 +12,9 @@ namespace Gestion.Colegial.Api.Controllers
     //[Route("api/Horas")]
     public class HorasController : ControllerBase
     {
-        private readonly HoraService _horaService;
+        private readonly IHoraService _horaService;
 
-        public HorasController(HoraService horaService)
+        public HorasController(IHoraService horaService)
         {
             _horaService = horaService;
         }
