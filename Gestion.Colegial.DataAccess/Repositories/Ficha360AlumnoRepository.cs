@@ -28,11 +28,14 @@ namespace Gestion.Colegial.DataAccess.Repositories
                 cmd.Parameters.AddRange(sqlParams);
                 con.Open();
                 using var reader = await cmd.ExecuteReaderAsync();
+                // DataTable.Load(reader) consume el result set actual Y avanza al siguiente
+                // automáticamente; NO llamar NextResult() entre Loads o se saltea un result set
+                // y luego falla con "Invalid attempt to call NextResult when reader is closed".
                 var dt1 = new DataTable(); dt1.Load(reader);
-                reader.NextResult();
-                var dt2 = new DataTable(); dt2.Load(reader);
-                reader.NextResult();
-                var dt3 = new DataTable(); dt3.Load(reader);
+                var dt2 = new DataTable();
+                if (!reader.IsClosed) dt2.Load(reader);
+                var dt3 = new DataTable();
+                if (!reader.IsClosed) dt3.Load(reader);
                 answer.Data = new Ficha360AlumnoResult
                 {
                     DatosPersonales = Mapear.Convert.ToList<Ficha360Alumno_DatosPersonalesResult>(dt1).FirstOrDefault(),
