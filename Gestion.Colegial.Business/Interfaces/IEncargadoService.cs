@@ -11,5 +11,6 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Create(EncargadosFindDto obj);
         Task<Answer> Edit(EncargadosFindDto obj);
         Task<Answer> Delete(int id);
+        Task<Answer> ByAlumno(int Alu_Id);
     }
 }

@@ -132,5 +132,18 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _encargadoService.Delete(value);
             return Ok(answer.Data);
         }
+
+        /// <summary>
+        /// Obtiene los encargados vinculados a un alumno.
+        /// </summary>
+        /// <param name="Alu_Id">Identificador único del alumno.</param>
+        /// <returns>Lista de encargados con parentesco y datos de persona.</returns>
+        [HttpGet]
+        [Route("ByAlumnoAsync")]
+        public async Task<IActionResult> ByAlumno(int Alu_Id)
+        {
+            Answer answer = await _encargadoService.ByAlumno(Alu_Id);
+            return Ok(answer.Data);
+        }
     }
 }

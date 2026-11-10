@@ -165,5 +165,29 @@ namespace Gestion.Colegial.Business.Services
                 return answer;
             }
         }
+
+        public async Task<Answer> ByAlumno(int Alu_Id)
+        {
+            Answer answer = await _repository.ByAlumno(Alu_Id);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Access = true;
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
     }
 }
