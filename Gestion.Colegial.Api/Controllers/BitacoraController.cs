@@ -25,6 +25,13 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _service.Insert(request.Usu_Id, request.Bit_Accion, request.Bit_Tabla, request.Bit_RegistroId, request.Bit_Descripcion, request.Bit_Ip);
             return Ok(answer);
         }
+
+        [HttpGet("ByAlumnoAsync")]
+        public async Task<IActionResult> ByAlumno(int Alu_Id)
+        {
+            Answer answer = await _service.ByAlumno(Alu_Id);
+            return Ok(answer.Data);
+        }
     }
 
     public class BitacoraRequest

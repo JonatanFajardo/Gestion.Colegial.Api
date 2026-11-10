@@ -22,6 +22,16 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await SearchAll<UDP_tbBitacora_ListResult>(sql, parameters);
         }
 
+        public async Task<Answer> ByAlumno(int Alu_Id)
+        {
+            const string sql = "seguridad.UDP_tbBitacora_ByAlumno";
+            SqlParameter[] parameters =
+            {
+                new SqlParameter { ParameterName = "@Alu_Id", DbType = DbType.Int32, Value = Alu_Id },
+            };
+            return await SearchAll<UDP_tbBitacora_ByAlumnoResult>(sql, parameters);
+        }
+
         public async Task<Answer> Insert(int Usu_Id, string Bit_Accion, string Bit_Tabla, int? Bit_RegistroId, string Bit_Descripcion, string Bit_Ip)
         {
             const string sql = "seguridad.UDP_tbBitacora_Insert";

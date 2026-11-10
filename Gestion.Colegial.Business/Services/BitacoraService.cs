@@ -22,5 +22,6 @@ namespace Gestion.Colegial.Business.Services
         public Task<Answer> List(int? Usu_Id, string Bit_Tabla, int? Top) => Wrap(_r.List(Usu_Id, Bit_Tabla, Top));
         public Task<Answer> Insert(int Usu_Id, string Bit_Accion, string Bit_Tabla, int? Bit_RegistroId, string Bit_Descripcion, string Bit_Ip)
             => Wrap(_r.Insert(Usu_Id, Bit_Accion, Bit_Tabla, Bit_RegistroId, Bit_Descripcion, Bit_Ip), MessageShow.SuccessSave);
+        public Task<Answer> ByAlumno(int Alu_Id) => Wrap(_r.ByAlumno(Alu_Id));
     }
 }

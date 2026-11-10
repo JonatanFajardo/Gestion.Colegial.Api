@@ -7,5 +7,6 @@ namespace Gestion.Colegial.Business.Interfaces
     {
         Task<Answer> List(int? Usu_Id, string Bit_Tabla, int? Top);
         Task<Answer> Insert(int Usu_Id, string Bit_Accion, string Bit_Tabla, int? Bit_RegistroId, string Bit_Descripcion, string Bit_Ip);
+        Task<Answer> ByAlumno(int Alu_Id);
     }
 }
