@@ -20,5 +20,8 @@ namespace Gestion.Colegial.Business.Services
         }
 
         public Task<Answer> List(int? Emp_Id) => Wrap(_r.List(Emp_Id));
+
+        public Task<Answer> MarcarEntregado(int Emp_Id, string Documento, bool EsEntregado, DateTime? FechaEntrega, DateTime? Doc_FechaVencimiento, string Observacion, int usuarioRegistra) =>
+            Wrap(_r.MarcarEntregado(Emp_Id, Documento, EsEntregado, FechaEntrega, Doc_FechaVencimiento, Observacion, usuarioRegistra), MessageShow.SuccessEdit);
     }
 }
