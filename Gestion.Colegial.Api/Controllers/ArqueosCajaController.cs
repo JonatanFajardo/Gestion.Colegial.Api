@@ -27,6 +27,13 @@ namespace Gestion.Colegial.Api.Controllers
             return Ok(answer.Data);
         }
 
+        [HttpGet("ListAsync")]
+        public async Task<IActionResult> List(int? Usu_Id, DateTime? FechaDesde, DateTime? FechaHasta)
+        {
+            Answer answer = await _service.List(Usu_Id, FechaDesde, FechaHasta);
+            return Ok(answer.Data);
+        }
+
         [HttpPost("CreateAsync")]
         public async Task<IActionResult> Create([FromBody] ArqueoCajaRequest request)
         {

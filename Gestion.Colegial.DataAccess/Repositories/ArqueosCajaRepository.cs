@@ -30,6 +30,18 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await SearchAll<PR_tbArqueosCaja_LastResult>(sql, parameters);
         }
 
+        public async Task<Answer> List(int? Usu_Id, DateTime? FechaDesde, DateTime? FechaHasta)
+        {
+            const string sql = "finanza.PR_tbArqueosCaja_List";
+            SqlParameter[] parameters =
+            {
+                new SqlParameter { ParameterName = "@Usu_Id",     DbType = DbType.Int32, Value = (object)Usu_Id     ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@FechaDesde", DbType = DbType.Date,  Value = (object)FechaDesde ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@FechaHasta", DbType = DbType.Date,  Value = (object)FechaHasta ?? DBNull.Value },
+            };
+            return await SearchAll<PR_tbArqueosCaja_ListResult>(sql, parameters);
+        }
+
         public async Task<Answer> Insert(int Usu_Id, DateTime Arq_Fecha, decimal Arq_TotalEfectivo, decimal Arq_TotalTransferencia, decimal Arq_TotalTarjeta, string Arq_Observaciones, int usuarioRegistra)
         {
             const string sql = "finanza.PR_tbArqueosCaja_Insert";

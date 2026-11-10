@@ -21,6 +21,7 @@ namespace Gestion.Colegial.Business.Services
 
         public Task<Answer> Find(int Arq_Id) => Wrap(_r.Find(Arq_Id));
         public Task<Answer> LastByUsuario(int Usu_Id) => Wrap(_r.LastByUsuario(Usu_Id));
+        public Task<Answer> List(int? Usu_Id, DateTime? FechaDesde, DateTime? FechaHasta) => Wrap(_r.List(Usu_Id, FechaDesde, FechaHasta));
         public Task<Answer> Insert(int Usu_Id, DateTime Arq_Fecha, decimal Arq_TotalEfectivo, decimal Arq_TotalTransferencia, decimal Arq_TotalTarjeta, string Arq_Observaciones, int usuarioRegistra)
             => Wrap(_r.Insert(Usu_Id, Arq_Fecha, Arq_TotalEfectivo, Arq_TotalTransferencia, Arq_TotalTarjeta, Arq_Observaciones, usuarioRegistra), MessageShow.SuccessSave);
     }
