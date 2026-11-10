@@ -127,6 +127,7 @@ builder.Services.AddScoped<IHorariosRepository, HorariosRepository>();
 builder.Services.AddScoped<INotasRepository, NotasRepository>();
 builder.Services.AddScoped<IPlanClasesRepository, PlanClasesRepository>();
 builder.Services.AddScoped<ITareasRepository, TareasRepository>();
+builder.Services.AddScoped<IEntregasTareaRepository, EntregasTareaRepository>();
 builder.Services.AddScoped<IMisAlumnosRepository, MisAlumnosRepository>();
 builder.Services.AddScoped<IMapaAulasRepository, MapaAulasRepository>();
 // Repositorios Fase 1 (Infraestructura compartida)
@@ -231,6 +232,7 @@ builder.Services.AddScoped<IHorariosService, HorariosService>();
 builder.Services.AddScoped<INotasService, NotasService>();
 builder.Services.AddScoped<IPlanClasesService, PlanClasesService>();
 builder.Services.AddScoped<ITareasService, TareasService>();
+builder.Services.AddScoped<IEntregasTareaService, EntregasTareaService>();
 builder.Services.AddScoped<IMisAlumnosService, MisAlumnosService>();
 builder.Services.AddScoped<IMapaAulasService, MapaAulasService>();
 // Servicios Fase 1 (Infraestructura compartida)
