@@ -234,6 +234,11 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
                     Logs.Error(answer);
                     return answer;
                 }
+
+                // El repositorio devuelve PR_tbPagos_InsertResult (NewId); exponemos solo el Id nuevo.
+                var insertResult = answer.Data as PR_tbPagos_InsertResult;
+                answer.Data = insertResult?.NewId.HasValue == true ? (int)insertResult.NewId.Value : (int?)null;
+
                 answer.Message = MessageShow.SuccessSave;
                 return answer;
             }

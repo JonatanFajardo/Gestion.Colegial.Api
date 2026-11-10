@@ -125,6 +125,11 @@ namespace Gestion.Colegial.Business.Services
                     Logs.Error(answer);
                     return answer;
                 }
+
+                // El repositorio devuelve PR_tbAlumnos_InsertResult (SCOPE_IDENTITY); exponemos solo el Alu_Id nuevo.
+                var insertResult = answer.Data as Gestion.Colegial.Entities.Entities.PR_tbAlumnos_InsertResult;
+                answer.Data = insertResult?.SCOPE_IDENTITY.HasValue == true ? (int)insertResult.SCOPE_IDENTITY.Value : (int?)null;
+
                 answer.Message = MessageShow.SuccessSave;
                 return answer;
             }

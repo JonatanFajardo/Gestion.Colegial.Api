@@ -68,7 +68,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
             new SqlParameter(){ParameterName= "@Per_Sexo", DbType = DbType.String, Value = obj.Per.Per_Sexo },
             new SqlParameter(){ParameterName= "@Per_UsuarioRegistra", DbType = DbType.Int32, Value = obj.Per.Per_UsuarioRegistra }
             };
-            Answer answer = await New(sql, sqlParameters);
+            Answer answer = await NewWithId<PR_tbAlumnos_InsertResult>(sql, sqlParameters);
             return answer;
         }
 

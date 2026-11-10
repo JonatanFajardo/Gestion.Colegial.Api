@@ -78,7 +78,7 @@ namespace Gestion.Colegial.DataAccess.Repositories.Finanzas
                 new SqlParameter(){ParameterName= "@Pag_NumeroReferencia", DbType = DbType.String, Value = (object)obj.Pag_NumeroReferencia ?? DBNull.Value },
                 new SqlParameter(){ParameterName= "@Pag_Observaciones", DbType = DbType.String, Value = (object)obj.Pag_Observaciones ?? DBNull.Value },
             };
-            Answer answer = await New(sql, sqlParameters);
+            Answer answer = await NewWithId<PR_tbPagos_InsertResult>(sql, sqlParameters);
             return answer;
         }
 
