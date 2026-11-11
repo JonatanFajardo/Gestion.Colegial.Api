@@ -176,6 +176,9 @@ builder.Services.AddScoped<IPeriodoAnioRepository, PeriodoAnioRepository>();
 builder.Services.AddScoped<IEnfoqueAnioRepository, EnfoqueAnioRepository>();
 builder.Services.AddScoped<ISeccionAnioRepository, SeccionAnioRepository>();
 builder.Services.AddScoped<IOfertaAnioRepository, OfertaAnioRepository>();
+// Repositorios Año Lectivo — Fase 6 (rollover + expediente/promociones)
+builder.Services.AddScoped<IRolloverRepository, RolloverRepository>();
+builder.Services.AddScoped<IMatriculaAnioRepository, MatriculaAnioRepository>();
 
 // Repositorios Financieros
 builder.Services.AddScoped<IConceptoPagoRepository, ConceptoPagoRepository>();
@@ -290,6 +293,9 @@ builder.Services.AddScoped<IPeriodoAnioService, PeriodoAnioService>();
 builder.Services.AddScoped<IEnfoqueAnioService, EnfoqueAnioService>();
 builder.Services.AddScoped<ISeccionAnioService, SeccionAnioService>();
 builder.Services.AddScoped<IOfertaAnioService, OfertaAnioService>();
+// Servicios Año Lectivo — Fase 6 (rollover + expediente/promociones)
+builder.Services.AddScoped<IRolloverService, RolloverService>();
+builder.Services.AddScoped<IMatriculaAnioService, MatriculaAnioService>();
 
 // Servicios Financieros
 builder.Services.AddScoped<IConceptoPagoService, ConceptoPagoService>();
