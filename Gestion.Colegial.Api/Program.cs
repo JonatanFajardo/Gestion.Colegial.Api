@@ -167,6 +167,15 @@ builder.Services.AddScoped<IConfiguracionRepository, ConfiguracionRepository>();
 builder.Services.AddScoped<IGraduacionRepository, GraduacionRepository>();
 // Repositorio Dev Tools
 builder.Services.AddScoped<IDevToolsRepository, DevToolsRepository>();
+// Repositorio Matrículas (módulo Matrículas)
+builder.Services.AddScoped<IMatriculaRepository, MatriculaRepository>();
+// Repositorio Año Lectivo (capa multi-año, hueco #1)
+builder.Services.AddScoped<IAnioLectivoRepository, AnioLectivoRepository>();
+// Repositorios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
+builder.Services.AddScoped<IPeriodoAnioRepository, PeriodoAnioRepository>();
+builder.Services.AddScoped<IEnfoqueAnioRepository, EnfoqueAnioRepository>();
+builder.Services.AddScoped<ISeccionAnioRepository, SeccionAnioRepository>();
+builder.Services.AddScoped<IOfertaAnioRepository, OfertaAnioRepository>();
 
 // Repositorios Financieros
 builder.Services.AddScoped<IConceptoPagoRepository, ConceptoPagoRepository>();
@@ -272,6 +281,15 @@ builder.Services.AddScoped<IConfiguracionService, ConfiguracionService>();
 builder.Services.AddScoped<IGraduacionService, GraduacionService>();
 // Servicio Dev Tools
 builder.Services.AddScoped<IDevToolsService, DevToolsService>();
+// Servicio Matrículas (módulo Matrículas)
+builder.Services.AddScoped<IMatriculaService, MatriculaService>();
+// Servicio Año Lectivo (capa multi-año, hueco #1)
+builder.Services.AddScoped<IAnioLectivoService, AnioLectivoService>();
+// Servicios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
+builder.Services.AddScoped<IPeriodoAnioService, PeriodoAnioService>();
+builder.Services.AddScoped<IEnfoqueAnioService, EnfoqueAnioService>();
+builder.Services.AddScoped<ISeccionAnioService, SeccionAnioService>();
+builder.Services.AddScoped<IOfertaAnioService, OfertaAnioService>();
 
 // Servicios Financieros
 builder.Services.AddScoped<IConceptoPagoService, ConceptoPagoService>();
