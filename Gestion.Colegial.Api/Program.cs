@@ -171,6 +171,7 @@ builder.Services.AddScoped<IDevToolsRepository, DevToolsRepository>();
 builder.Services.AddScoped<IMatriculaRepository, MatriculaRepository>();
 // Repositorio Año Lectivo (capa multi-año, hueco #1)
 builder.Services.AddScoped<IAnioLectivoRepository, AnioLectivoRepository>();
+builder.Services.AddScoped<IEventosCalendarioRepository, EventosCalendarioRepository>();
 // Repositorios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
 builder.Services.AddScoped<IPeriodoAnioRepository, PeriodoAnioRepository>();
 builder.Services.AddScoped<IEnfoqueAnioRepository, EnfoqueAnioRepository>();
@@ -288,6 +289,7 @@ builder.Services.AddScoped<IDevToolsService, DevToolsService>();
 builder.Services.AddScoped<IMatriculaService, MatriculaService>();
 // Servicio Año Lectivo (capa multi-año, hueco #1)
 builder.Services.AddScoped<IAnioLectivoService, AnioLectivoService>();
+builder.Services.AddScoped<IEventosCalendarioService, EventosCalendarioService>();
 // Servicios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
 builder.Services.AddScoped<IPeriodoAnioService, PeriodoAnioService>();
 builder.Services.AddScoped<IEnfoqueAnioService, EnfoqueAnioService>();
