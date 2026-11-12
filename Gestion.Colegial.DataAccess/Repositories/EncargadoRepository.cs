@@ -91,5 +91,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Delete(sql, sqlParameters);
             return answer;
         }
+
+        public async Task<Answer> ByAlumno(int Alu_Id)
+        {
+            const string sql = "PR_tbEncargados_ByAlumno";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ ParameterName = "@Alu_Id", DbType = DbType.Int32, Value = Alu_Id },
+            };
+            Answer answer = await Read<PR_tbEncargados_ByAlumnoResult>(sql, sqlParameters);
+            return answer;
+        }
     }
 }

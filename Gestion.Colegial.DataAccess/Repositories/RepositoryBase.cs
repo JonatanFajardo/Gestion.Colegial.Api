@@ -270,6 +270,50 @@ namespace Gestion.Colegial.DataAccess.Repositories
 		}
 
 		/// <summary>
+		/// Crea una petición a la base de datos para ingresar un nuevo registro y obtener
+		/// el Id recién insertado (el SP debe devolver un result set, ej. SELECT SCOPE_IDENTITY() AS NewId).
+		/// </summary>
+		/// <typeparam name="T">DTO que mapea la(s) columna(s) devueltas por el SP (ej. NewId).</typeparam>
+		/// <param name="queryString"></param>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public async Task<Answer> NewWithId<T>(string queryString, dynamic parameters)
+		{
+			Answer answer = new Answer();
+			try
+			{
+				using (SqlConnection con = new SqlConnection(Connection.GetConnectionString()))
+				{
+					using (SqlCommand command = new SqlCommand(queryString, con))
+					{
+						command.CommandType = CommandType.StoredProcedure;
+						command.Parameters.AddRange(parameters);
+
+						con.Open();
+						SqlDataReader reader = await command.ExecuteReaderAsync();
+						DataTable table = new DataTable();
+						table.Load(reader);
+						answer.Data = Mapear.Convert.ToList<T>(table).FirstOrDefault();
+						if (answer.Data == null)
+						{
+							answer.Message = "Ninguna fila Registrada";
+							answer.Access = true;
+							return answer;
+						}
+						answer.Access = false;
+						return answer;
+					}
+				}
+			}
+			catch (Exception error)
+			{
+				answer.Incidents(error);
+				answer.Access = true;
+				return answer;
+			}
+		}
+
+		/// <summary>
 		/// Crea una petición a la base de datos para actualizar un registro.
 		/// </summary>
 		/// <param name="queryString"></param>

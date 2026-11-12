@@ -11,5 +11,6 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> Create(tbEncargados obj);
         Task<Answer> Edit(tbEncargados obj);
         Task<Answer> Delete(int id);
+        Task<Answer> ByAlumno(int Alu_Id);
     }
 }
