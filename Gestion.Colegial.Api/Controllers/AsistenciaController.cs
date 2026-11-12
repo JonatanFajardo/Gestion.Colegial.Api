@@ -31,6 +31,9 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Create([FromBody] AsistenciaRequest request)
         {
             Answer answer = await _service.Insert(request.Hor_Id, request.Alu_Id, request.Asi_Fecha, request.Asi_Estado, request.Asi_Observacion, request.UsuarioRegistra);
+            // El ADM solo mira el código HTTP: un error de la base (p. ej. día cerrado por el calendario)
+            // debe llegar como error, no como 200 con Access = true.
+            if (answer.Access) return BadRequest(new { Mensaje = "No se pudo guardar la asistencia." });
             return Ok(answer);
         }
 
@@ -38,6 +41,9 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Edit([FromBody] AsistenciaEditRequest request)
         {
             Answer answer = await _service.Update(request.Asi_Id, request.Asi_Estado, request.Asi_Observacion, request.UsuarioModifica);
+            // El ADM solo mira el código HTTP: un error de la base (p. ej. día cerrado por el calendario)
+            // debe llegar como error, no como 200 con Access = true.
+            if (answer.Access) return BadRequest(new { Mensaje = "No se pudo guardar la asistencia." });
             return Ok(answer);
         }
     }
@@ -48,7 +54,7 @@ namespace Gestion.Colegial.Api.Controllers
         public int Alu_Id { get; set; }
         public DateTime Asi_Fecha { get; set; }
         public string Asi_Estado { get; set; }
-        public string Asi_Observacion { get; set; }
+        public string? Asi_Observacion { get; set; }
         public int UsuarioRegistra { get; set; }
     }
 
@@ -56,7 +62,7 @@ namespace Gestion.Colegial.Api.Controllers
     {
         public int Asi_Id { get; set; }
         public string Asi_Estado { get; set; }
-        public string Asi_Observacion { get; set; }
+        public string? Asi_Observacion { get; set; }
         public int UsuarioModifica { get; set; }
     }
 }
