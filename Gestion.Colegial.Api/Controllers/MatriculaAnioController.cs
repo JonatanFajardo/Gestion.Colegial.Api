@@ -57,5 +57,32 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _matriculaAnioService.Promover(anioOrigen, seccionOrigen, anioDestino, seccionDestino);
             return Ok(answer.Data);
         }
+
+        /// <summary>Grupos de ubicación de los alumnos del año vs secciones del año e inscritos. value = Ani_Id (vacío = año activo).</summary>
+        [HttpGet]
+        [Route("ResumenInscripcionAsync")]
+        public async Task<IActionResult> ResumenInscripcion(int? value)
+        {
+            Answer answer = await _matriculaAnioService.ResumenInscripcion(value);
+            return Ok(answer.Data);
+        }
+
+        /// <summary>Crea las secciones del año que faltan según la ubicación de los alumnos (aniId vacío = año activo).</summary>
+        [HttpPost]
+        [Route("CrearSeccionesDesdeUbicacionAsync")]
+        public async Task<IActionResult> CrearSeccionesDesdeUbicacion(int? aniId, int? aluId, int? usuario)
+        {
+            Answer answer = await _matriculaAnioService.CrearSeccionesDesdeUbicacion(aniId, aluId, usuario);
+            return Ok(answer.Data);
+        }
+
+        /// <summary>Inscribe en el año (en lote, o solo aluId) según la ubicación; opcionalmente crea secciones y pasa de Graduado a Activo.</summary>
+        [HttpPost]
+        [Route("InscribirDesdeUbicacionAsync")]
+        public async Task<IActionResult> InscribirDesdeUbicacion(int? aniId, int? aluId, bool crearSecciones = true, bool activarEstado = true, int? usuario = null)
+        {
+            Answer answer = await _matriculaAnioService.InscribirDesdeUbicacion(aniId, aluId, crearSecciones, activarEstado, usuario);
+            return Ok(answer.Data);
+        }
     }
 }

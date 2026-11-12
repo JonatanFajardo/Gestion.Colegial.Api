@@ -123,5 +123,63 @@ namespace Gestion.Colegial.Business.Services
                 return answer;
             }
         }
+
+        public async Task<Answer> ResumenInscripcion(int? aniId)
+        {
+            Answer answer = await _repository.ResumenInscripcion(aniId);
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                }
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
+
+        public async Task<Answer> CrearSeccionesDesdeUbicacion(int? aniId, int? aluId, int? usuario)
+        {
+            Answer answer = await _repository.CrearSeccionesDesdeUbicacion(aniId, aluId, usuario);
+            return ConMensajeDeGuardado(answer);
+        }
+
+        public async Task<Answer> InscribirDesdeUbicacion(int? aniId, int? aluId, bool crearSecciones, bool activarEstado, int? usuario)
+        {
+            Answer answer = await _repository.InscribirDesdeUbicacion(aniId, aluId, crearSecciones, activarEstado, usuario);
+            return ConMensajeDeGuardado(answer);
+        }
+
+        /// <summary>Data queda con el resultado (conteos) del procedimiento.</summary>
+        private static Answer ConMensajeDeGuardado(Answer answer)
+        {
+            try
+            {
+                if (answer.Access)
+                {
+                    answer.Message = MessageShow.Error;
+                    Logs.Error(answer);
+                    return answer;
+                }
+                answer.Message = MessageShow.SuccessSave;
+                return answer;
+            }
+            catch (Exception e)
+            {
+                answer.Access = true;
+                answer.Message = MessageShow.Error;
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return answer;
+            }
+        }
     }
 }

@@ -55,5 +55,44 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Answer answer = await Search<PR_tbMatriculaAnio_PromoverResult>(sql, sqlParameters);
             return answer;
         }
+
+        /// <summary>Grupos de ubicación de los alumnos del año vs secciones del año e inscritos (aniId null = año activo).</summary>
+        public async Task<Answer> ResumenInscripcion(int? aniId)
+        {
+            const string sql = "app.PR_tbMatriculaAnio_ResumenInscripcion";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Ani_Id", DbType = DbType.Int32, Value = (object)aniId ?? DBNull.Value },
+            };
+            Answer answer = await Read<PR_tbMatriculaAnio_ResumenInscripcionResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        /// <summary>Crea las secciones del año que faltan según la ubicación de los alumnos (aluId limita a uno).</summary>
+        public async Task<Answer> CrearSeccionesDesdeUbicacion(int? aniId, int? aluId, int? usuario)
+        {
+            const string sql = "app.PR_tbSeccionesAnio_CrearDesdeUbicacion";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Ani_Id", DbType = DbType.Int32, Value = (object)aniId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = (object)aluId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Usuario", DbType = DbType.Int32, Value = (object)usuario ?? DBNull.Value }
+            };
+            Answer answer = await Search<PR_tbMatriculaAnio_InscribirDesdeUbicacionResult>(sql, sqlParameters);
+            return answer;
+        }
+
+        /// <summary>Inscribe en el año, en lote o un alumno, según su ubicación.</summary>
+        public async Task<Answer> InscribirDesdeUbicacion(int? aniId, int? aluId, bool crearSecciones, bool activarEstado, int? usuario)
+        {
+            const string sql = "app.PR_tbMatriculaAnio_InscribirDesdeUbicacion";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ParameterName= "@Ani_Id", DbType = DbType.Int32, Value = (object)aniId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@Alu_Id", DbType = DbType.Int32, Value = (object)aluId ?? DBNull.Value },
+                new SqlParameter(){ParameterName= "@CrearSecciones", DbType = DbType.Boolean, Value = crearSecciones },
+                new SqlParameter(){ParameterName= "@ActivarEstado", DbType = DbType.Boolean, Value = activarEstado },
+                new SqlParameter(){ParameterName= "@Usuario", DbType = DbType.Int32, Value = (object)usuario ?? DBNull.Value }
+            };
+            Answer answer = await Search<PR_tbMatriculaAnio_InscribirDesdeUbicacionResult>(sql, sqlParameters);
+            return answer;
+        }
     }
 }
