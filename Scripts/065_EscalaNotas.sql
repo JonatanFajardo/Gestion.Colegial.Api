@@ -147,12 +147,13 @@ CREATE OR ALTER PROCEDURE app.PR_tbEscalaNotas_Exist
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT TOP 1 Esc_Id
+    SELECT TOP 1 Esc_Id, Esc_Concepto, Esc_NotaDesde, Esc_NotaHasta
     FROM app.tbEscalaNotas
     WHERE Esc_EsEliminado = 0
       AND (@Esc_Id IS NULL OR Esc_Id <> @Esc_Id)
       AND @Esc_NotaDesde <= Esc_NotaHasta
-      AND @Esc_NotaHasta >= Esc_NotaDesde;
+      AND @Esc_NotaHasta >= Esc_NotaDesde
+    ORDER BY Esc_NotaDesde;
 END
 GO
 
