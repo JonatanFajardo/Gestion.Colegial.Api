@@ -73,10 +73,10 @@ BEGIN
     INSERT INTO app.tbEscalaNotas (Esc_Concepto, Esc_Abreviatura, Esc_NotaDesde, Esc_NotaHasta, Esc_Aprueba, Esc_Orden, Esc_UsuarioRegistra)
     VALUES
         (N'Excelente',       N'A', 90, 100, 1, 1, 1),
-        (N'Muy Bueno',       N'B', 80,  89, 1, 2, 1),
-        (N'Bueno',           N'C', 70,  79, 1, 3, 1),
-        (N'Necesita Mejorar',N'D', 60,  69, 0, 4, 1),
-        (N'Deficiente',      N'F',  0,  59, 0, 5, 1);
+        (N'Muy Bueno',       N'B', 80,  90, 1, 2, 1),
+        (N'Bueno',           N'C', 70,  80, 1, 3, 1),
+        (N'Necesita Mejorar',N'D', 60,  70, 0, 4, 1),
+        (N'Deficiente',      N'F',  0,  60, 0, 5, 1);
 END
 GO
 
@@ -139,7 +139,9 @@ BEGIN
 END
 GO
 
--- Choque de rangos: existe otra fila activa cuyo rango se solapa con el dado.
+-- Choque de rangos: existe otra fila activa cuyo rango se SOLAPA con el dado. Se usa
+-- desigualdad estricta para que dos rangos que apenas se TOCAN (ej. 80-90 y 90-100) no
+-- cuenten como choque: la escala debe ser contigua, no tener huecos de decimales.
 CREATE OR ALTER PROCEDURE app.PR_tbEscalaNotas_Exist
     @Esc_NotaDesde decimal(5,2),
     @Esc_NotaHasta decimal(5,2),
@@ -151,8 +153,8 @@ BEGIN
     FROM app.tbEscalaNotas
     WHERE Esc_EsEliminado = 0
       AND (@Esc_Id IS NULL OR Esc_Id <> @Esc_Id)
-      AND @Esc_NotaDesde <= Esc_NotaHasta
-      AND @Esc_NotaHasta >= Esc_NotaDesde
+      AND @Esc_NotaDesde < Esc_NotaHasta
+      AND @Esc_NotaHasta > Esc_NotaDesde
     ORDER BY Esc_NotaDesde;
 END
 GO
