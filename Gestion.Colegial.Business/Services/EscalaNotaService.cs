@@ -78,6 +78,13 @@ namespace Gestion.Colegial.Business.Services
             catch (Exception e) { answer.Access = true; answer.Message = MessageShow.Error; answer.Incidents(e); Logs.Error(answer); return answer; }
         }
 
+        public async Task<Answer> CuadroHonor(int anio, int? nivId, int? secId)
+        {
+            Answer answer = await _repository.CuadroHonor(anio, nivId, secId);
+            try { return Marca(answer, answer.Message); }
+            catch (Exception e) { answer.Access = true; answer.Message = MessageShow.Error; answer.Incidents(e); Logs.Error(answer); return answer; }
+        }
+
         public async Task<Answer> ConfigGet()
         {
             Answer answer = await _repository.ConfigGet();

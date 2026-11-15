@@ -77,6 +77,15 @@ namespace Gestion.Colegial.Api.Controllers
             return Ok(answer.Data);
         }
 
+        /// <summary>Ranking de alumnos de un año que llegan al umbral de honor (filtros opcionales por nivel/sección).</summary>
+        [HttpGet]
+        [Route("CuadroHonorAsync")]
+        public async Task<IActionResult> CuadroHonor(int anio, int? nivId = null, int? secId = null)
+        {
+            Answer answer = await _service.CuadroHonor(anio, nivId, secId);
+            return Ok(answer.Data);
+        }
+
         /// <summary>Umbrales del cuadro de honor (una sola fila).</summary>
         [HttpGet]
         [Route("ConfigAsync")]

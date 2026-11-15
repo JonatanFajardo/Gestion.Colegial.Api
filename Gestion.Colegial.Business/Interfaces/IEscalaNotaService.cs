@@ -12,6 +12,7 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Edit(tbEscalaNotas obj);
         Task<Answer> Solapa(decimal desde, decimal hasta, int? id);
         Task<Answer> Delete(int id);
+        Task<Answer> CuadroHonor(int anio, int? nivId, int? secId);
         Task<Answer> ConfigGet();
         Task<Answer> ConfigSet(tbCuadroHonorConfig obj);
     }

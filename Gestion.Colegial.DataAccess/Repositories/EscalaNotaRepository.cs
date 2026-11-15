@@ -73,6 +73,12 @@ namespace Gestion.Colegial.DataAccess.Repositories
         public async Task<Answer> Delete(int id) =>
             await Delete("app.PR_tbEscalaNotas_Delete", new[] { Entero("@Esc_Id", id) });
 
+        public async Task<Answer> CuadroHonor(int anio, int? nivId, int? secId)
+        {
+            SqlParameter[] p = { Entero("@Anio", anio), Entero("@Niv_Id", nivId), Entero("@Sec_Id", secId) };
+            return await Read<PR_CuadroHonorResult>("app.PR_CuadroHonor", p);
+        }
+
         public async Task<Answer> ConfigGet() =>
             await Search<PR_tbCuadroHonorConfig_GetResult>("app.PR_tbCuadroHonorConfig_Get", Array.Empty<SqlParameter>());
 
