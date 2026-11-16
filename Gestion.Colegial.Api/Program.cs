@@ -175,6 +175,7 @@ builder.Services.AddScoped<IEventosCalendarioRepository, EventosCalendarioReposi
 builder.Services.AddScoped<ICasosDisciplinaRepository, CasosDisciplinaRepository>();
 builder.Services.AddScoped<IReporteAsistenciaRepository, ReporteAsistenciaRepository>();
 builder.Services.AddScoped<IDocumentosEmitidosRepository, DocumentosEmitidosRepository>();
+builder.Services.AddScoped<IEscalaNotaRepository, EscalaNotaRepository>();
 // Repositorios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
 builder.Services.AddScoped<IPeriodoAnioRepository, PeriodoAnioRepository>();
 builder.Services.AddScoped<IEnfoqueAnioRepository, EnfoqueAnioRepository>();
@@ -296,6 +297,7 @@ builder.Services.AddScoped<IEventosCalendarioService, EventosCalendarioService>(
 builder.Services.AddScoped<ICasosDisciplinaService, CasosDisciplinaService>();
 builder.Services.AddScoped<IReporteAsistenciaService, ReporteAsistenciaService>();
 builder.Services.AddScoped<IDocumentosEmitidosService, DocumentosEmitidosService>();
+builder.Services.AddScoped<IEscalaNotaService, EscalaNotaService>();
 // Servicios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
 builder.Services.AddScoped<IPeriodoAnioService, PeriodoAnioService>();
 builder.Services.AddScoped<IEnfoqueAnioService, EnfoqueAnioService>();

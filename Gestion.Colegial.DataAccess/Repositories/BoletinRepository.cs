@@ -11,7 +11,9 @@ namespace Gestion.Colegial.DataAccess.Repositories
     {
         public async Task<Answer> Generate(int Alu_Id, int Anio)
         {
-            const string sql = "app.PR_Boletin_Generate";
+            // Notas del boletín como único result set (ver script 067). PR_Boletin_Generate
+            // devolvía 3 result sets y el reader solo leía el primero (datos del alumno).
+            const string sql = "app.PR_Boletin_Notas";
             SqlParameter[] parameters =
             {
                 new SqlParameter { ParameterName = "@Alu_Id", DbType = DbType.Int32, Value = Alu_Id },
