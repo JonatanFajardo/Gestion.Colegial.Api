@@ -5,6 +5,7 @@ using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Gestion.Colegial.Entities.Entities;
+using Gestion.Colegial.Business.Services;
 
 namespace Gestion.Colegial.Business.Services.ModuloFinanzas
 {
@@ -68,7 +69,7 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
                 // Mapear de PR_tbPagos_ListByAlumnoResult a PagoListDto
                 if (answer.Data != null)
                 {
-                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListByAlumnoResult>;
+                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListResult>;
                     if (resultList != null)
                     {
                         answer.Data = _mapper.Map<List<PagoListDto>>(resultList);
@@ -102,7 +103,7 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
                 // Mapear de PR_tbPagos_ListByFechaResult a PagoListDto
                 if (answer.Data != null)
                 {
-                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListByFechaResult>;
+                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListResult>;
                     if (resultList != null)
                     {
                         answer.Data = _mapper.Map<List<PagoListDto>>(resultList);
@@ -136,7 +137,7 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
                 // Mapear de PR_tbPagos_ListByRangoFechasResult a PagoListDto
                 if (answer.Data != null)
                 {
-                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListByRangoFechasResult>;
+                    var resultList = answer.Data as IEnumerable<PR_tbPagos_ListResult>;
                     if (resultList != null)
                     {
                         answer.Data = _mapper.Map<List<PagoListDto>>(resultList);
@@ -225,18 +226,23 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
 
         public async Task<Answer> Create(object obj)
         {
-            Answer answer = await _repository.Create(obj as dynamic);
+            if (obj is not PagoFindDto dto)
+                return new Answer { Access = true, Message = "No llegaron datos del pago.", Data = null };
+
+            Answer answer = await _repository.Registrar(dto);
             try
             {
                 if (answer.Access)
                 {
-                    answer.Message = MessageShow.Error;
-                    Logs.Error(answer);
+                    // Las validaciones del procedimiento (THROW 500xx) llegan tal cual.
+                    string? validacion = EventosCalendarioService.MensajeDeValidacionSql(answer);
+                    if (validacion == null) Logs.Error(answer);
+                    answer.Message = validacion ?? MessageShow.Error;
                     return answer;
                 }
 
-                // El repositorio devuelve PR_tbPagos_InsertResult (NewId); exponemos solo el Id nuevo.
-                var insertResult = answer.Data as PR_tbPagos_InsertResult;
+                // Se expone solo el Id nuevo (el excedente, si lo hubo, ya quedó en saldo a favor).
+                var insertResult = answer.Data as PR_tbPagos_RegistrarResult;
                 answer.Data = insertResult?.NewId.HasValue == true ? (int)insertResult.NewId.Value : (int?)null;
 
                 answer.Message = MessageShow.SuccessSave;

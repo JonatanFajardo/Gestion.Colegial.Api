@@ -121,7 +121,8 @@ public class DtoMappingProfile : Profile
             .ForMember(dest => dest.Alumno, opt => opt.MapFrom(src => src.Alumno))
             .ForMember(dest => dest.Pendiente, opt => opt.MapFrom(src => src.Pendiente))
             .ForMember(dest => dest.FechaVence, opt => opt.MapFrom(src => src.FechaVence))
-            .ForMember(dest => dest.EstadoPago, opt => opt.MapFrom(src => src.EstadoPago));
+            .ForMember(dest => dest.EstadoPago, opt => opt.MapFrom(src => src.EstadoPago))
+            .ForMember(dest => dest.AlumnoId, opt => opt.MapFrom(src => src.Alu_Id));
 
         CreateMap<PR_tbCuentasCobrar_FindResult, CuentaCobrarFindDto>()
             .ForMember(dest => dest.CuentaCobrarId, opt => opt.MapFrom(src => src.Cco_Id))
@@ -385,7 +386,10 @@ public class DtoMappingProfile : Profile
             .ForMember(dest => dest.Encargado, opt => opt.MapFrom(src => src.Encargado ?? string.Empty))
             .ForMember(dest => dest.Usuario, opt => opt.MapFrom(src => src.Usuario ?? string.Empty))
             .ForMember(dest => dest.NumeroRecibo, opt => opt.MapFrom(src => src.Rec_NumeroRecibo ?? string.Empty))
-            .ForMember(dest => dest.FechaEmisionRecibo, opt => opt.MapFrom(src => src.Rec_FechaEmision));
+            .ForMember(dest => dest.FechaEmisionRecibo, opt => opt.MapFrom(src => src.Rec_FechaEmision))
+            .ForMember(dest => dest.AlumnoId, opt => opt.MapFrom(src => src.Alu_Id))
+            .ForMember(dest => dest.EsAnulado, opt => opt.MapFrom(src => src.Pag_EsAnulado))
+            .ForMember(dest => dest.MotivoAnulacion, opt => opt.MapFrom(src => src.Pag_MotivoAnulacion));
 
         CreateMap<PR_tbPagos_FindResult, PagoFindDto>()
             .ForMember(dest => dest.PagoId, opt => opt.MapFrom(src => src.Pag_Id))
@@ -499,6 +503,8 @@ public class DtoMappingProfile : Profile
             .ForMember(dest => dest.numeroReferencia, opt => opt.MapFrom(src => src.Pag_NumeroReferencia))
             .ForMember(dest => dest.numeroRecibo, opt => opt.MapFrom(src => src.numeroRecibo))
             .ForMember(dest => dest.usuario, opt => opt.MapFrom(src => src.Alumno))
-            .ForMember(dest => dest.observaciones, opt => opt.MapFrom(src => src.Pag_Observaciones));
+            .ForMember(dest => dest.observaciones, opt => opt.MapFrom(src => src.Pag_Observaciones))
+            .ForMember(dest => dest.esAnulado, opt => opt.MapFrom(src => src.Pag_EsAnulado))
+            .ForMember(dest => dest.motivoAnulacion, opt => opt.MapFrom(src => src.Pag_MotivoAnulacion));
     }
 }

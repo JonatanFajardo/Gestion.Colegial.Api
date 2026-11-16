@@ -12,6 +12,7 @@ namespace Gestion.Colegial.DataAccess.Interfaces.Finanzas
         Task<Answer> Find(int id);
         Task<Answer> Detail(int id);
         Task<Answer> Create(tbPagos obj);
+        Task<Answer> Registrar(Gestion.Colegial.Entities.DTOs.finansas.PagoFindDto dto);
         Task<Answer> Delete(int id);
         Task<Answer> GetRecibo(int pagoId);
     }

@@ -11,10 +11,24 @@ namespace Gestion.Colegial.Api.Controllers
     public class PagosController : ControllerBase
     {
         private readonly IPagoService _pagoService;
+        private readonly ICajaCorreccionesService _correcciones;
 
-        public PagosController(IPagoService pagoService)
+        public PagosController(IPagoService pagoService, ICajaCorreccionesService correcciones)
         {
             _pagoService = pagoService;
+            _correcciones = correcciones;
+        }
+
+        /// <summary>
+        /// Anula un pago (no lo borra): lo que cubría vuelve a pendiente y el dinero
+        /// se devuelve o pasa a saldo a favor. Responde { Access, Message, Data }.
+        /// </summary>
+        [HttpPost]
+        [Route("AnularAsync")]
+        public async Task<IActionResult> Anular([FromBody] PagoAnularDto entity)
+        {
+            Answer answer = await _correcciones.AnularPago(entity);
+            return Ok(answer);
         }
 
         [HttpGet]
@@ -70,6 +84,8 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Create([FromBody] PagoFindDto entity)
         {
             Answer answer = await _pagoService.Create(entity);
+            if (answer.Access)
+                return BadRequest(answer.Message);
             return Ok(answer.Data);
         }
 

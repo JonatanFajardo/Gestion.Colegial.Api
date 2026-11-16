@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Gestion.Colegial.Entities.DTOs.finansas
 {
@@ -18,5 +19,9 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
         public DateTime FechaRegistro { get; set; }
         public int? UsuarioModificaId { get; set; }
         public DateTime? FechaModifica { get; set; }
+
+        /// <summary>Cargos (tbCuentasCobrar) que cubre el pago. Opcional: sin cargos solo se registra el pago.
+        /// Con cargos, el pago los cubre del más viejo al más nuevo y lo que sobra va a saldo a favor.</summary>
+        public List<int>? CuentasCobrarIds { get; set; }
     }
 }

@@ -16,5 +16,8 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
         public string Usuario { get; set; }
         public string NumeroRecibo { get; set; }
         public DateTime? FechaEmisionRecibo { get; set; }
+        public int AlumnoId { get; set; }
+        public bool EsAnulado { get; set; }
+        public string MotivoAnulacion { get; set; }
     }
 }
