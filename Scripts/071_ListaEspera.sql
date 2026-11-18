@@ -104,6 +104,12 @@ BEGIN
 END
 GO
 
+-- Un alumno queda ligado a un solo aspirante.
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID('app.tbAspirantes') AND name = 'UX_tbAspirantes_Alumno')
+    CREATE UNIQUE INDEX UX_tbAspirantes_Alumno ON app.tbAspirantes (Alu_Id)
+        WHERE Alu_Id IS NOT NULL AND Asp_EsEliminado = 0;
+GO
+
 /* ---------------------------------------------------------------- Funciones */
 
 -- Cupo de un grado en un año (o de un grado + modalidad si @Mda_Id no es NULL). Una sola fila.
@@ -576,13 +582,15 @@ BEGIN
     IF @Par_Id IS NULL OR NOT EXISTS (SELECT 1 FROM app.tbParentescos WHERE Par_Id = @Par_Id AND Par_EsEliminado = 0)
         THROW 50087, N'Elija el parentesco del encargado.', 1;
 
-    DECLARE @Recurso nvarchar(100) = CONCAT(N'aspirantes-', @Ani_Id, N'-', @Cun_Id);
-    DECLARE @Posicion int, @Nuevo bit = CASE WHEN @Asp_Id IS NULL THEN 1 ELSE 0 END;
+    DECLARE @Posicion int, @Nuevo bit = CASE WHEN @Asp_Id IS NULL THEN 1 ELSE 0 END, @Bloqueo int;
 
     BEGIN TRY
         BEGIN TRANSACTION;
-        -- Una sola escritura a la vez por cola: la posición máx + 1 no se repite.
-        EXEC sp_getapplock @Resource = @Recurso, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 10000;
+        -- Una sola escritura a la vez en toda la lista (pocas y cortas): la posición máx + 1 no se repite,
+        -- el duplicado se revisa sin carreras y un cambio de grado no se cruza con otro.
+        EXEC @Bloqueo = sp_getapplock @Resource = N'app.tbAspirantes', @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 10000;
+        IF @Bloqueo < 0
+            THROW 50097, N'La lista de espera está ocupada con otro cambio. Intente de nuevo.', 1;
 
         -- Duplicado abierto en el mismo año (misma identidad, o mismo nombre + fecha de nacimiento).
         DECLARE @Dup nvarchar(300) = (
@@ -644,8 +652,6 @@ BEGIN
             -- Cambia de cola: queda al final de la nueva.
             IF @AniAntes <> @Ani_Id OR @CunAntes <> @Cun_Id
             BEGIN
-                DECLARE @Recurso2 nvarchar(100) = CONCAT(N'aspirantes-', @AniAntes, N'-', @CunAntes);
-                EXEC sp_getapplock @Resource = @Recurso2, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 10000;
                 SET @Posicion = ISNULL((SELECT MAX(Asp_Posicion) FROM app.tbAspirantes WITH (UPDLOCK, HOLDLOCK)
                                          WHERE Ani_Id = @Ani_Id AND Cun_Id = @Cun_Id AND Asp_EsEliminado = 0 AND Asp_Id <> @Asp_Id), 0) + 1;
             END
@@ -709,7 +715,7 @@ END
 GO
 
 -- Mover de estado: ofrecer | rechazar | desistio | reactivar | matricular.
--- Bloquea la cola del grado (applock): dos ofertas a la vez no se llevan el mismo asiento.
+-- Bloquea la lista (applock): dos ofertas a la vez no se llevan el mismo asiento.
 CREATE OR ALTER PROCEDURE app.PR_tbAspirantes_CambiarEstado
     @Asp_Id  int,
     @Accion  varchar(20),
@@ -727,23 +733,27 @@ BEGIN
     IF @Accion NOT IN ('ofrecer','rechazar','desistio','reactivar','matricular')
         THROW 50096, N'Acción desconocida.', 1;
 
-    DECLARE @Ani_Id int, @Cun_Id int;
-    SELECT @Ani_Id = Ani_Id, @Cun_Id = Cun_Id FROM app.tbAspirantes WHERE Asp_Id = @Asp_Id AND Asp_EsEliminado = 0;
-    IF @Ani_Id IS NULL
-        THROW 50083, N'El aspirante ya no existe.', 1;
-
-    DECLARE @Recurso nvarchar(100) = CONCAT(N'aspirantes-', @Ani_Id, N'-', @Cun_Id);
-    DECLARE @Aviso nvarchar(300) = NULL, @Nuevo varchar(2);
+    DECLARE @Aviso nvarchar(300) = NULL, @Nuevo varchar(2), @Bloqueo int;
 
     BEGIN TRY
         BEGIN TRANSACTION;
-        EXEC sp_getapplock @Resource = @Recurso, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 10000;
+        -- La misma llave que al registrar: dos ofertas a la vez no se llevan el mismo asiento
+        -- y el estado, el grado y el cupo se leen ya con la lista bloqueada.
+        EXEC @Bloqueo = sp_getapplock @Resource = N'app.tbAspirantes', @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 10000;
+        IF @Bloqueo < 0
+            THROW 50097, N'La lista de espera está ocupada con otro cambio. Intente de nuevo.', 1;
 
-        DECLARE @Estado varchar(2), @Mda_Id int, @Grado nvarchar(100);
-        SELECT @Estado = a.Asp_Estado, @Mda_Id = a.Mda_Id, @Grado = CAST(g.Cun_Descripcion AS nvarchar(100))
+        DECLARE @Estado varchar(2), @Ani_Id int, @Cun_Id int, @Mda_Id int, @Grado nvarchar(100),
+                @Identidad varchar(13), @Nombres nvarchar(100), @Apellidos nvarchar(100), @Nacimiento date, @FechaOferta datetime;
+        SELECT @Estado = a.Asp_Estado, @Ani_Id = a.Ani_Id, @Cun_Id = a.Cun_Id, @Mda_Id = a.Mda_Id,
+               @Grado = CAST(g.Cun_Descripcion AS nvarchar(100)), @Identidad = a.Asp_Identidad, @Nombres = a.Asp_Nombres,
+               @Apellidos = a.Asp_Apellidos, @Nacimiento = a.Asp_FechaNacimiento, @FechaOferta = a.Asp_FechaOferta
         FROM app.tbAspirantes a WITH (UPDLOCK, HOLDLOCK)
         JOIN app.tbCursosNiveles g ON g.Cun_Id = a.Cun_Id
         WHERE a.Asp_Id = @Asp_Id AND a.Asp_EsEliminado = 0;
+
+        IF @Estado IS NULL
+            THROW 50083, N'El aspirante ya no existe.', 1;
 
         IF @Accion = 'ofrecer'
         BEGIN
@@ -755,7 +765,7 @@ BEGIN
             FROM app.tbAspirantes x
             WHERE x.Ani_Id = @Ani_Id AND x.Cun_Id = @Cun_Id AND x.Asp_EsEliminado = 0 AND x.Asp_Estado = 'EE'
             ORDER BY x.Asp_Prioridad DESC, x.Asp_Posicion;
-            IF @Siguiente <> @Asp_Id
+            IF @Siguiente IS NULL OR @Siguiente <> @Asp_Id
             BEGIN
                 DECLARE @MsgSig nvarchar(400) = CONCAT(N'El cupo se ofrece al siguiente de la cola de ', @Grado, N': ', @SiguienteNombre, N'.');
                 THROW 50089, @MsgSig, 1;
@@ -804,6 +814,24 @@ BEGIN
             IF @Motivo IS NULL
                 THROW 50091, N'Escriba el motivo.', 1;
 
+            -- Mientras estuvo fuera pudieron volver a anotarlo: no se reactiva un segundo registro abierto.
+            DECLARE @DupR nvarchar(300) = (
+                SELECT TOP (1) CONCAT(a.Asp_Nombres, N' ', a.Asp_Apellidos, N' (', app.FN_AspiranteEstadoTexto(a.Asp_Estado), N', ',
+                                      CAST(g.Cun_Descripcion AS nvarchar(100)), N')')
+                FROM app.tbAspirantes a
+                JOIN app.tbCursosNiveles g ON g.Cun_Id = a.Cun_Id
+                WHERE a.Ani_Id = @Ani_Id AND a.Asp_EsEliminado = 0 AND a.Asp_Estado IN ('EE','OF') AND a.Asp_Id <> @Asp_Id
+                  AND (   (@Identidad IS NOT NULL AND a.Asp_Identidad = @Identidad)
+                       OR (a.Asp_FechaNacimiento = @Nacimiento
+                           AND LTRIM(RTRIM(a.Asp_Nombres))   COLLATE Latin1_General_CI_AI = LTRIM(RTRIM(@Nombres))   COLLATE Latin1_General_CI_AI
+                           AND LTRIM(RTRIM(a.Asp_Apellidos)) COLLATE Latin1_General_CI_AI = LTRIM(RTRIM(@Apellidos)) COLLATE Latin1_General_CI_AI))
+                ORDER BY a.Asp_Id);
+            IF @DupR IS NOT NULL
+            BEGIN
+                DECLARE @MsgDupR nvarchar(400) = CONCAT(N'No se reactiva: ya está otra vez en la lista de este año como ', @DupR, N'.');
+                THROW 50082, @MsgDupR, 1;
+            END
+
             DECLARE @Posicion int = ISNULL((SELECT MAX(Asp_Posicion) FROM app.tbAspirantes
                                             WHERE Ani_Id = @Ani_Id AND Cun_Id = @Cun_Id AND Asp_EsEliminado = 0), 0) + 1;
             SET @Nuevo = 'EE';
@@ -817,8 +845,19 @@ BEGIN
         BEGIN
             IF @Estado <> 'OF'
                 THROW 50094, N'Solo se matricula a un aspirante con cupo ofrecido.', 1;
-            IF @Alu_Id IS NULL OR NOT EXISTS (SELECT 1 FROM app.tbAlumnos WHERE Alu_Id = @Alu_Id)
+            DECLARE @AluRegistro datetime;
+            SELECT @AluRegistro = pe.Per_FechaRegistra
+            FROM app.tbAlumnos al
+            JOIN app.tbPersonas pe ON pe.Per_Id = al.Per_Id
+            WHERE al.Alu_Id = @Alu_Id AND pe.Per_EsEliminado = 0;
+            IF @Alu_Id IS NULL OR @AluRegistro IS NULL
                 THROW 50095, N'No se encontró el alumno recién creado.', 1;
+            IF EXISTS (SELECT 1 FROM app.tbAspirantes WHERE Alu_Id = @Alu_Id AND Asp_Id <> @Asp_Id AND Asp_EsEliminado = 0)
+                THROW 50095, N'Ese alumno ya está ligado a otro aspirante.', 1;
+            -- Solo el alumno que se creó con el wizard después de ofrecer el cupo (no uno que ya existía).
+            -- Per_FechaRegistra va con la hora del servidor (UTC); la oferta, con la de Honduras.
+            IF @AluRegistro < DATEADD(MINUTE, DATEDIFF(MINUTE, @Ahora, GETDATE()) - 5, @FechaOferta)
+                THROW 50095, N'Ese alumno ya existía antes de ofrecer el cupo: matricule al aspirante con el wizard.', 1;
 
             SET @Nuevo = 'MA';
             UPDATE app.tbAspirantes
