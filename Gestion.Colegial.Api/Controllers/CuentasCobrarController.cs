@@ -11,10 +11,23 @@ namespace Gestion.Colegial.Api.Controllers
     public class CuentasCobrarController : ControllerBase
     {
         private readonly ICuentaCobrarService _cuentaCobrarService;
+        private readonly ICajaCorreccionesService _correcciones;
 
-        public CuentasCobrarController(ICuentaCobrarService cuentaCobrarService)
+        public CuentasCobrarController(ICuentaCobrarService cuentaCobrarService, ICajaCorreccionesService correcciones)
         {
             _cuentaCobrarService = cuentaCobrarService;
+            _correcciones = correcciones;
+        }
+
+        /// <summary>
+        /// Perdona parte o todo un cargo (exoneración, beca o ajuste). Responde { Access, Message, Data }.
+        /// </summary>
+        [HttpPost]
+        [Route("PerdonarAsync")]
+        public async Task<IActionResult> Perdonar([FromBody] CuentaCobrarPerdonarDto entity)
+        {
+            Answer answer = await _correcciones.PerdonarCargo(entity);
+            return Ok(answer);
         }
 
         [HttpGet]

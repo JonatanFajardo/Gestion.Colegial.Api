@@ -11,5 +11,16 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
         public decimal Pendiente { get; set; }
         public DateTime FechaVence { get; set; }
         public string EstadoPago { get; set; }
+        public int AlumnoId { get; set; }
+        public string Identidad { get; set; }
+        public string Nivel { get; set; }
+        public string Grado { get; set; }
+        public string Seccion { get; set; }
+        public decimal MontoOriginal { get; set; }
+        public decimal MontoDescuento { get; set; }
+        public decimal MontoMora { get; set; }
+        public decimal MontoTotal { get; set; }
+        public int? Mes { get; set; }
+        public int? Anio { get; set; }
     }
 }

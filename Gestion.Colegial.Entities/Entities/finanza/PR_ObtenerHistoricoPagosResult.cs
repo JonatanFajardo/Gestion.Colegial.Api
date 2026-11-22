@@ -16,5 +16,7 @@ namespace Gestion.Colegial.Entities.Entities
         public string numeroRecibo { get; set; }
         public string Alumno { get; set; }
         public string Pag_Observaciones { get; set; }
+        public bool Pag_EsAnulado { get; set; }
+        public string Pag_MotivoAnulacion { get; set; }
     }
 }

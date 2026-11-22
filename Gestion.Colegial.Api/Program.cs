@@ -195,6 +195,7 @@ builder.Services.AddScoped<IDescuentoRepository, DescuentoRepository>();
 builder.Services.AddScoped<IEstadoPagoRepository, EstadoPagoRepository>();
 builder.Services.AddScoped<ICuentaCobrarRepository, CuentaCobrarRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
+builder.Services.AddScoped<ICajaCorreccionesRepository, CajaCorreccionesRepository>();
 //builder.Services.AddScoped<IReporteFinancieroRepository, ReporteFinancieroRepository>();
 
 // Services
@@ -319,6 +320,7 @@ builder.Services.AddScoped<IDescuentoService, DescuentoService>();
 builder.Services.AddScoped<IEstadoPagoService, EstadoPagoService>();
 builder.Services.AddScoped<ICuentaCobrarService, CuentaCobrarService>();
 builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<ICajaCorreccionesService, CajaCorreccionesService>();
 //builder.Services.AddScoped<IReporteFinancieroService, ReporteFinancieroService>();
 
 var app = builder.Build();

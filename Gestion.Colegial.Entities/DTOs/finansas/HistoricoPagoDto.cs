@@ -12,5 +12,7 @@ namespace Gestion.Colegial.Entities.DTOs.finansas
         public string numeroRecibo { get; set; }
         public string usuario { get; set; }
         public string observaciones { get; set; }
+        public bool esAnulado { get; set; }
+        public string motivoAnulacion { get; set; }
     }
 }
