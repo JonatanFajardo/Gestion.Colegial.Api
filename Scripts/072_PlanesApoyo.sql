@@ -863,9 +863,10 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
+        -- Bloquea el plan: si a la vez alguien lo completa o cancela, no se marca un paso en un plan ya cerrado.
         DECLARE @Estado varchar(20) = (
             SELECT p.Apo_Estado
-            FROM app.tbPlanesApoyo p
+            FROM app.tbPlanesApoyo p WITH (UPDLOCK, HOLDLOCK)
             JOIN app.FN_PlanesApoyo_Visibles(ISNULL(@PuedeGestionar, 0), @VerConfidenciales, @Usuario) v ON v.Apo_Id = p.Apo_Id
             WHERE p.Apo_Id = @Apo_Id);
         IF @Estado IS NULL
@@ -962,20 +963,35 @@ BEGIN
     IF LEN(@Apn_Texto) > 5000
         THROW 50098, N'La nota admite hasta 5000 caracteres.', 1;
 
-    DECLARE @Estado varchar(20) = (
-        SELECT p.Apo_Estado
-        FROM app.tbPlanesApoyo p
-        JOIN app.FN_PlanesApoyo_Visibles(ISNULL(@PuedeGestionar, 0), @VerConfidenciales, @Usuario) v ON v.Apo_Id = p.Apo_Id
-        WHERE p.Apo_Id = @Apo_Id);
-    IF @Estado IS NULL
-        THROW 50088, N'El plan ya no existe o no lo puede ver.', 1;
-    IF @Estado IN ('completado','cancelado')
-        THROW 50089, N'Este plan ya terminó. Reábralo antes de escribir una nota.', 1;
+    SET XACT_ABORT ON;
+    DECLARE @Apn_Id int;
 
-    INSERT INTO app.tbPlanesApoyoNotas (Apo_Id, Apn_Texto, Apn_Usuario, Apn_Fecha)
-    VALUES (@Apo_Id, @Apn_Texto, @Usuario, app.FN_AhoraHonduras());
+    BEGIN TRY
+        BEGIN TRANSACTION;
 
-    SELECT CAST(SCOPE_IDENTITY() AS int) AS Apn_Id;
+        -- Bloquea el plan: si a la vez alguien lo completa o cancela, la nota no entra en un plan ya cerrado.
+        DECLARE @Estado varchar(20) = (
+            SELECT p.Apo_Estado
+            FROM app.tbPlanesApoyo p WITH (UPDLOCK, HOLDLOCK)
+            JOIN app.FN_PlanesApoyo_Visibles(ISNULL(@PuedeGestionar, 0), @VerConfidenciales, @Usuario) v ON v.Apo_Id = p.Apo_Id
+            WHERE p.Apo_Id = @Apo_Id);
+        IF @Estado IS NULL
+            THROW 50088, N'El plan ya no existe o no lo puede ver.', 1;
+        IF @Estado IN ('completado','cancelado')
+            THROW 50089, N'Este plan ya terminó. Reábralo antes de escribir una nota.', 1;
+
+        INSERT INTO app.tbPlanesApoyoNotas (Apo_Id, Apn_Texto, Apn_Usuario, Apn_Fecha)
+        VALUES (@Apo_Id, @Apn_Texto, @Usuario, app.FN_AhoraHonduras());
+        SET @Apn_Id = CAST(SCOPE_IDENTITY() AS int);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH;
+
+    SELECT @Apn_Id AS Apn_Id;
 END
 GO
 
