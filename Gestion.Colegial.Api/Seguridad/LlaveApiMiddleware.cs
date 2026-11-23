@@ -54,6 +54,11 @@ namespace Gestion.Colegial.Api.Seguridad
                 contexto.Items[ClaveUsuario] = usuId.Value;
             }
 
+            // Ya validados: se quitan de la petición para que la página de error de desarrollo
+            // (que lista los encabezados) ni ningún registro muestren la llave.
+            contexto.Request.Headers.Remove(OpcionesSeguridad.EncabezadoLlave);
+            contexto.Request.Headers.Remove(OpcionesSeguridad.EncabezadoUsuario);
+
             await _next(contexto);
         }
 

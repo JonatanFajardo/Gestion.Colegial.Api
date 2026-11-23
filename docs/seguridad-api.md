@@ -36,6 +36,10 @@ usuario de Asistencia, Notas, Horarios, Plan de clases, Tareas, Entregas, Vacaci
 Mensajes, Configuración, Arqueos, Pagos, Correcciones de caja, Graduación, Matrícula por año,
 Notificaciones, Perfil, Bitácora, Dashboard de caja y cierre de sesión.
 
+Además exigen pantalla (admin o el rol que la tenga): crear, editar y quitar usuarios
+(`Listado de usuarios`) y roles con sus pantallas (`Listado de roles`), Dev Tools (`PasoAsync`),
+Rollover de año lectivo y Graduación (graduar y backfill, `Graduación de Alumnos`).
+
 Para un módulo nuevo que reciba usuario o permisos: agregar el atributo que corresponda en su
 controller, con el mismo nombre de pantalla que usa el ADM en `TienePantalla`.
 
@@ -69,6 +73,11 @@ GC_API_KEY=<la llave> dotnet run --project Gestion.Colegial.Api
 GC_API_KEY=<la llave> GC_API_BASEURL=http://localhost:5076/api/v1/ dotnet run --project GESTION_COLEGIAL.Web
 ```
 
+### Encabezados después de validar
+
+Tras validarlos, la API quita `X-Api-Key` y `X-Gc-Usuario` de la petición: así no aparecen en la
+página de error de desarrollo (que lista los encabezados) ni en registros.
+
 ### Sin llave
 
 Si `GC_API_KEY` no está configurada, la API y el ADM se comportan como antes (sin encabezados ni
@@ -78,4 +87,6 @@ Si solo uno de los dos tiene la llave, el ADM recibe 401 en todas las llamadas: 
 ### Otros clientes
 
 Cualquier otro programa que llame a la API debe mandar `X-Api-Key`. Swagger (solo en desarrollo)
-abre sin llave; para probar llamadas use el botón *Authorize* y pegue la llave.
+abre sin llave; para probar llamadas use el botón *Authorize* y pegue la llave. Las acciones con reglas
+de usuario responden 401 desde Swagger porque además piden `X-Gc-Usuario` firmado; para probarlas use
+el ADM o una API local sin `GC_API_KEY`.

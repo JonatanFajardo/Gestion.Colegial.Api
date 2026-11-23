@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
@@ -43,6 +44,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
+        [RequierePantalla("Listado de roles")]
         public async Task<IActionResult> Create(tbRoles entity)
         {
             Answer answer = await _rolesService.Create(entity);
@@ -51,6 +53,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("EditAsync")]
+        [RequierePantalla("Listado de roles")]
         public async Task<IActionResult> Edit(tbRoles entity)
         {
             Answer answer = await _rolesService.Edit(entity);
@@ -69,6 +72,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("RemoveAsync")]
+        [RequierePantalla("Listado de roles")]
         public async Task<IActionResult> Remove(int value)
         {
             Answer answer = await _rolesService.Delete(value);
@@ -93,6 +97,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("SavePantallasAsync")]
+        [RequierePantalla("Listado de roles")]
         public async Task<IActionResult> SavePantallas(RolConPantallasDTO dto)
         {
             Answer answer = await _rolesService.SavePantallas(dto.Rol_Id, dto.PantallaIds);

@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPost("PasoAsync")]
+        [RequierePantalla("Dev Tools")]
         public async Task<IActionResult> Paso(string Tabla, int Delta)
         {
             Answer a = await _service.Paso(Tabla, Delta);

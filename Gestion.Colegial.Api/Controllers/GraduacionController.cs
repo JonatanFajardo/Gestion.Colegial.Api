@@ -38,6 +38,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("GraduarAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "usuarioId")]
+        [RequierePantalla("Graduación de Alumnos")]
         public async Task<IActionResult> Graduar([FromQuery] int alumnoId, [FromQuery] int usuarioId)
         {
             if (alumnoId <= 0) return BadRequest("alumnoId requerido.");
@@ -57,6 +58,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("BackfillAsync")]
+        [RequierePantalla("Graduación de Alumnos")]
         public async Task<IActionResult> Backfill(
             [FromQuery] int? anio = null,
             [FromQuery] int topN = 50,

@@ -147,16 +147,18 @@ namespace Gestion.Colegial.Api.Seguridad
 
             public Func<object?> Leer { get; }
 
-            /// <summary>Escribe respetando el tipo del campo (null en un int queda 0; un int en un bool no se escribe).</summary>
+            /// <summary>
+            /// Escribe respetando el tipo del campo. Null, o un valor de otro tipo (un permiso sobre un
+            /// campo int), deja el campo vacío (null, 0 o false): nunca se queda lo que mandó el ADM.
+            /// </summary>
             public void Escribir(object? valor)
             {
                 Type t = Nullable.GetUnderlyingType(_tipo) ?? _tipo;
-                if (valor == null)
+                if (valor == null || valor.GetType() != t)
                 {
                     _escribir(Nullable.GetUnderlyingType(_tipo) != null ? null : Activator.CreateInstance(t));
                     return;
                 }
-                if (valor.GetType() != t) return;
                 _escribir(valor);
             }
         }
