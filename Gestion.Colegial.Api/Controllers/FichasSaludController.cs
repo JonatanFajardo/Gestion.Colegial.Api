@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -14,6 +15,7 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "Usuario")]
     public class FichasSaludController : ControllerBase
     {
         private readonly IFichasSaludService _service;
@@ -60,6 +62,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GuardarAsync")]
+        [RequierePantalla("Editar ficha de salud")]
         public async Task<IActionResult> Guardar([FromBody] FichaSaludGuardarDTO obj)
         {
             Answer answer = await _service.Guardar(obj);

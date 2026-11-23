@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -14,6 +15,8 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "Usuario")]
+    [PermisoDelServidor("Cerrar y publicar parciales", "PuedeCerrar")]
     public class CierresParcialController : ControllerBase
     {
         private readonly ICierresParcialService _service;

@@ -1,6 +1,7 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -10,6 +11,7 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [AlcanceEmpleado("Ver asistencia de todas las secciones", "empId")]
     public class ReporteAsistenciaController : ControllerBase
     {
         private readonly IReporteAsistenciaService _service;

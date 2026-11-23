@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -55,6 +56,7 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPost("Logout")]
+        [DatoDelServidor(DatoUsuario.Usuario, "usuId")]
         public async Task<IActionResult> Logout([FromBody] int usuId)
         {
             try

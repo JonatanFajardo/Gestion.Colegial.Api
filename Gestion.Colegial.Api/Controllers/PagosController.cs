@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Microsoft.AspNetCore.Mvc;
 using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -25,6 +26,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("AnularAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> Anular([FromBody] PagoAnularDto entity)
         {
             Answer answer = await _correcciones.AnularPago(entity);
@@ -81,6 +83,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> Create([FromBody] PagoFindDto entity)
         {
             Answer answer = await _pagoService.Create(entity);

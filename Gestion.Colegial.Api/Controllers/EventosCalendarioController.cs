@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -13,6 +14,10 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "Usuario")]
+    [DatoDelServidor(DatoUsuario.Empleado, "empId")]
+    [DatoDelServidor(DatoUsuario.Rol, "rolId")]
+    [PermisoDelServidor("Editar calendario escolar", "verTodo", "incluirBorradores")]
     public class EventosCalendarioController : ControllerBase
     {
         private readonly IEventosCalendarioService _service;
@@ -120,6 +125,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("GuardarAsync")]
+        [RequierePantalla("Editar calendario escolar")]
         public async Task<IActionResult> Guardar([FromBody] EventoCalendarioGuardarDTO obj)
         {
             Answer answer = await _service.Guardar(obj);
@@ -131,6 +137,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>publicar = true lo publica; false lo vuelve borrador.</summary>
         [HttpPost]
         [Route("PublicarAsync")]
+        [RequierePantalla("Editar calendario escolar")]
         public async Task<IActionResult> Publicar(int id, bool publicar = true, int? usuario = null)
         {
             Answer answer = await _service.Publicar(id, publicar, usuario);
@@ -140,6 +147,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Quita un día del calendario (baja lógica). Devuelve el mes para volver a él.</summary>
         [HttpPost]
         [Route("EliminarAsync")]
+        [RequierePantalla("Editar calendario escolar")]
         public async Task<IActionResult> Eliminar(int id, int? usuario = null)
         {
             Answer answer = await _service.Eliminar(id, usuario);
@@ -161,6 +169,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("CargarFeriadosHondurasAsync")]
+        [RequierePantalla("Editar calendario escolar")]
         public async Task<IActionResult> CargarFeriadosHonduras([FromBody] CargarFeriadosDTO obj)
         {
             Answer answer = await _service.CargarFeriadosHonduras(obj);

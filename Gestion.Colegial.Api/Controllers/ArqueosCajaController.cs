@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -21,6 +22,7 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet("LastByUsuarioAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id")]
         public async Task<IActionResult> LastByUsuario(int Usu_Id)
         {
             Answer answer = await _service.LastByUsuario(Usu_Id);
@@ -35,6 +37,7 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPost("CreateAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id", "UsuarioRegistra")]
         public async Task<IActionResult> Create([FromBody] ArqueoCajaRequest request)
         {
             Answer answer = await _service.Insert(request.Usu_Id, request.Arq_Fecha, request.Arq_TotalEfectivo, request.Arq_TotalTransferencia, request.Arq_TotalTarjeta, request.Arq_Observaciones, request.UsuarioRegistra);

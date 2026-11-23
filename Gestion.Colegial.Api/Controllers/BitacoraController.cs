@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -20,6 +21,7 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpPost("CreateAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id")]
         public async Task<IActionResult> Create([FromBody] BitacoraRequest request)
         {
             Answer answer = await _service.Insert(request.Usu_Id, request.Bit_Accion, request.Bit_Tabla, request.Bit_RegistroId, request.Bit_Descripcion, request.Bit_Ip);

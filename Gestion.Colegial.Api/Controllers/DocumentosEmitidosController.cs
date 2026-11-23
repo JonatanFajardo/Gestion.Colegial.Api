@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -51,6 +52,8 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("EmitirAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Doc_UsuarioEmite")]
+        [RequierePantalla("Emitir constancias")]
         public async Task<IActionResult> Emitir([FromBody] DocumentoEmitirDTO obj)
         {
             Answer answer = await _service.Emitir(obj);
