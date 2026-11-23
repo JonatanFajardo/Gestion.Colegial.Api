@@ -1,4 +1,5 @@
-﻿using Gestion.Colegial.Business.Dtos;
+using Gestion.Colegial.Api.Seguridad;
+using Gestion.Colegial.Business.Dtos;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -149,6 +150,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Liga un encargado existente a un alumno con su parentesco (si ya estaba ligado, cambia el parentesco).</summary>
         [HttpPost]
         [Route("VincularAsync")]
+        [RequierePantalla("Editar alumnos|Matrícula nueva|Crear alumnos")]
         public async Task<IActionResult> Vincular([FromBody] EncargadoVinculoDto obj)
         {
             Answer answer = await _encargadoService.Vincular(obj.Enc_Id, obj.Alu_Id, obj.Par_Id);
@@ -158,6 +160,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Quita el vínculo entre un encargado y un alumno (no borra al encargado).</summary>
         [HttpPost]
         [Route("DesvincularAsync")]
+        [RequierePantalla("Editar alumnos|Matrícula nueva|Crear alumnos")]
         public async Task<IActionResult> Desvincular([FromBody] EncargadoVinculoDto obj)
         {
             Answer answer = await _encargadoService.Desvincular(obj.Enc_Id, obj.Alu_Id);

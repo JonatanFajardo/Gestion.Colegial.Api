@@ -15,7 +15,7 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
-    [DatoDelServidor(DatoUsuario.Usuario, "Usuario")]
+    [DatoDelServidor(DatoUsuario.Usuario, "Usuario", "usuarioId")]
     public class FichasSaludController : ControllerBase
     {
         private readonly IFichasSaludService _service;

@@ -9,7 +9,7 @@ namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [DatoDelServidor(DatoUsuario.Usuario, "UsuarioRegistra", "UsuarioModifica")]
+    [DatoDelServidor(DatoUsuario.Usuario, "UsuarioRegistra", "UsuarioModifica", "Usu_Id")]
     public class NotasController : ControllerBase
     {
         private readonly INotasService _service;
