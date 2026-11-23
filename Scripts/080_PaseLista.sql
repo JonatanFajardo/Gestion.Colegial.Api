@@ -10,7 +10,7 @@
    - El pase de lista (Insert / Update) rechaza a quien no puede pasar lista de ese horario y fecha,
      aunque la petición no pase por la pantalla.
    - Las alertas de salud por sección solo se devuelven a quien puede pasar lista de ese horario
-     (nuevo parámetro @Usu_Id; sin él no devuelve nada).
+     (nuevo parámetro opcional @Usu_Id; sin él se comporta como antes, y la API siempre lo envía).
    Se puede ejecutar varias veces.
    ============================================================================= */
 USE [DB_GestionColegial]
@@ -178,12 +178,13 @@ GO
 CREATE OR ALTER PROCEDURE app.PR_tbFichasSalud_AlertasSeccion
     @Hor_Id int,
     @Fecha  date = NULL,
-    @Usu_Id int  = NULL   -- quien pide las alertas: sin él, o sin acceso a ese horario ese día, no devuelve nada
+    @Usu_Id int  = NULL   -- quien pide las alertas: si viene, solo se devuelven con acceso a ese horario ese día
 AS
 BEGIN
     SET NOCOUNT ON;
     SET @Fecha = ISNULL(@Fecha, CAST(app.FN_AhoraHonduras() AS date));
-    DECLARE @Puede bit = app.FN_PaseLista_Puede(@Usu_Id, @Hor_Id, @Fecha);
+    -- Sin @Usu_Id (llamadas de la versión anterior) se comporta como antes; con él, solo quien puede pasar lista
+    DECLARE @Puede bit = CASE WHEN @Usu_Id IS NULL THEN 1 ELSE app.FN_PaseLista_Puede(@Usu_Id, @Hor_Id, @Fecha) END;
 
     DECLARE @Sea_Id int = (SELECT Sea_Id FROM app.FN_SeccionAnioDeHorario(@Hor_Id, @Fecha));
     DECLARE @Cur_Id int, @Cun_Id int, @Sec_Id int, @Mda_Id int;
