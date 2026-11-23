@@ -17,15 +17,18 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
--- Empleado del usuario si su rol es Docente; NULL si no lo es (puede capturar cualquier sección).
+-- Empleado del usuario si su rol es Docente (-1 si no tiene empleado); NULL si no es docente o si
+-- @Usu_Id es NULL (sin restricción). Un usuario que no existe (0, vacío) se trata como sin acceso (-1).
 CREATE OR ALTER FUNCTION app.FN_Cuaderno_EmpDocente (@Usu_Id int)
 RETURNS int
 AS
 BEGIN
-    RETURN (SELECT TOP 1 CASE WHEN LOWER(LTRIM(RTRIM(r.Rol_Descripcion))) = 'docente' THEN ISNULL(u.Emp_Id, -1) END
-            FROM seguridad.tbUsuarios u
-            JOIN seguridad.tbRoles r ON r.Rol_Id = u.Rol_Id
-            WHERE u.Usu_Id = @Usu_Id);
+    IF @Usu_Id IS NULL RETURN NULL;
+    RETURN ISNULL((SELECT TOP 1 CASE WHEN LOWER(LTRIM(RTRIM(r.Rol_Descripcion))) = 'docente' THEN ISNULL(u.Emp_Id, -1) END
+                   FROM seguridad.tbUsuarios u
+                   JOIN seguridad.tbRoles r ON r.Rol_Id = u.Rol_Id
+                   WHERE u.Usu_Id = @Usu_Id),
+                  CASE WHEN EXISTS (SELECT 1 FROM seguridad.tbUsuarios WHERE Usu_Id = @Usu_Id) THEN NULL ELSE -1 END);
 END
 GO
 
