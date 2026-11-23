@@ -6,6 +6,7 @@
    C. Configuración de semestres: semestre_activo (0 = automático por fecha, 1 o 2 = fijo),
       fechas de inicio y fin de cada semestre, y app.fn_SemestreActivo().
    D. app.FN_Sustitucion_Ciclo solo toma 'semestre_activo' si vale 1 o 2 (misma firma).
+   E. Fotos de perfil con nombre de archivo inexistente (profile-13.jpeg).
    Nota: app.tbMatriculas (vacía, sin pantalla) sigue en uso por spGraduarAlumno y
    seguridad.UDP_tbBitacora_ByAlumno; no se elimina aquí.
    ============================================================================= */
@@ -135,4 +136,10 @@ RETURN
         WHERE x.Sem_Id IS NOT NULL
         ORDER BY x.Prioridad, x.Sem_Id DESC
     ) s;
+GO
+
+/* ---------- E. Fotos de perfil que apuntaban a un archivo inexistente (profile-13.jpeg) ---------- */
+UPDATE app.tbPersonas
+SET Per_Imagen = CASE WHEN Per_Sexo = 'F' THEN '/Content/img/profile/profile-14-mujer.jpeg' ELSE '/Content/img/profile/profile-13-hombre.jpeg' END
+WHERE Per_Imagen = '/Content/img/profile/profile-13.jpeg';
 GO
