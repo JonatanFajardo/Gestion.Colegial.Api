@@ -31,5 +31,7 @@ namespace Gestion.Colegial.Entities.Entities
         public string Per_Direccion { get; set; }
         public string Per_Sexo { get; set; }
         public bool Per_EsEliminado { get; set; }
+        public int Per_Id { get; set; }
+        public bool Per_EsActivo { get; set; }
     }
 }

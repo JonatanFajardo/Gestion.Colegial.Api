@@ -43,9 +43,9 @@ namespace Gestion.Colegial.DataAccess.Repositories
             new SqlParameter(){ParameterName= "@Enc_Ocupacion", DbType = DbType.String, Value = obj.Enc_Ocupacion },
             new SqlParameter(){ParameterName= "@Per_Identidad", DbType = DbType.String, Value = obj.Per.Per_Identidad },
             new SqlParameter(){ParameterName= "@Per_PrimerNombre", DbType = DbType.String, Value = obj.Per.Per_PrimerNombre },
-            new SqlParameter(){ParameterName= "@Per_SegundoNombre", DbType = DbType.String, Value = obj.Per.Per_SegundoNombre },
+            new SqlParameter(){ParameterName= "@Per_SegundoNombre", DbType = DbType.String, Value = (object)obj.Per.Per_SegundoNombre ?? DBNull.Value },
             new SqlParameter(){ParameterName= "@Per_ApellidoPaterno", DbType = DbType.String, Value = obj.Per.Per_ApellidoPaterno },
-            new SqlParameter(){ParameterName= "@Per_ApellidoMaterno", DbType = DbType.String, Value = obj.Per.Per_ApellidoMaterno },
+            new SqlParameter(){ParameterName= "@Per_ApellidoMaterno", DbType = DbType.String, Value = (object)obj.Per.Per_ApellidoMaterno ?? DBNull.Value },
             new SqlParameter(){ParameterName= "@Per_FechaNacimiento", DbType = DbType.DateTime, Value = obj.Per.Per_FechaNacimiento },
             new SqlParameter(){ParameterName= "@Per_CorreoElectronico", DbType = DbType.String, Value = obj.Per.Per_CorreoElectronico },
             new SqlParameter(){ParameterName= "@Per_Telefono", DbType = DbType.String, Value = obj.Per.Per_Telefono },
@@ -67,9 +67,9 @@ namespace Gestion.Colegial.DataAccess.Repositories
             new SqlParameter(){ParameterName= "@Enc_Ocupacion", DbType = DbType.String, Value = obj.Enc_Ocupacion },
             new SqlParameter(){ParameterName= "@Per_Identidad", DbType = DbType.String, Value = obj.Per.Per_Identidad },
             new SqlParameter(){ParameterName= "@Per_PrimerNombre", DbType = DbType.String, Value = obj.Per.Per_PrimerNombre },
-            new SqlParameter(){ParameterName= "@Per_SegundoNombre", DbType = DbType.String, Value = obj.Per.Per_SegundoNombre },
+            new SqlParameter(){ParameterName= "@Per_SegundoNombre", DbType = DbType.String, Value = (object)obj.Per.Per_SegundoNombre ?? DBNull.Value },
             new SqlParameter(){ParameterName= "@Per_ApellidoPaterno", DbType = DbType.String, Value = obj.Per.Per_ApellidoPaterno },
-            new SqlParameter(){ParameterName= "@Per_ApellidoMaterno", DbType = DbType.String, Value = obj.Per.Per_ApellidoMaterno },
+            new SqlParameter(){ParameterName= "@Per_ApellidoMaterno", DbType = DbType.String, Value = (object)obj.Per.Per_ApellidoMaterno ?? DBNull.Value },
             new SqlParameter(){ParameterName= "@Per_FechaNacimiento", DbType = DbType.DateTime, Value = obj.Per.Per_FechaNacimiento },
             new SqlParameter(){ParameterName= "@Per_CorreoElectronico", DbType = DbType.String, Value = obj.Per.Per_CorreoElectronico },
             new SqlParameter(){ParameterName= "@Per_Telefono", DbType = DbType.String, Value = obj.Per.Per_Telefono },
@@ -100,6 +100,27 @@ namespace Gestion.Colegial.DataAccess.Repositories
             };
             Answer answer = await Read<PR_tbEncargados_ByAlumnoResult>(sql, sqlParameters);
             return answer;
+        }
+
+        public async Task<Answer> Vincular(int Enc_Id, int Alu_Id, int Par_Id)
+        {
+            const string sql = "PR_tbEncargados_Vincular";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ ParameterName = "@Enc_Id", DbType = DbType.Int32, Value = Enc_Id },
+                new SqlParameter(){ ParameterName = "@Alu_Id", DbType = DbType.Int32, Value = Alu_Id },
+                new SqlParameter(){ ParameterName = "@Par_Id", DbType = DbType.Int32, Value = Par_Id },
+            };
+            return await Update(sql, sqlParameters);
+        }
+
+        public async Task<Answer> Desvincular(int Enc_Id, int Alu_Id)
+        {
+            const string sql = "PR_tbEncargados_Desvincular";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ ParameterName = "@Enc_Id", DbType = DbType.Int32, Value = Enc_Id },
+                new SqlParameter(){ ParameterName = "@Alu_Id", DbType = DbType.Int32, Value = Alu_Id },
+            };
+            return await Update(sql, sqlParameters);
         }
     }
 }

@@ -145,5 +145,23 @@ namespace Gestion.Colegial.Api.Controllers
             Answer answer = await _encargadoService.ByAlumno(Alu_Id);
             return Ok(answer.Data);
         }
+
+        /// <summary>Liga un encargado existente a un alumno con su parentesco (si ya estaba ligado, cambia el parentesco).</summary>
+        [HttpPost]
+        [Route("VincularAsync")]
+        public async Task<IActionResult> Vincular([FromBody] EncargadoVinculoDto obj)
+        {
+            Answer answer = await _encargadoService.Vincular(obj.Enc_Id, obj.Alu_Id, obj.Par_Id);
+            return Ok(new { answer.Access, Message = answer.Access ? (answer.ErrorDetails ?? "No se pudo ligar al encargado.") : "Encargado ligado." });
+        }
+
+        /// <summary>Quita el vínculo entre un encargado y un alumno (no borra al encargado).</summary>
+        [HttpPost]
+        [Route("DesvincularAsync")]
+        public async Task<IActionResult> Desvincular([FromBody] EncargadoVinculoDto obj)
+        {
+            Answer answer = await _encargadoService.Desvincular(obj.Enc_Id, obj.Alu_Id);
+            return Ok(new { answer.Access, Message = answer.Access ? (answer.ErrorDetails ?? "No se pudo desligar al encargado.") : "Encargado desligado." });
+        }
     }
 }
