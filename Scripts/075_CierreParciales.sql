@@ -199,7 +199,9 @@ BEGIN
     SET NOCOUNT ON;
     IF @Anio IS NULL OR @Sem_Id IS NULL OR @Pac_Id IS NULL RETURN;
 
-    IF EXISTS (SELECT 1 FROM app.tbCierresParcial
+    -- HOLDLOCK: dentro de la transacción de quien escribe la nota, el candado queda tomado hasta el
+    -- COMMIT, así un cierre simultáneo (UPDLOCK en PR_CierresParcial_Cerrar) espera a que termine.
+    IF EXISTS (SELECT 1 FROM app.tbCierresParcial WITH (HOLDLOCK)
                WHERE Cpa_Anio = @Anio AND Sem_Id = @Sem_Id AND Pac_Id = @Pac_Id AND Cpa_Estado = 'cerrado')
     BEGIN
         DECLARE @Mensaje nvarchar(400) = CONCAT(
@@ -256,9 +258,6 @@ BEGIN
         RETURN;
     END
 
-    -- 075: parcial cerrado = no se registran ni cambian notas (THROW 50070)
-    EXEC app.PR_CierresParcial_ValidarAbierto @Anio, @Sem_Id, @Par_Id;
-
     DECLARE @FechaAnio DATE = DATEFROMPARTS(@Anio, 1, 1);
     DECLARE @ExistingId INT = NULL;
 
@@ -274,6 +273,9 @@ BEGIN
 
     BEGIN TRY
         BEGIN TRANSACTION;
+
+        -- 075: parcial cerrado = no se registran ni cambian notas (THROW 50070), dentro de la transacción
+        EXEC app.PR_CierresParcial_ValidarAbierto @Anio, @Sem_Id, @Par_Id;
 
         IF @ExistingId IS NOT NULL
         BEGIN
@@ -306,6 +308,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        IF ERROR_NUMBER() = 50070 THROW;
         SELECT 0 AS CodeResult, 0 AS Not_Id, ERROR_MESSAGE() AS Mensaje;
     END CATCH
 END
@@ -319,11 +322,10 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- 075: parcial cerrado = no se registran ni cambian notas (THROW 50070)
-    EXEC app.PR_CierresParcial_ValidarNota @Not_Id;
-
     BEGIN TRY
         BEGIN TRANSACTION;
+        -- 075: parcial cerrado = no se registran ni cambian notas (THROW 50070), dentro de la transacción
+        EXEC app.PR_CierresParcial_ValidarNota @Not_Id;
         UPDATE [app].[tbNotas]
         SET Not_Nota            = @Not_Calificacion,
             Not_UsuarioModifica = @UsuarioModifica,
@@ -335,6 +337,7 @@ BEGIN
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        IF ERROR_NUMBER() = 50070 THROW;
         SELECT 0 AS CodeResult;
     END CATCH
 END
@@ -345,12 +348,15 @@ CREATE OR ALTER PROCEDURE [dbo].[PR_tbNotas_Delete]
 	@Not_Id INT
 AS
   BEGIN
-          -- 075: parcial cerrado = no se quitan notas (THROW 50070)
+          SET XACT_ABORT ON;
+          BEGIN TRANSACTION;
+          -- 075: parcial cerrado = no se quitan notas (THROW 50070), dentro de la transacción
           EXEC app.PR_CierresParcial_ValidarNota @Not_Id;
 
           UPDATE [app].[tbNotas]
           SET    Not_Eseliminado	= 1
           WHERE  Not_Id 		= @Not_Id
+          COMMIT TRANSACTION;
   END
 GO
 
