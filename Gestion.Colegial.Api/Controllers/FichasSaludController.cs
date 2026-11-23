@@ -52,11 +52,14 @@ namespace Gestion.Colegial.Api.Controllers
         [Route("BitacoraAsync")]
         public async Task<IActionResult> Bitacora(int value) => Ok((await _service.Bitacora(value)).Data);
 
-        /// <summary>Alertas críticas de los alumnos del pase de lista de un horario: solo Alu_Id y Fsa_Alerta.</summary>
+        /// <summary>
+        /// Alertas críticas de los alumnos del pase de lista de un horario: solo Alu_Id y Fsa_Alerta.
+        /// Solo las recibe quien puede pasar lista de ese horario ese día (dirección, titular o suplente).
+        /// </summary>
         [HttpGet]
         [Route("AlertasSeccionAsync")]
-        public async Task<IActionResult> AlertasSeccion(int horId, DateTime? fecha = null) =>
-            Ok((await _service.AlertasSeccion(horId, fecha)).Data);
+        public async Task<IActionResult> AlertasSeccion(int horId, DateTime? fecha = null, int? usuarioId = null) =>
+            Ok((await _service.AlertasSeccion(horId, fecha, usuarioId)).Data);
 
         [HttpPost]
         [Route("GuardarAsync")]

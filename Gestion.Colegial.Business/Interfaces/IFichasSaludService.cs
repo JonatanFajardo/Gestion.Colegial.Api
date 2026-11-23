@@ -10,7 +10,7 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Find(int aluId);
         Task<Answer> Contactos(int aluId);
         Task<Answer> Bitacora(int aluId);
-        Task<Answer> AlertasSeccion(int horId, DateTime? fecha);
+        Task<Answer> AlertasSeccion(int horId, DateTime? fecha, int? usuId);
         Task<Answer> Guardar(FichaSaludGuardarDTO obj);
     }
 }
