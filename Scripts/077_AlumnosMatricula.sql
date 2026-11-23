@@ -42,7 +42,8 @@ BEGIN
 END
 GO
 
-/* Mismo comportamiento; solo vuelve a lanzar el error en vez de callarlo. */
+/* Mismo resultado; vuelve a lanzar el error en vez de callarlo y toma el Id de la persona recién creada
+   (no IDENT_CURRENT, que con altas simultáneas podía tomar el de otra persona). */
 CREATE OR ALTER PROCEDURE [dbo].[PR_tbAlumnos_Insert]
 	@Niv_Id int,
 	@Cun_Id int,
@@ -65,6 +66,8 @@ AS
   BEGIN
 	BEGIN TRANSACTION
 		BEGIN TRY
+		DECLARE @Nueva TABLE (Per_Id DECIMAL(38,0));
+		INSERT INTO @Nueva (Per_Id)
 		 EXEC [PR_tbPersonas_Insert]
 			 @Per_Identidad,
 			 @Per_PrimerNombre,
@@ -79,17 +82,63 @@ AS
 			 @Per_UsuarioRegistra
 
 		DECLARE @Per_Id INT;
-		SET @Per_Id = IDENT_CURRENT('[app].[tbPersonas]');
+		SELECT @Per_Id = CONVERT(INT, Per_Id) FROM @Nueva;  -- el Id que devolvió el alta de persona, no el último de la tabla
 
           INSERT INTO [app].[tbAlumnos]
 					(Per_Id, Niv_Id, Cun_Id, Mda_Id, Cur_Id, Sec_Id, Est_Id, AnioCursado)
           VALUES
 		  			(@Per_Id, @Niv_Id, @Cun_Id, @Mda_Id, @Cur_Id, @Sec_Id, @Est_Id, DATEPART(YEAR, GETDATE()))
+		SELECT @Per_Id AS [SCOPE_IDENTITY];  -- mismo resultado que antes (lo lee el API)
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
 		THROW;
+	END CATCH
+  END
+GO
+
+/* Alta de encargado: mismo comportamiento y resultado; toma el Id de la persona recién creada. */
+CREATE OR ALTER PROCEDURE [dbo].[PR_tbEncargados_Insert]
+	@Enc_Ocupacion varchar(50),
+	@Per_Identidad	varchar(13),
+	@Per_PrimerNombre	nvarchar(50),
+	@Per_SegundoNombre	nvarchar(50),
+	@Per_ApellidoPaterno	nvarchar(50),
+	@Per_ApellidoMaterno	nvarchar(50),
+	@Per_FechaNacimiento	date,
+	@Per_CorreoElectronico	varchar(150),
+	@Per_Telefono	varchar(9),
+	@Per_Direccion	varchar(150),
+	@Per_Sexo	char(1),
+	@Per_UsuarioRegistra	int
+AS
+  BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+		DECLARE @Nueva TABLE (Per_Id DECIMAL(38,0));
+		INSERT INTO @Nueva (Per_Id)
+		 EXEC [PR_tbPersonas_Insert]
+			 @Per_Identidad,
+			 @Per_PrimerNombre,
+			 @Per_SegundoNombre,
+			 @Per_ApellidoPaterno,
+			 @Per_ApellidoMaterno,
+			 @Per_FechaNacimiento,
+			 @Per_CorreoElectronico,
+			 @Per_Telefono,
+			 @Per_Direccion,
+			 @Per_Sexo,
+			 @Per_UsuarioRegistra
+		DECLARE @Per_Id INT;
+		SELECT @Per_Id = CONVERT(INT, Per_Id) FROM @Nueva;
+
+		INSERT INTO [app].[tbEncargados] (Per_Id, Enc_Ocupacion) VALUES (@Per_Id, @Enc_Ocupacion)
+		SELECT @Per_Id AS [SCOPE_IDENTITY];
+		COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION
 	END CATCH
   END
 GO
