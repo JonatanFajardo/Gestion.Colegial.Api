@@ -61,15 +61,26 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await New("app.PR_tbNotas_Insert", p);
         }
 
+        /// <summary>
+        /// app.PR_tbNotas_Update (script 016) recibe @Not_Calificacion (int) y @UsuarioModifica y responde
+        /// CodeResult (1 = guardó). Antes se le mandaban @Not_Nota/@Not_UsuarioModifica y siempre fallaba.
+        /// Si el parcial está cerrado el procedimiento lanza THROW 50070 (queda en Answer).
+        /// </summary>
         public async Task<Answer> Edit(int Not_Id, decimal Not_Nota, int usuarioModifica)
         {
             SqlParameter[] p =
             {
-                new SqlParameter { ParameterName = "@Not_Id",              DbType = DbType.Int32,   Value = Not_Id },
-                new SqlParameter { ParameterName = "@Not_Nota",            DbType = DbType.Decimal, Value = Not_Nota },
-                new SqlParameter { ParameterName = "@Not_UsuarioModifica", DbType = DbType.Int32,   Value = usuarioModifica },
+                new SqlParameter { ParameterName = "@Not_Id",           DbType = DbType.Int32, Value = Not_Id },
+                new SqlParameter { ParameterName = "@Not_Calificacion", DbType = DbType.Int32, Value = (int)Math.Round(Not_Nota, MidpointRounding.AwayFromZero) },
+                new SqlParameter { ParameterName = "@UsuarioModifica",  DbType = DbType.Int32, Value = usuarioModifica },
             };
-            return await Update("app.PR_tbNotas_Update", p);
+            Answer answer = await Search<PR_tbNotas_UpdateResult>("app.PR_tbNotas_Update", p);
+            if (!answer.Access && (answer.Data as PR_tbNotas_UpdateResult)?.CodeResult != 1)
+            {
+                answer.Access = true;
+                answer.Message = "app.PR_tbNotas_Update no guardó la nota (CodeResult 0).";
+            }
+            return answer;
         }
     }
 }
