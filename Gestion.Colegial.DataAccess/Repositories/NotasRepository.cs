@@ -10,14 +10,21 @@ namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class NotasRepository : RepositoryBase, INotasRepository
     {
-        public async Task<Answer> List(int Hor_Id, int Par_Id)
+        public async Task<Answer> List(int Hor_Id, int Par_Id, int Usu_Id)
         {
             SqlParameter[] p =
             {
                 new SqlParameter { ParameterName = "@Hor_Id", DbType = DbType.Int32, Value = Hor_Id },
                 new SqlParameter { ParameterName = "@Par_Id", DbType = DbType.Int32, Value = Par_Id },
+                new SqlParameter { ParameterName = "@Usu_Id", DbType = DbType.Int32, Value = Usu_Id },
             };
             return await SearchAll<NotasCuadernoResult>("app.PR_tbNotas_List", p);
+        }
+
+        public async Task<Answer> Horarios(int Usu_Id)
+        {
+            SqlParameter[] p = { new SqlParameter { ParameterName = "@Usu_Id", DbType = DbType.Int32, Value = Usu_Id } };
+            return await SearchAll<NotasCuadernoHorarioResult>("app.PR_Cuaderno_Horarios", p);
         }
 
         public async Task<Answer> Cuaderno(int Sec_Id, int Mat_Id, int Par_Id, int Sem_Id, int Anio)
@@ -44,21 +51,27 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await SearchAll<NotasBoletinResult>("app.PR_Notas_BoletinAlumno", p);
         }
 
-        public async Task<Answer> Insert(int Alu_Id, int Sec_Id, int Mat_Id, int Sem_Id, int Par_Id,
-                                         decimal Not_Nota, DateTime Not_Año, int usuarioRegistra)
+        /// <summary>
+        /// app.PR_tbNotas_Insert crea la nota o actualiza la que ya existe (mismo alumno, materia, seccion,
+        /// semestre, parcial y año). Si el parcial esta cerrado o el usuario no puede, lanza THROW 5007x.
+        /// </summary>
+        public async Task<Answer> Insert(int Alu_Id, int Hor_Id, int Par_Id, decimal Not_Nota, int usuarioRegistra)
         {
             SqlParameter[] p =
             {
-                new SqlParameter { ParameterName = "@Alu_Id",              DbType = DbType.Int32,   Value = Alu_Id },
-                new SqlParameter { ParameterName = "@Sec_Id",              DbType = DbType.Int32,   Value = Sec_Id },
-                new SqlParameter { ParameterName = "@Mat_Id",              DbType = DbType.Int32,   Value = Mat_Id },
-                new SqlParameter { ParameterName = "@Sem_Id",              DbType = DbType.Int32,   Value = Sem_Id },
-                new SqlParameter { ParameterName = "@Par_Id",              DbType = DbType.Int32,   Value = Par_Id },
-                new SqlParameter { ParameterName = "@Not_Nota",            DbType = DbType.Decimal, Value = Not_Nota },
-                new SqlParameter { ParameterName = "@Not_Año",             DbType = DbType.Date,    Value = Not_Año },
-                new SqlParameter { ParameterName = "@Not_UsuarioRegistra", DbType = DbType.Int32,   Value = usuarioRegistra },
+                new SqlParameter { ParameterName = "@Alu_Id",           DbType = DbType.Int32, Value = Alu_Id },
+                new SqlParameter { ParameterName = "@Hor_Id",           DbType = DbType.Int32, Value = Hor_Id },
+                new SqlParameter { ParameterName = "@Par_Id",           DbType = DbType.Int32, Value = Par_Id },
+                new SqlParameter { ParameterName = "@Not_Calificacion", DbType = DbType.Int32, Value = (int)Math.Round(Not_Nota, MidpointRounding.AwayFromZero) },
+                new SqlParameter { ParameterName = "@UsuarioRegistra",  DbType = DbType.Int32, Value = usuarioRegistra },
             };
-            return await New("app.PR_tbNotas_Insert", p);
+            Answer answer = await Search<PR_tbNotas_InsertResult>("app.PR_tbNotas_Insert", p);
+            if (!answer.Access && (answer.Data as PR_tbNotas_InsertResult)?.CodeResult != 1)
+            {
+                answer.Access = true;
+                answer.Message = (answer.Data as PR_tbNotas_InsertResult)?.Mensaje ?? "No se guardo la nota.";
+            }
+            return answer;
         }
 
         /// <summary>

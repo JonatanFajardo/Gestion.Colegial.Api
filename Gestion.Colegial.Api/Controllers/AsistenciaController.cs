@@ -1,7 +1,9 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Entities.Entities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Gestion.Colegial.Api.Seguridad;
 
@@ -20,6 +22,23 @@ namespace Gestion.Colegial.Api.Controllers
         {
             Answer answer = await _service.List(Hor_Id, Fecha);
             return Ok(answer.Data);
+        }
+
+        /// <summary>Horarios que ve el usuario para pasar lista en una fecha (dirección: todos; docente: los suyos y los que cubre).</summary>
+        [HttpGet("HorariosAsync")]
+        public async Task<IActionResult> Horarios(int Usu_Id, DateTime Fecha, int? Niv_Id, int? Cun_Id, int? Sec_Id)
+        {
+            Answer answer = await _service.Horarios(Usu_Id, Fecha, Niv_Id, Cun_Id, Sec_Id);
+            return Ok(answer.Data);
+        }
+
+        /// <summary>¿Puede este usuario pasar lista de este horario en esta fecha?</summary>
+        [HttpGet("PuedeAsync")]
+        public async Task<IActionResult> Puede(int Usu_Id, int Hor_Id, DateTime Fecha)
+        {
+            Answer answer = await _service.Puede(Usu_Id, Hor_Id, Fecha);
+            var fila = (answer.Data as System.Collections.IEnumerable)?.Cast<PR_Asistencia_PuedeResult>().FirstOrDefault();
+            return Ok(new { Puede = fila != null && fila.Puede });
         }
 
         [HttpGet("ByAlumnoAsync")]

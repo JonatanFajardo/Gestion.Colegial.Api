@@ -21,6 +21,32 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await SearchAll<PR_tbAsistencia_ListResult>(sql, parameters);
         }
 
+        public async Task<Answer> Horarios(int Usu_Id, DateTime Fecha, int? Niv_Id, int? Cun_Id, int? Sec_Id)
+        {
+            const string sql = "app.PR_Asistencia_Horarios";
+            SqlParameter[] parameters =
+            {
+                new SqlParameter { ParameterName = "@Usu_Id", DbType = DbType.Int32, Value = Usu_Id },
+                new SqlParameter { ParameterName = "@Fecha",  DbType = DbType.Date,  Value = Fecha },
+                new SqlParameter { ParameterName = "@Niv_Id", DbType = DbType.Int32, Value = (object)Niv_Id ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@Cun_Id", DbType = DbType.Int32, Value = (object)Cun_Id ?? DBNull.Value },
+                new SqlParameter { ParameterName = "@Sec_Id", DbType = DbType.Int32, Value = (object)Sec_Id ?? DBNull.Value },
+            };
+            return await SearchAll<PR_Asistencia_HorariosResult>(sql, parameters);
+        }
+
+        public async Task<Answer> Puede(int Usu_Id, int Hor_Id, DateTime Fecha)
+        {
+            const string sql = "app.PR_Asistencia_Puede";
+            SqlParameter[] parameters =
+            {
+                new SqlParameter { ParameterName = "@Usu_Id", DbType = DbType.Int32, Value = Usu_Id },
+                new SqlParameter { ParameterName = "@Hor_Id", DbType = DbType.Int32, Value = Hor_Id },
+                new SqlParameter { ParameterName = "@Fecha",  DbType = DbType.Date,  Value = Fecha },
+            };
+            return await SearchAll<PR_Asistencia_PuedeResult>(sql, parameters);
+        }
+
         public async Task<Answer> ByAlumno(int Alu_Id, int? Anio)
         {
             const string sql = "app.PR_tbAsistencia_ByAlumno";

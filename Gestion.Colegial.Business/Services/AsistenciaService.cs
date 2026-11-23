@@ -31,6 +31,12 @@ namespace Gestion.Colegial.Business.Services
         public Task<Answer> List(int Hor_Id, DateTime Fecha)
             => Wrap(_r.List(Hor_Id, Fecha));
 
+        public Task<Answer> Horarios(int Usu_Id, DateTime Fecha, int? Niv_Id, int? Cun_Id, int? Sec_Id)
+            => Wrap(_r.Horarios(Usu_Id, Fecha, Niv_Id, Cun_Id, Sec_Id));
+
+        public Task<Answer> Puede(int Usu_Id, int Hor_Id, DateTime Fecha)
+            => Wrap(_r.Puede(Usu_Id, Hor_Id, Fecha));
+
         public Task<Answer> ByAlumno(int Alu_Id, int? Anio)
             => Wrap(_r.ByAlumno(Alu_Id, Anio));
 

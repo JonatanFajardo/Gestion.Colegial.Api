@@ -45,9 +45,9 @@ namespace Gestion.Colegial.DataAccess.Repositories
         public async Task<Answer> Bitacora(int aluId) =>
             await Read<PR_tbFichasSaludBitacora_ListResult>("app.PR_tbFichasSaludBitacora_List", new[] { Entero("@Alu_Id", aluId) });
 
-        public async Task<Answer> AlertasSeccion(int horId, DateTime? fecha) =>
+        public async Task<Answer> AlertasSeccion(int horId, DateTime? fecha, int? usuId) =>
             await Read<PR_tbFichasSalud_AlertasSeccionResult>("app.PR_tbFichasSalud_AlertasSeccion",
-                new[] { Entero("@Hor_Id", horId), Fecha("@Fecha", fecha) });
+                new[] { Entero("@Hor_Id", horId), Fecha("@Fecha", fecha), Entero("@Usu_Id", usuId) });
 
         public async Task<Answer> Guardar(FichaSaludGuardarDTO obj)
         {
