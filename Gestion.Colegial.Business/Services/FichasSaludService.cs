@@ -109,7 +109,7 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Bitacora(int aluId) => Revisar(await _repository.Bitacora(aluId));
 
-        public async Task<Answer> AlertasSeccion(int horId, DateTime? fecha) => Revisar(await _repository.AlertasSeccion(horId, fecha));
+        public async Task<Answer> AlertasSeccion(int horId, DateTime? fecha, int? usuId) => Revisar(await _repository.AlertasSeccion(horId, fecha, usuId));
 
         public async Task<Answer> Guardar(FichaSaludGuardarDTO obj)
         {
