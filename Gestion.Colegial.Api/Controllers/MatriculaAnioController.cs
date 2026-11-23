@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -70,6 +71,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Crea las secciones del año que faltan según la ubicación de los alumnos (aniId vacío = año activo).</summary>
         [HttpPost]
         [Route("CrearSeccionesDesdeUbicacionAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "usuario")]
         public async Task<IActionResult> CrearSeccionesDesdeUbicacion(int? aniId, int? aluId, int? usuario)
         {
             Answer answer = await _matriculaAnioService.CrearSeccionesDesdeUbicacion(aniId, aluId, usuario);
@@ -79,6 +81,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Inscribe en el año (en lote, o solo aluId) según la ubicación; opcionalmente crea secciones y pasa de Graduado a Activo.</summary>
         [HttpPost]
         [Route("InscribirDesdeUbicacionAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "usuario")]
         public async Task<IActionResult> InscribirDesdeUbicacion(int? aniId, int? aluId, bool crearSecciones = true, bool activarEstado = true, int? usuario = null)
         {
             Answer answer = await _matriculaAnioService.InscribirDesdeUbicacion(aniId, aluId, crearSecciones, activarEstado, usuario);

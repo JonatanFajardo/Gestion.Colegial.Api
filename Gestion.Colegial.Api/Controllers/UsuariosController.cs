@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
@@ -42,6 +43,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
+        [RequierePantalla("Listado de usuarios")]
         public async Task<IActionResult> Create(tbUsuarios entity)
         {
             Answer answer = await _usuarioService.Create(entity);
@@ -50,6 +52,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("EditAsync")]
+        [RequierePantalla("Listado de usuarios")]
         public async Task<IActionResult> Edit(tbUsuarios entity)
         {
             Answer answer = await _usuarioService.Edit(entity);
@@ -75,6 +78,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("RemoveAsync")]
+        [RequierePantalla("Listado de usuarios")]
         public async Task<IActionResult> Remove(int value)
         {
             Answer answer = await _usuarioService.Delete(value);

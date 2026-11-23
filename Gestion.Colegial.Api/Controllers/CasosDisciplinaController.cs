@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -14,6 +15,9 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "usuId", "Usuario")]
+    [DatoDelServidor(DatoUsuario.Empleado, "empId")]
+    [PermisoDelServidor("Ver casos reservados", "verReservados")]
     public class CasosDisciplinaController : ControllerBase
     {
         private readonly ICasosDisciplinaService _service;
@@ -81,6 +85,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("RegistrarAsync")]
+        [RequierePantalla("Registrar caso de disciplina")]
         public async Task<IActionResult> Registrar([FromBody] CasoDisciplinaRegistrarDTO obj)
         {
             Answer answer = await _service.Registrar(obj);
@@ -91,6 +96,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CambiarEstadoAsync")]
+        [RequierePantalla("Atender casos de disciplina")]
         public async Task<IActionResult> CambiarEstado([FromBody] CasoDisciplinaEstadoDTO obj)
         {
             Answer answer = await _service.CambiarEstado(obj);
@@ -101,6 +107,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("AgregarAccionAsync")]
+        [RequierePantalla("Atender casos de disciplina")]
         public async Task<IActionResult> AgregarAccion([FromBody] CasoDisciplinaAccionDTO obj)
         {
             Answer answer = await _service.AgregarAccion(obj);
@@ -111,6 +118,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CompletarAccionAsync")]
+        [RequierePantalla("Atender casos de disciplina")]
         public async Task<IActionResult> CompletarAccion(int casId, int cacId, int? usuario = null)
         {
             Answer answer = await _service.CompletarAccion(casId, cacId, usuario);
@@ -121,6 +129,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("AgregarNotaAsync")]
+        [RequierePantalla("Atender casos de disciplina")]
         public async Task<IActionResult> AgregarNota([FromBody] CasoDisciplinaNotaDTO obj)
         {
             Answer answer = await _service.AgregarNota(obj);

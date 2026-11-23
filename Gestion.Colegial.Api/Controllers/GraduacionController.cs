@@ -1,6 +1,7 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -36,6 +37,8 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("GraduarAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "usuarioId")]
+        [RequierePantalla("Graduación de Alumnos")]
         public async Task<IActionResult> Graduar([FromQuery] int alumnoId, [FromQuery] int usuarioId)
         {
             if (alumnoId <= 0) return BadRequest("alumnoId requerido.");
@@ -55,6 +58,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("BackfillAsync")]
+        [RequierePantalla("Graduación de Alumnos")]
         public async Task<IActionResult> Backfill(
             [FromQuery] int? anio = null,
             [FromQuery] int topN = 50,

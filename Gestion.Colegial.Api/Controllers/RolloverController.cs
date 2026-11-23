@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Arrastra la estructura del año <paramref name="origen"/> al año <paramref name="destino"/> (ambos = Ani_Anio).</summary>
         [HttpPost]
         [Route("RollForwardAsync")]
+        [RequierePantalla("Rollover de año lectivo")]
         public async Task<IActionResult> RollForward(int origen, int destino)
         {
             Answer answer = await _rolloverService.RollForward(origen, destino);

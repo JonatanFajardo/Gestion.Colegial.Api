@@ -2,11 +2,13 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "UsuarioModifica", "usuarioId")]
     public class ConfiguracionController : ControllerBase
     {
         private readonly IConfiguracionService _service;

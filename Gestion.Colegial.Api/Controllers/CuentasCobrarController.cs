@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Microsoft.AspNetCore.Mvc;
 using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -24,6 +25,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// </summary>
         [HttpPost]
         [Route("PerdonarAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> Perdonar([FromBody] CuentaCobrarPerdonarDto entity)
         {
             Answer answer = await _correcciones.PerdonarCargo(entity);
@@ -152,6 +154,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GenerarMensualidadAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> GenerarMensualidad([FromBody] GenerarMensualidadRequestDto request)
         {
             Answer answer = await _cuentaCobrarService.GenerarMensualidad(request);
@@ -160,6 +163,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GenerarMensualidadesRangoAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> GenerarMensualidadesRango([FromBody] GenerarMensualidadesRangoRequestDto request)
         {
             Answer answer = await _cuentaCobrarService.GenerarMensualidadesRango(request);

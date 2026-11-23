@@ -1,4 +1,5 @@
 using Gestion.Colegial.Api.Controllers;
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
 using Gestion.Colegial.Business.Mapping;
@@ -26,7 +27,18 @@ builder.Host.UseSerilog((context, configuration) =>
 // Configure AutoMapper
 builder.Services.AddAutoMapper(typeof(DtoMappingProfile));
 
-builder.Services.AddControllers().AddJsonOptions(opts =>
+// Llave compartida con el ADM (GC_API_KEY). Sin ella la API se comporta como antes.
+var opcionesSeguridad = new OpcionesSeguridad(builder.Configuration[OpcionesSeguridad.VariableLlave]);
+builder.Services.AddSingleton(opcionesSeguridad);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IUsuarioActual, UsuarioActual>();
+
+builder.Services.AddControllers(opts =>
+{
+    // Usuario, empleado, rol y banderas de permiso los pone el servidor (ver Seguridad/ReglasServidor.cs).
+    opts.Filters.Add<ReglasServidorFilter>();
+}).AddJsonOptions(opts =>
 {
     // Preservar nombres de propiedades tal cual están definidos en los entities (PascalCase / snake_case con underscore).
     // Los JS del ADM esperan los nombres EXACTOS de las columnas del SP (ej: Alu_NombreCompleto).
@@ -35,7 +47,31 @@ builder.Services.AddControllers().AddJsonOptions(opts =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Para probar desde Swagger con la llave configurada: botón "Authorize" → X-Api-Key.
+    c.AddSecurityDefinition("LlaveApi", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = OpcionesSeguridad.EncabezadoLlave,
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Description = "Valor de GC_API_KEY"
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "LlaveApi"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 //builder.Services.AddDbContext<DB_OdoremContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ODOREM")));
 //var s = builder.Configuration.GetConnectionString("ODOREM");
 
@@ -345,6 +381,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+// Llave de la API y usuario firmado (ver docs/seguridad-api.md).
+if (!opcionesSeguridad.Activa)
+{
+    app.Logger.LogWarning("GC_API_KEY no está configurada: la API acepta llamadas sin llave y cree el usuario que le mandan. Configúrela fuera de desarrollo.");
+}
+app.UseMiddleware<LlaveApiMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

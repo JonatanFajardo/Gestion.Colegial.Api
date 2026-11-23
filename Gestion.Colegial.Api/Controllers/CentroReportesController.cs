@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
@@ -14,6 +15,7 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "usuId", "Usu_Id")]
     public class CentroReportesController : ControllerBase
     {
         private readonly ICentroReportesService _service;

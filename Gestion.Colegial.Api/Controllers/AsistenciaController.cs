@@ -5,11 +5,13 @@ using Gestion.Colegial.Entities.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "UsuarioRegistra", "UsuarioModifica", "Usu_Id")]
     public class AsistenciaController : ControllerBase
     {
         private readonly IAsistenciaService _service;

@@ -3,6 +3,7 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -13,6 +14,7 @@ namespace Gestion.Colegial.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "Usuario")]
     public class AspirantesController : ControllerBase
     {
         private readonly IAspirantesService _service;
@@ -66,6 +68,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GuardarAsync")]
+        [RequierePantalla("Gestionar lista de espera")]
         public async Task<IActionResult> Guardar([FromBody] AspiranteGuardarDTO obj)
         {
             Answer answer = await _service.Guardar(obj);
@@ -81,6 +84,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>ofrecer | rechazar | desistio | reactivar.</summary>
         [HttpPost]
         [Route("CambiarEstadoAsync")]
+        [RequierePantalla("Gestionar lista de espera")]
         public async Task<IActionResult> CambiarEstado([FromBody] AspiranteEstadoDTO obj)
         {
             Answer answer = await _service.CambiarEstado(obj);
@@ -96,6 +100,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>El wizard de Matrícula creó al alumno: el aspirante (con oferta) pasa a Matriculado.</summary>
         [HttpPost]
         [Route("MatricularAsync")]
+        [RequierePantalla("Gestionar lista de espera")]
         public async Task<IActionResult> Matricular([FromBody] AspiranteMatricularDTO obj)
         {
             Answer answer = await _service.Matricular(obj);

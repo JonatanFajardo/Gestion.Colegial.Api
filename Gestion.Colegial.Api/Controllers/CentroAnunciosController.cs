@@ -3,11 +3,13 @@ using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    [DatoDelServidor(DatoUsuario.Usuario, "UsuarioRegistra", "UsuarioModifica")]
     public class CentroAnunciosController : ControllerBase
     {
         private readonly ICentroAnunciosService _service;

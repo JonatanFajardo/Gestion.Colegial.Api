@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces.ModuloFinanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
 using Microsoft.AspNetCore.Mvc;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -31,6 +32,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("DevolverAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> Devolver([FromBody] SaldoFavorDevolverDto entity)
         {
             Answer answer = await _service.DevolverSaldoFavor(entity);
@@ -39,6 +41,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("AplicarAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
         public async Task<IActionResult> Aplicar([FromBody] SaldoFavorAplicarDto entity)
         {
             Answer answer = await _service.AplicarSaldoFavor(entity);

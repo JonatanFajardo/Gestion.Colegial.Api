@@ -2,6 +2,7 @@ using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Gestion.Colegial.Api.Seguridad;
 
 namespace Gestion.Colegial.Api.Controllers
 {
@@ -13,6 +14,7 @@ namespace Gestion.Colegial.Api.Controllers
         public DashboardCajeroController(IDashboardCajeroService service) { _service = service; }
 
         [HttpGet("ResumenAsync")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id")]
         public async Task<IActionResult> Resumen(int Usu_Id, DateTime? Fecha)
         {
             Answer answer = await _service.Resumen(Usu_Id, Fecha);
