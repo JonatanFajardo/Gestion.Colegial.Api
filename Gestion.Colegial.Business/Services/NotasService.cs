@@ -50,8 +50,11 @@ namespace Gestion.Colegial.Business.Services
 
         private static Answer Rechazo(string mensaje) => new Answer { Access = true, Message = mensaje, Data = "" };
 
-        public Task<Answer> List(int Hor_Id, int Par_Id)
-            => Wrap(_r.List(Hor_Id, Par_Id));
+        public Task<Answer> List(int Hor_Id, int Par_Id, int Usu_Id)
+            => Wrap(_r.List(Hor_Id, Par_Id, Usu_Id));
+
+        public Task<Answer> Horarios(int Usu_Id)
+            => Wrap(_r.Horarios(Usu_Id));
 
         public Task<Answer> Cuaderno(int Sec_Id, int Mat_Id, int Par_Id, int Sem_Id, int Anio)
             => Wrap(_r.Cuaderno(Sec_Id, Mat_Id, Par_Id, Sem_Id, Anio));
@@ -59,13 +62,10 @@ namespace Gestion.Colegial.Business.Services
         public Task<Answer> Boletin(int Alu_Id, int Sem_Id, int Anio)
             => Wrap(_r.Boletin(Alu_Id, Sem_Id, Anio));
 
-        public async Task<Answer> Insert(int Alu_Id, int Sec_Id, int Mat_Id, int Sem_Id, int Par_Id,
-                                   decimal Not_Nota, DateTime Not_Año, int usuarioRegistra)
+        public async Task<Answer> Insert(int Alu_Id, int Hor_Id, int Par_Id, decimal Not_Nota, int usuarioRegistra)
         {
-            string cerrado = await PeriodoCerrado(Not_Año.Year, Sem_Id, Par_Id, null);
-            if (cerrado != null) return Rechazo(cerrado);
-            return await Wrap(_r.Insert(Alu_Id, Sec_Id, Mat_Id, Sem_Id, Par_Id, Not_Nota, Not_Año, usuarioRegistra),
-                              MessageShow.SuccessSave);
+            // El procedimiento revisa el cierre del parcial dentro de la transaccion (THROW 50070).
+            return await Wrap(_r.Insert(Alu_Id, Hor_Id, Par_Id, Not_Nota, usuarioRegistra), MessageShow.SuccessSave);
         }
 
         public async Task<Answer> Edit(int Not_Id, decimal Not_Nota, int usuarioModifica)

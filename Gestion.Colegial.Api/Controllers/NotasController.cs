@@ -14,9 +14,18 @@ namespace Gestion.Colegial.Api.Controllers
         public NotasController(INotasService service) { _service = service; }
 
         [HttpGet("ListAsync")]
-        public async Task<IActionResult> List(int Hor_Id, int Par_Id)
+        public async Task<IActionResult> List(int Hor_Id, int Par_Id, int Usu_Id)
         {
-            Answer answer = await _service.List(Hor_Id, Par_Id);
+            Answer answer = await _service.List(Hor_Id, Par_Id, Usu_Id);
+            if (answer.Access) return Ok(new { Error = true, answer.Message });
+            return Ok(answer.Data);
+        }
+
+        // Horarios (materia + seccion + semestre) del año activo que el usuario puede capturar.
+        [HttpGet("HorariosAsync")]
+        public async Task<IActionResult> Horarios(int Usu_Id)
+        {
+            Answer answer = await _service.Horarios(Usu_Id);
             return Ok(answer.Data);
         }
 
@@ -38,8 +47,7 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Create([FromBody] NotaCreateRequest request)
         {
             Answer answer = await _service.Insert(
-                request.Alu_Id, request.Sec_Id, request.Mat_Id, request.Sem_Id, request.Par_Id,
-                request.Not_Nota, request.Not_Año, request.UsuarioRegistra);
+                request.Alu_Id, request.Hor_Id, request.Par_Id, request.Not_Nota, request.UsuarioRegistra);
             return Ok(answer);
         }
 
@@ -54,12 +62,9 @@ namespace Gestion.Colegial.Api.Controllers
     public class NotaCreateRequest
     {
         public int Alu_Id { get; set; }
-        public int Sec_Id { get; set; }
-        public int Mat_Id { get; set; }
-        public int Sem_Id { get; set; }
+        public int Hor_Id { get; set; }
         public int Par_Id { get; set; }
         public decimal Not_Nota { get; set; }
-        public DateTime Not_Año { get; set; }
         public int UsuarioRegistra { get; set; }
     }
 
