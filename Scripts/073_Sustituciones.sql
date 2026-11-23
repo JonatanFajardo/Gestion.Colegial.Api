@@ -157,7 +157,7 @@ RETURN
         FROM (
             SELECT TRY_CAST(c.Con_Valor AS int) AS Sem_Id, 0 AS Prioridad
             FROM app.tbConfiguracion c
-            WHERE c.Con_Clave = 'semestre_activo'
+            WHERE c.Con_Clave = 'semestre_activo' AND TRY_CAST(c.Con_Valor AS int) IN (1, 2)
             UNION ALL
             SELECT h.Sem_Id, CASE WHEN h.Sem_Id = CASE WHEN MONTH(@Fecha) <= 6 THEN 1 ELSE 2 END THEN 1 ELSE 2 END
             FROM app.tbHorarios h
