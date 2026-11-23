@@ -189,5 +189,23 @@ namespace Gestion.Colegial.Business.Services
                 return answer;
             }
         }
+
+        public async Task<Answer> Vincular(int Enc_Id, int Alu_Id, int Par_Id)
+        {
+            if (Enc_Id <= 0 || Alu_Id <= 0 || Par_Id <= 0)
+            {
+                return new Answer { Access = true, Message = "Faltan el encargado, el alumno o el parentesco.", ErrorDetails = "Faltan el encargado, el alumno o el parentesco." };
+            }
+            Answer answer = await _repository.Vincular(Enc_Id, Alu_Id, Par_Id);
+            if (answer.Access) Logs.Error(answer);
+            return answer;
+        }
+
+        public async Task<Answer> Desvincular(int Enc_Id, int Alu_Id)
+        {
+            Answer answer = await _repository.Desvincular(Enc_Id, Alu_Id);
+            if (answer.Access) Logs.Error(answer);
+            return answer;
+        }
     }
 }
