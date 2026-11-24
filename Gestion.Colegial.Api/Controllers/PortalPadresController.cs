@@ -76,7 +76,8 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpGet("AnunciosAsync")]
         [RequierePantalla(Portal)]
-        public async Task<IActionResult> Anuncios() => Ok(Lista(await _service.Anuncios()));
+        public async Task<IActionResult> Anuncios(int? usuId) =>
+            Ok(usuId is > 0 ? Lista(await _service.Anuncios(usuId.Value)) : Array.Empty<object>());
 
         [HttpGet("SolicitudesAsync")]
         [RequierePantalla(Portal)]

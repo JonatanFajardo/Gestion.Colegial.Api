@@ -12,7 +12,7 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Asistencia(int usuId, int aluId, int? anio);
         Task<Answer> Cuenta(int usuId, int aluId, int? anio);
         Task<Answer> Calendario(int usuId, int aluId, DateTime desde, DateTime hasta);
-        Task<Answer> Anuncios();
+        Task<Answer> Anuncios(int usuId);
         Task<Answer> Solicitudes(int usuId, int? aluId);
         Task<Answer> SolicitudCrear(PortalSolicitudCrearDTO obj);
         Task<Answer> SolicitudRetirar(PortalSolicitudRetirarDTO obj);

@@ -101,7 +101,7 @@ namespace Gestion.Colegial.Business.Services
             return await _calendario.ParaAlumno(aluId, desde, hasta);
         }
 
-        public async Task<Answer> Anuncios() => await _anuncios.List();
+        public async Task<Answer> Anuncios(int usuId) => await _anuncios.ParaFamilia(usuId);
 
         public async Task<Answer> Solicitudes(int usuId, int? aluId) => Revisar(await _repository.Solicitudes(usuId, aluId));
 
