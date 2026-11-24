@@ -36,6 +36,12 @@ usuario de Asistencia, Notas, Horarios, Plan de clases, Tareas, Entregas, Vacaci
 Mensajes, Configuración, Arqueos, Pagos, Correcciones de caja, Graduación, Matrícula por año,
 Notificaciones, Perfil, Bitácora, Dashboard de caja y cierre de sesión.
 
+Portal de padres (`PortalPadresController`): las lecturas y solicitudes de la familia exigen la pantalla
+`Portal de padres` y reciben el usuario firmado; el procedimiento saca de ahí al encargado
+(`seguridad.tbUsuariosEncargados`) y solo devuelve lo de sus hijos. La bandeja exige `Solicitudes del portal`
+y las invitaciones `Invitaciones al portal`. `InvitacionAsync` y `ActivarAsync` solo piden la llave: las usa
+la página pública de activación, que no tiene sesión.
+
 Además exigen pantalla (admin o el rol que la tenga): crear, editar y quitar usuarios
 (`Listado de usuarios`) y roles con sus pantallas (`Listado de roles`), Dev Tools (`PasoAsync`),
 Rollover de año lectivo y Graduación (graduar y backfill, `Graduación de Alumnos`).
