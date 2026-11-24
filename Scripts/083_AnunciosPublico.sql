@@ -159,6 +159,7 @@ BEGIN
                                FROM app.tbEncargados_tbAlumnos ea
                                INNER JOIN app.tbAlumnos al ON al.Alu_Id = ea.Alu_Id
                                WHERE ea.Enc_Id = @Enc_Id
+                                 AND al.Est_Id <> 3 -- los graduados ya no reciben avisos de su grado
                                  AND al.Niv_Id = a.Anu_NivId
                                  AND (a.Anu_CunId IS NULL OR al.Cun_Id = a.Anu_CunId)
                                  AND (a.Anu_SecId IS NULL OR al.Sec_Id = a.Anu_SecId)))))
