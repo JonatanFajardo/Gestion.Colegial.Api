@@ -3,28 +3,75 @@ using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using System.Data;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Gestion.Colegial.DataAccess.Repositories
 {
     public class UsuarioRepository : RepositoryBase, IUsuarioRepository
     {
-        public async Task<Answer> LoginAsync(string username, string password)
+        /// <summary>Datos del usuario y su huella guardada (por nombre o por Id). La comparación se hace en Business.</summary>
+        public async Task<Answer> DatosLoginAsync(string? usuName, int? usuId)
         {
-            const string sql = "Seguridad.UDP_tbUsuarios_Login";
-
-            // Hash password using SHA256
-            string hashedPassword = HashPassword(password);
-
             SqlParameter[] sqlParameters = {
-                new SqlParameter(){ParameterName= "@Usu_Name", DbType = DbType.String, Value = username },
-                new SqlParameter(){ParameterName= "@Usu_Contrasena", DbType = DbType.String, Value = hashedPassword },
+                Texto("@Usu_Name", usuName, 100),
+                Entero("@Usu_Id", usuId),
             };
+            return await Search<PR_tbUsuarios_DatosLoginResult>("seguridad.PR_tbUsuarios_DatosLogin", sqlParameters);
+        }
 
-            Answer answer = await Search<UDP_tbUsuarios_LoginResult>(sql, sqlParameters);
-            return answer;
+        /// <summary>Único punto para guardar la contraseña de un usuario existente (huella ya calculada).</summary>
+        public async Task<Answer> GuardarContrasenaAsync(int usuId, string huella, string? huellaLegado, string? huellaEsperada,
+            int? bitUsuId, string? bitAccion, string? ip)
+        {
+            SqlParameter[] sqlParameters = {
+                Entero("@Usu_Id", usuId),
+                Ascii("@Contrasena", huella, 255),
+                Ascii("@ContrasenaLegado", huellaLegado, 64),
+                Ascii("@ContrasenaEsperada", huellaEsperada, 255),
+                Entero("@Bit_UsuId", bitUsuId),
+                Ascii("@Bit_Accion", bitAccion, 50),
+                Ascii("@Bit_Ip", ip, 45),
+            };
+            return await Search<PR_FilasResult>("seguridad.PR_tbUsuarios_GuardarContrasena", sqlParameters);
+        }
+
+        /// <summary>Cuenta el intento ANTES de revisar la contraseña (o dice que está bloqueado).</summary>
+        public async Task<Answer> ReservarIntentoAsync(string usuario, string? ip, int maxUsuario, int maxIp, int ventanaMinutos, int bloqueoMinutos)
+        {
+            SqlParameter[] sqlParameters = {
+                Texto("@Usuario", usuario, 100),
+                Ascii("@Ip", ip, 45),
+                Entero("@MaxUsuario", maxUsuario),
+                Entero("@MaxIp", maxIp),
+                Entero("@VentanaMinutos", ventanaMinutos),
+                Entero("@BloqueoMinutos", bloqueoMinutos),
+            };
+            return await Search<PR_tbIntentosLogin_ReservarResult>("seguridad.PR_tbIntentosLogin_Reservar", sqlParameters);
+        }
+
+        /// <summary>Contraseña incorrecta: solo la bitácora (el intento ya se contó al reservarlo).</summary>
+        public async Task<Answer> RegistrarFalloAsync(int? usuId, string? ip, string motivo, bool bloqueoUsuario, bool bloqueoIp, int bloqueoMinutos)
+        {
+            SqlParameter[] sqlParameters = {
+                Entero("@Usu_Id", usuId),
+                Ascii("@Ip", ip, 45),
+                Ascii("@Motivo", motivo, 500),
+                new SqlParameter() { ParameterName = "@BloqueoUsuario", SqlDbType = SqlDbType.Bit, Value = bloqueoUsuario },
+                new SqlParameter() { ParameterName = "@BloqueoIp", SqlDbType = SqlDbType.Bit, Value = bloqueoIp },
+                Entero("@BloqueoMinutos", bloqueoMinutos),
+            };
+            return await Search<PR_FilasResult>("seguridad.PR_tbIntentosLogin_RegistrarFallo", sqlParameters);
+        }
+
+        /// <summary>Contraseña correcta: borra el conteo del usuario y descuenta el intento de la IP.</summary>
+        public async Task<Answer> RegistrarExitoAsync(string usuario, string? ip, int maxIp)
+        {
+            SqlParameter[] sqlParameters = {
+                Texto("@Usuario", usuario, 100),
+                Ascii("@Ip", ip, 45),
+                Entero("@MaxIp", maxIp),
+            };
+            return await Search<PR_FilasResult>("seguridad.PR_tbIntentosLogin_RegistrarExito", sqlParameters);
         }
 
         public async Task<Answer> LoginInAsync(int usuId, string userIp)
@@ -95,11 +142,11 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         public async Task<Answer> Create(tbUsuarios obj)
         {
-            string hashedPassword = HashPassword(obj.Usu_Contraseña ?? "Temporal123");
+            // La huella la calcula UsuarioService (Business/Seguridad/Contrasenas.cs).
             const string sql = "Seguridad.UDP_tbUsuarios_Insert";
             SqlParameter[] sqlParameters = {
                 new SqlParameter(){ParameterName= "@Usu_Name", DbType = DbType.String, Value = obj.Usu_Name},
-                new SqlParameter(){ParameterName= "@Usu_Contrasena", DbType = DbType.String, Value = hashedPassword},
+                new SqlParameter(){ParameterName= "@Usu_Contrasena", DbType = DbType.String, Value = obj.Usu_Contraseña},
                 new SqlParameter(){ParameterName= "@Rol_Id", DbType = DbType.Int32, Value = obj.Rol_Id},
                 new SqlParameter(){ParameterName= "@Emp_Id", DbType = DbType.Int32, Value = obj.Emp_Id}
             };
@@ -150,18 +197,13 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
         // ==================== Helpers ====================
 
-        private string HashPassword(string password)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                StringBuilder builder = new StringBuilder();
-                foreach (byte b in bytes)
-                {
-                    builder.Append(b.ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
+        private static SqlParameter Entero(string nombre, int? valor) =>
+            new SqlParameter() { ParameterName = nombre, SqlDbType = SqlDbType.Int, Value = (object?)valor ?? DBNull.Value };
+
+        private static SqlParameter Texto(string nombre, string? valor, int largo) =>
+            new SqlParameter() { ParameterName = nombre, SqlDbType = SqlDbType.NVarChar, Size = largo, Value = (object?)valor ?? DBNull.Value };
+
+        private static SqlParameter Ascii(string nombre, string? valor, int largo) =>
+            new SqlParameter() { ParameterName = nombre, SqlDbType = SqlDbType.VarChar, Size = largo, Value = (object?)valor ?? DBNull.Value };
     }
 }

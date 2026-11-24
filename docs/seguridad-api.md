@@ -90,3 +90,66 @@ Cualquier otro programa que llame a la API debe mandar `X-Api-Key`. Swagger (sol
 abre sin llave; para probar llamadas use el botón *Authorize* y pegue la llave. Las acciones con reglas
 de usuario responden 401 desde Swagger porque además piden `X-Gc-Usuario` firmado; para probarlas use
 el ADM o una API local sin `GC_API_KEY`.
+
+## Contraseñas e inicio de sesión
+
+### Cómo se guardan
+
+- Formato: `v2$iteraciones$sal$huella` = PBKDF2-HMAC-SHA256, 600 000 iteraciones, sal aleatoria de
+  16 bytes por usuario, huella de 32 bytes (Base64). Se calcula en
+  `Gestion.Colegial.Business/Seguridad/Contrasenas.cs`.
+- Las contraseñas viejas (SHA-256 sin sal, 64 caracteres hexadecimales) se convierten solas al
+  formato nuevo la próxima vez que el usuario entra con la contraseña correcta.
+- Reglas para una contraseña nueva: de 8 a 128 caracteres, sin espacios al inicio o al final y
+  distinta del nombre de usuario.
+
+### Un solo camino para guardar una contraseña
+
+Todo lo que ponga o cambie una contraseña (alta de usuario, cambio en *Mi Perfil*, restablecimiento
+desde *Usuarios*, activación de cuentas del portal de padres) debe:
+
+1. Calcular la huella con `Contrasenas.Crear(clave)` (nunca SHA-256 ni otra fórmula propia).
+2. Para un usuario que ya existe, guardarla con `IUsuarioService.GuardarContrasenaAsync(...)`,
+   que valida las reglas y llama a `seguridad.PR_tbUsuarios_GuardarContrasena`. Ese procedimiento
+   solo acepta el formato `v2$` y puede dejar el registro en la bitácora.
+
+Un procedimiento que cree la cuenta y su contraseña en el mismo paso (por ejemplo, la activación
+del portal) recibe la huella ya calculada con `Contrasenas.Crear`.
+
+### Límite de intentos
+
+| Clave | Por defecto | Qué hace |
+|---|---|---|
+| `Login:MaxFallosUsuario` | 5 | Fallos con el mismo usuario (exista o no) antes de bloquearlo. |
+| `Login:MaxFallosIp` | 20 | Fallos desde la misma IP antes de bloquearla (0 = sin límite por IP). |
+| `Login:VentanaMinutos` | 15 | Tiempo en que se cuentan los fallos. |
+| `Login:BloqueoMinutos` | 15 | Duración del bloqueo. |
+
+- Se configuran en `appsettings.json` o con variables de entorno (`Login__BloqueoMinutos=1`).
+- Los conteos viven en `seguridad.tbIntentosLogin`. Cada intento se cuenta **antes** de revisar
+  la contraseña (`PR_tbIntentosLogin_Reservar`, en un solo paso): así varios intentos al mismo
+  tiempo no pasan del máximo. Si la contraseña es correcta se descuenta: el conteo del usuario se
+  borra y a la IP solo se le quita ese intento (sus fallos siguen contando).
+- Los fallos de usuarios que existen y los bloqueos quedan en `seguridad.tbBitacora`.
+- Mensajes siempre genéricos: "Usuario o contraseña incorrectos." o "Demasiados intentos
+  fallidos. Espere N minutos…", con el mismo tiempo de respuesta exista o no el usuario.
+- `POST Account/Login` responde **200** con `Success = false` cuando no deja entrar, para que el
+  ADM pueda mostrar el mensaje.
+- La IP es la del navegador: el ADM la manda en `IpCliente` (la API solo ve la del ADM). Si el ADM se
+  publica detrás de un proxy (nginx, Cloudflare, etc.), hay que configurar ahí los encabezados
+  reenviados (`ForwardedHeaders`) con la IP del proxy; si no, todos los usuarios comparten la IP
+  del proxy y el límite por IP los bloquearía juntos.
+
+### Transición con el código anterior
+
+Mientras el ADM y la API anteriores sigan usando la misma base, al convertir una contraseña se
+guarda también su huella vieja en `Usu_ContrasenaLegado` y `seguridad.UDP_tbUsuarios_Login` (el
+procedimiento del código anterior) la acepta. Cuando todo corra con el código nuevo, ejecutar
+una vez:
+
+```sql
+EXEC seguridad.PR_tbUsuarios_CerrarTransicionContrasenas;
+```
+
+Borra esas huellas viejas y deja de guardarlas. Correr de nuevo `Scripts/084_LoginSeguro.sql`
+no reabre la transición.

@@ -1,5 +1,6 @@
 using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Seguridad;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
@@ -27,44 +28,70 @@ namespace Gestion.Colegial.Business.Services
             _configuration = configuration;
         }
 
+        public const string MensajeIncorrecto = "Usuario o contraseña incorrectos.";
+
+        /// <summary>
+        /// Inicio de sesión. Mismo mensaje y mismo trabajo (una derivación PBKDF2) exista o no el
+        /// usuario. Los fallos se cuentan por usuario y por IP; al llegar al máximo, se bloquea un rato.
+        /// Una contraseña en formato viejo correcta se vuelve a guardar en el formato nuevo.
+        /// </summary>
         public async Task<Answer> AuthenticateAsync(LoginRequestDTO loginRequest, string userIp)
         {
             var response = new Answer();
 
             try
             {
-                // Autenticar usuario
-                var loginResult = await _usuarioRepository.LoginAsync(loginRequest.Username, loginRequest.Password);
+                string usuario = (loginRequest.Username ?? string.Empty).Trim();
+                if (usuario.Length > 100) usuario = usuario.Substring(0, 100);
+                string clave = loginRequest.Password ?? string.Empty;
 
-                // CORRECCI�N: l�gica invertida (debe ser !loginResult.Access)
-                if (loginResult.Access || loginResult.Data == null)
+                // El intento se cuenta antes de revisar la contraseña (así no se puede probar en paralelo).
+                PR_tbIntentosLogin_ReservarResult? reserva = await ReservarIntento(usuario, userIp);
+                if (reserva == null)
                 {
-                    response.Access = false;
-                    response.Message = "Error de autenticacion";
-                    response.Data = new LoginResponseDTO
-                    {
-                        Success = false,
-                        Message = "Error al conectar con el servidor"
-                    };
-                    return response;
+                    return Rechazo(response, "No se pudo iniciar sesión. Intente de nuevo.");
+                }
+                if (reserva.Permitido != 1)
+                {
+                    return Rechazo(response, MensajeBloqueo(reserva.Segundos));
                 }
 
-                // Ya no usamos FirstOrDefault porque el repositorio ya devuelve un �nico registro
-                var userData = loginResult.Data as UDP_tbUsuarios_LoginResult;
+                var datos = (await _usuarioRepository.DatosLoginAsync(usuario, null)).Data as PR_tbUsuarios_DatosLoginResult;
+                ResultadoContrasena verificacion = Contrasenas.Verificar(clave, datos?.Usu_Contrasena);
 
-                if (userData == null || userData.IsAuthenticated == 0)
+                if (datos == null || !verificacion.Correcta || datos.Habilitado != 1)
                 {
-                    response.Access = false;
-                    response.Data = new LoginResponseDTO
-                    {
-                        Success = false,
-                        Message = userData?.Message ?? "Usuario o contrase�a incorrectos"
-                    };
-                    return response;
+                    string motivo = datos == null ? "Usuario no existe"
+                        : !verificacion.Correcta ? "Contraseña incorrecta"
+                        : "Cuenta inactiva, suspendida o eliminada";
+                    await RegistrarFallo(datos?.Usu_Id, userIp, motivo, reserva);
+                    return Rechazo(response, reserva.Segundos > 0 ? MensajeBloqueo(reserva.Segundos) : MensajeIncorrecto);
                 }
+
+                await _usuarioRepository.RegistrarExitoAsync(usuario, userIp, MaxFallosIp);
+
+                if (verificacion.DebeActualizar)
+                {
+                    // Conversión al formato nuevo. Mientras dure la transición se guarda también la huella
+                    // vieja para que el código anterior siga aceptando a este usuario.
+                    Answer conversion = await _usuarioRepository.GuardarContrasenaAsync(datos.Usu_Id, Contrasenas.Crear(clave),
+                        verificacion.FormatoAnterior ? Contrasenas.HuellaAnterior(clave) : null, datos.Usu_Contrasena, null, null, null);
+                    if (conversion.Access) Logs.Error(conversion);
+                }
+
+                var userData = new UDP_tbUsuarios_LoginResult
+                {
+                    Usu_Id = datos.Usu_Id,
+                    Usu_Name = datos.Usu_Name ?? usuario,
+                    Emp_Id = datos.Emp_Id,
+                    Rol_Id = datos.Rol_Id,
+                    Rol_Nombre = datos.Rol_Nombre ?? string.Empty,
+                    IsAuthenticated = 1,
+                    Message = "Login exitoso"
+                };
 
                 // Registrar login
-                var loginInResult = await _usuarioRepository.LoginInAsync(userData.Usu_Id, userIp);
+                await _usuarioRepository.LoginInAsync(userData.Usu_Id, userIp);
 
                 // Obtener pantallas/permisos del rol
                 var pantallasResult = await _usuarioRepository.GetPantallasByRolAsync(userData.Rol_Id);
@@ -108,11 +135,134 @@ namespace Gestion.Colegial.Business.Services
                 response.Data = new LoginResponseDTO
                 {
                     Success = false,
-                    Message = "Error interno del servidor"
+                    Message = "No se pudo iniciar sesión. Intente de nuevo."
                 };
             }
 
             return response;
+        }
+
+        /// <summary>
+        /// Cambio de la propia contraseña: pide la actual (los fallos cuentan para el bloqueo del
+        /// usuario igual que en el inicio de sesión). Answer.Access = true significa error.
+        /// </summary>
+        public async Task<Answer> CambiarContrasenaAsync(CambiarContrasenaDTO dto)
+        {
+            var answer = new Answer();
+            try
+            {
+                var datos = dto.Usu_Id > 0
+                    ? (await _usuarioRepository.DatosLoginAsync(null, dto.Usu_Id)).Data as PR_tbUsuarios_DatosLoginResult
+                    : null;
+                if (datos == null || datos.Habilitado != 1)
+                {
+                    return Error(answer, "No se encontró la cuenta.");
+                }
+
+                string usuario = datos.Usu_Name ?? string.Empty;
+                PR_tbIntentosLogin_ReservarResult? reserva = await ReservarIntento(usuario, dto.IpCliente);
+                if (reserva == null)
+                {
+                    return Error(answer, "No se pudo cambiar la contraseña.");
+                }
+                if (reserva.Permitido != 1)
+                {
+                    return Error(answer, MensajeBloqueo(reserva.Segundos));
+                }
+
+                if (!Contrasenas.Verificar(dto.ContrasenaActual, datos.Usu_Contrasena).Correcta)
+                {
+                    await RegistrarFallo(datos.Usu_Id, dto.IpCliente, "Cambio de contraseña: la actual no coincide", reserva);
+                    return Error(answer, reserva.Segundos > 0 ? MensajeBloqueo(reserva.Segundos) : "La contraseña actual no es correcta.");
+                }
+                await _usuarioRepository.RegistrarExitoAsync(usuario, dto.IpCliente, MaxFallosIp);
+
+                if (dto.ContrasenaNueva == dto.ContrasenaActual)
+                {
+                    return Error(answer, "La contraseña nueva debe ser distinta de la actual.");
+                }
+
+                return await GuardarContrasenaAsync(datos.Usu_Id, usuario, dto.ContrasenaNueva, datos.Usu_Id,
+                    "Cambio de contraseña", dto.IpCliente);
+            }
+            catch (Exception e)
+            {
+                answer.Incidents(e);
+                Logs.Error(answer);
+                return Error(answer, "No se pudo cambiar la contraseña.");
+            }
+        }
+
+        /// <summary>
+        /// ÚNICO camino para poner una contraseña nueva a un usuario existente (cambio, restablecimiento,
+        /// activación de cuentas): valida las reglas, calcula la huella y la guarda con
+        /// seguridad.PR_tbUsuarios_GuardarContrasena. Answer.Access = true significa error.
+        /// </summary>
+        public async Task<Answer> GuardarContrasenaAsync(int usuId, string usuName, string? nueva, int? actorId, string accion, string? ip)
+        {
+            var answer = new Answer();
+            string? problema = Contrasenas.Validar(nueva, usuName);
+            if (problema != null)
+            {
+                return Error(answer, problema);
+            }
+
+            Answer guardado = await _usuarioRepository.GuardarContrasenaAsync(usuId, Contrasenas.Crear(nueva!), null, null,
+                actorId, accion, ip);
+            if (guardado.Access || guardado.Data is not PR_FilasResult { Filas: > 0 })
+            {
+                Logs.Error(guardado);
+                return Error(answer, "No se pudo guardar la contraseña.");
+            }
+
+            answer.Access = false;
+            answer.Message = "Contraseña actualizada.";
+            return answer;
+        }
+
+        private int MaxFallosUsuario => Limite("Login:MaxFallosUsuario", 5);
+        private int MaxFallosIp => Limite("Login:MaxFallosIp", 20);
+        private int VentanaMinutos => Limite("Login:VentanaMinutos", 15);
+        private int BloqueoMinutos => Limite("Login:BloqueoMinutos", 15);
+
+        private int Limite(string clave, int porDefecto) =>
+            int.TryParse(_configuration[clave], out int valor) && valor >= 0 ? valor : porDefecto;
+
+        /// <summary>Cuenta el intento antes de revisar la contraseña. null = no se pudo (se rechaza).</summary>
+        private async Task<PR_tbIntentosLogin_ReservarResult?> ReservarIntento(string usuario, string? ip)
+        {
+            Answer a = await _usuarioRepository.ReservarIntentoAsync(usuario, ip,
+                MaxFallosUsuario, MaxFallosIp, Math.Max(1, VentanaMinutos), Math.Max(1, BloqueoMinutos));
+            if (a.Access) Logs.Error(a);
+            return a.Data as PR_tbIntentosLogin_ReservarResult;
+        }
+
+        private async Task RegistrarFallo(int? usuId, string? ip, string motivo, PR_tbIntentosLogin_ReservarResult reserva)
+        {
+            Answer a = await _usuarioRepository.RegistrarFalloAsync(usuId, ip, motivo,
+                reserva.BloqueoUsuario == 1, reserva.BloqueoIp == 1, Math.Max(1, BloqueoMinutos));
+            if (a.Access && usuId != null) Logs.Error(a);
+        }
+
+        private static string MensajeBloqueo(int segundos)
+        {
+            int minutos = Math.Max(1, (int)Math.Ceiling(segundos / 60.0));
+            return $"Demasiados intentos fallidos. Espere {minutos} {(minutos == 1 ? "minuto" : "minutos")} e intente de nuevo.";
+        }
+
+        private static Answer Rechazo(Answer response, string mensaje)
+        {
+            response.Access = false;
+            response.Message = mensaje;
+            response.Data = new LoginResponseDTO { Success = false, Message = mensaje };
+            return response;
+        }
+
+        private static Answer Error(Answer answer, string mensaje)
+        {
+            answer.Access = true;
+            answer.Message = mensaje;
+            return answer;
         }
 
 
@@ -195,6 +345,9 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Create(tbUsuarios obj)
         {
+            string? problema = Contrasenas.Validar(obj.Usu_Contraseña, obj.Usu_Name);
+            if (problema != null) return Error(new Answer(), problema);
+            obj.Usu_Contraseña = Contrasenas.Crear(obj.Usu_Contraseña!);
             Answer answer = await _usuarioRepository.Create(obj);
             try
             {
