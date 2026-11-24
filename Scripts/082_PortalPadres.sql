@@ -663,6 +663,11 @@ BEGIN
         THROW 50088, N'No se encontró el encargado.', 1;
     IF NOT EXISTS (SELECT 1 FROM app.tbEncargados_tbAlumnos WHERE Enc_Id = @Enc_Id)
         THROW 50088, N'Este encargado no tiene alumnos ligados; primero lígelo a su hijo.', 1;
+    -- Con la cuenta suspendida el enlace cambiaría la contraseña pero la persona no podría entrar.
+    IF EXISTS (SELECT 1 FROM seguridad.tbUsuariosEncargados ue
+               INNER JOIN seguridad.tbUsuarios u ON u.Usu_Id = ue.Usu_Id
+               WHERE ue.Enc_Id = @Enc_Id AND ISNULL(u.Usu_EsEliminado, 0) = 0 AND ISNULL(u.Usu_Suspendido, 0) = 1)
+        THROW 50088, N'La cuenta de este encargado está suspendida: reactívela antes de mandar un enlace.', 1;
     IF @Horas IS NULL OR @Horas < 1 OR @Horas > 720 SET @Horas = 72;
 
     BEGIN TRAN;
@@ -732,16 +737,19 @@ BEGIN
         RETURN;
     END
 
-    SELECT app.FN_Portal_EstadoInvitacion(i.Inv_Estado, i.Inv_Vence) AS Estado,
-           p.Per_PrimerNombre AS Enc_Nombre,
-           (SELECT STRING_AGG(CAST(pa.Per_PrimerNombre AS nvarchar(max)), N', ')
-            FROM app.tbEncargados_tbAlumnos ea
-            INNER JOIN app.tbAlumnos a ON a.Alu_Id = ea.Alu_Id
-            INNER JOIN app.tbPersonas pa ON pa.Per_Id = a.Per_Id
-            WHERE ea.Enc_Id = i.Enc_Id) AS Hijos,
-           u.Usu_Name AS UsuarioExistente,
-           i.Inv_Vence
+    -- Nombres y usuario solo mientras el enlace sirve (vencido, detenido o usado: solo el estado).
+    SELECT x.Estado,
+           CASE WHEN x.Estado = 'pendiente' THEN p.Per_PrimerNombre END AS Enc_Nombre,
+           CASE WHEN x.Estado = 'pendiente' THEN
+               (SELECT STRING_AGG(CAST(pa.Per_PrimerNombre AS nvarchar(max)), N', ')
+                FROM app.tbEncargados_tbAlumnos ea
+                INNER JOIN app.tbAlumnos a ON a.Alu_Id = ea.Alu_Id
+                INNER JOIN app.tbPersonas pa ON pa.Per_Id = a.Per_Id
+                WHERE ea.Enc_Id = i.Enc_Id) END AS Hijos,
+           CASE WHEN x.Estado = 'pendiente' THEN u.Usu_Name END AS UsuarioExistente,
+           CASE WHEN x.Estado = 'pendiente' THEN i.Inv_Vence END AS Inv_Vence
     FROM app.tbInvitacionesPortal i
+    CROSS APPLY (SELECT app.FN_Portal_EstadoInvitacion(i.Inv_Estado, i.Inv_Vence) AS Estado) x
     INNER JOIN app.tbEncargados e ON e.Enc_Id = i.Enc_Id
     INNER JOIN app.tbPersonas p ON p.Per_Id = e.Per_Id
     LEFT JOIN seguridad.tbUsuariosEncargados ue ON ue.Enc_Id = i.Enc_Id
@@ -768,7 +776,9 @@ BEGIN
     WHERE LOWER(LTRIM(RTRIM(Rol_Descripcion))) = N'encargado' AND Rol_EsEliminado = 0 ORDER BY Rol_Id;
     IF @Rol_Id IS NULL
         THROW 50089, N'El portal de padres no está configurado (falta el rol Encargado).', 1;
-    IF @Usu_Name IS NULL OR LEN(@Usu_Name) < 4 OR @Usu_Name LIKE N'%[^a-zA-Z0-9._-]%'
+    -- Intercalación binaria: con la de la base, [a-z] también deja pasar letras con tilde o la ñ
+    -- (un "jóna" que se confunde con "jona").
+    IF @Usu_Name IS NULL OR LEN(@Usu_Name) < 4 OR @Usu_Name COLLATE Latin1_General_BIN2 LIKE N'%[^-a-zA-Z0-9._]%'
         THROW 50089, N'El usuario debe tener al menos 4 caracteres: letras, números, punto, guion o guion bajo, sin espacios.', 1;
 
     BEGIN TRAN;
