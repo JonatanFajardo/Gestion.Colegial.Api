@@ -1,6 +1,7 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using System.Threading.Tasks;
 using Gestion.Colegial.Api.Seguridad;
 
@@ -32,7 +33,7 @@ namespace Gestion.Colegial.Api.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var userIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+                var userIp = IpDelCliente(loginRequest.IpCliente);
                 _logger.LogDebug("IP del usuario: {UserIp}", userIp);
 
                 var result = await _usuarioService.AuthenticateAsync(loginRequest, userIp);
@@ -44,8 +45,10 @@ namespace Gestion.Colegial.Api.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Login fallido para usuario: {Username}. Mensaje: {Message}", loginRequest.Username, result.Message);
-                    return Unauthorized(result.Data);
+                    // 200 con Success = false: el ADM solo lee el cuerpo de las respuestas correctas y así
+                    // puede mostrar el mensaje (credenciales incorrectas o bloqueo por intentos).
+                    _logger.LogWarning("Login fallido para usuario: {Username} desde {Ip}. Mensaje: {Message}", loginRequest.Username, userIp, result.Message);
+                    return Ok(result.Data);
                 }
             }
             catch (Exception ex)
@@ -53,6 +56,34 @@ namespace Gestion.Colegial.Api.Controllers
                 _logger.LogError(ex, "Error en el proceso de login para usuario: {Username}", loginRequest.Username);
                 return StatusCode(500, new { success = false, message = "Error interno del servidor" });
             }
+        }
+
+        /// <summary>Cambio de la propia contraseña (el Usu_Id lo pone la API con el usuario firmado).</summary>
+        [HttpPost("CambiarContrasena")]
+        [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id")]
+        public async Task<IActionResult> CambiarContrasena([FromBody] CambiarContrasenaDTO dto)
+        {
+            dto.IpCliente = IpDelCliente(dto.IpCliente);
+            var result = await _usuarioService.CambiarContrasenaAsync(dto);
+            if (result.Access)
+            {
+                return BadRequest(new { Message = result.Message });
+            }
+            return Ok(new { Message = result.Message });
+        }
+
+        /// <summary>
+        /// IP del navegador. La manda el ADM (la API solo ve la del ADM); si no viene o no es una IP
+        /// válida, se usa la de la conexión.
+        /// </summary>
+        private string IpDelCliente(string? enviada)
+        {
+            if (!string.IsNullOrWhiteSpace(enviada) && enviada.Length <= 45 && IPAddress.TryParse(enviada.Trim(), out IPAddress? ip))
+            {
+                return (ip.IsIPv4MappedToIPv6 ? ip.MapToIPv4() : ip).ToString();
+            }
+            IPAddress? conexion = HttpContext.Connection.RemoteIpAddress;
+            return conexion == null ? "Unknown" : (conexion.IsIPv4MappedToIPv6 ? conexion.MapToIPv4() : conexion).ToString();
         }
 
         [HttpPost("Logout")]

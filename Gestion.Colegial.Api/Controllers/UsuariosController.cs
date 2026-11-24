@@ -1,5 +1,6 @@
 using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Seguridad;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,12 @@ namespace Gestion.Colegial.Api.Controllers
     public class UsuariosController : ControllerBase
     {
         private readonly IUsuarioService _usuarioService;
+        private readonly IUsuarioActual _usuarioActual;
 
-        public UsuariosController(IUsuarioService usuarioService)
+        public UsuariosController(IUsuarioService usuarioService, IUsuarioActual usuarioActual)
         {
             _usuarioService = usuarioService;
+            _usuarioActual = usuarioActual;
         }
 
         [HttpGet]
@@ -46,6 +49,12 @@ namespace Gestion.Colegial.Api.Controllers
         [RequierePantalla("Listado de usuarios")]
         public async Task<IActionResult> Create(tbUsuarios entity)
         {
+            // Sin contraseña por omisión: quien crea la cuenta escribe la inicial.
+            string? problema = Contrasenas.Validar(entity.Usu_Contraseña, entity.Usu_Name);
+            if (problema != null)
+            {
+                return BadRequest(new { Message = problema });
+            }
             Answer answer = await _usuarioService.Create(entity);
             return Ok(answer.Data);
         }
@@ -55,7 +64,28 @@ namespace Gestion.Colegial.Api.Controllers
         [RequierePantalla("Listado de usuarios")]
         public async Task<IActionResult> Edit(tbUsuarios entity)
         {
+            // Si viene una contraseña, se restablece (mismo camino que cualquier cambio de contraseña).
+            bool restablece = !string.IsNullOrEmpty(entity.Usu_Contraseña);
+            if (restablece)
+            {
+                string? problema = Contrasenas.Validar(entity.Usu_Contraseña, entity.Usu_Name);
+                if (problema != null)
+                {
+                    return BadRequest(new { Message = problema });
+                }
+            }
+
             Answer answer = await _usuarioService.Edit(entity);
+
+            if (restablece)
+            {
+                Answer clave = await _usuarioService.GuardarContrasenaAsync(entity.Usu_Id, entity.Usu_Name, entity.Usu_Contraseña,
+                    _usuarioActual.UsuId, "Restablecer contraseña", null);
+                if (clave.Access)
+                {
+                    return BadRequest(new { Message = clave.Message });
+                }
+            }
             return Ok(answer.Data);
         }
 

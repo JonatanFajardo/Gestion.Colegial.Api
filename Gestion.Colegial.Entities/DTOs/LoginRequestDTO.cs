@@ -11,5 +11,8 @@ namespace Gestion.Colegial.Entities.DTOs
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
+
+        /// <summary>IP del navegador, tal como la ve el ADM (la API solo ve la del ADM).</summary>
+        public string? IpCliente { get; set; }
     }
 }
