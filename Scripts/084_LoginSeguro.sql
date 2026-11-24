@@ -26,6 +26,8 @@
    - seguridad.tbIntentosLogin cuenta los fallos por usuario ('u:<usuario>') y por IP ('ip:<ip>').
      Al llegar al máximo dentro de la ventana, esa clave queda bloqueada un tiempo. Los números
      (5 por usuario, 20 por IP, ventana y bloqueo de 15 minutos) se configuran en la API.
+   - Cada intento se cuenta ANTES de revisar la contraseña (PR_tbIntentosLogin_Reservar) y se
+     descuenta si resulta correcta: varios intentos simultáneos no pasan del máximo.
    - Los fallos de usuarios que existen y los bloqueos quedan en seguridad.tbBitacora.
 
    Prefijo: Ilo_. Errores 50084.
@@ -267,30 +269,23 @@ END
 GO
 
 /* ─────────────────────────────── Límite de intentos ─────────────────────────────── */
--- Segundos que faltan de bloqueo para ese usuario o esa IP (0 = puede intentar).
-CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_Consultar
-    @Usuario nvarchar(100),
-    @Ip      varchar(45) = NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-    DECLARE @Ahora datetime2(0) = SYSUTCDATETIME();
-    SET @Usuario = LOWER(LTRIM(RTRIM(ISNULL(@Usuario, N''))));
-
-    SELECT ISNULL(MAX(DATEDIFF(SECOND, @Ahora, Ilo_BloqueadoHasta)), 0) AS Segundos
-    FROM seguridad.tbIntentosLogin
-    WHERE Ilo_BloqueadoHasta > @Ahora
-      AND Ilo_Clave IN (N'u:' + @Usuario, N'ip:' + ISNULL(@Ip, ''));
-END
+-- Reemplazado por PR_tbIntentosLogin_Reservar (consultar primero y contar después dejaba pasar
+-- varios intentos simultáneos).
+DROP PROCEDURE IF EXISTS seguridad.PR_tbIntentosLogin_Consultar;
 GO
 
--- Suma un fallo al usuario y a la IP; si llegan al máximo dentro de la ventana, los bloquea.
--- @Usu_Id: el usuario, si existe (para la bitácora). Responde { Segundos } de bloqueo (0 = sigue libre).
-CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_RegistrarFallo
+-- Se llama ANTES de revisar la contraseña. En un solo paso, con las filas tomadas:
+--   - si el usuario o la IP ya están bloqueados, no cuenta nada y responde Permitido = 0;
+--   - si no, cuenta el intento como fallo para el usuario y la IP (si la contraseña resulta
+--     correcta, PR_tbIntentosLogin_RegistrarExito lo descuenta) y, si llegan al máximo, el
+--     bloqueo empieza ya para los siguientes intentos. Este intento sí se revisa.
+-- Así varios intentos al mismo tiempo no pasan del máximo.
+-- Responde { Permitido, Segundos, BloqueoUsuario, BloqueoIp }:
+--   Permitido = 0: Segundos que faltan del bloqueo vigente.
+--   Permitido = 1: Segundos del bloqueo que inició este intento (0 = ninguno) y quién quedó bloqueado.
+CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_Reservar
     @Usuario         nvarchar(100),
     @Ip              varchar(45)  = NULL,
-    @Usu_Id          int          = NULL,
-    @Motivo          varchar(500) = NULL,
     @MaxUsuario      int          = 5,
     @MaxIp           int          = 20,
     @VentanaMinutos  int          = 15,
@@ -302,7 +297,8 @@ BEGIN
     DECLARE @Ahora datetime2(0) = SYSUTCDATETIME();
     DECLARE @Desde datetime2(0) = DATEADD(MINUTE, -@VentanaMinutos, @Ahora);
     DECLARE @Claves TABLE (Clave nvarchar(150) PRIMARY KEY, Maximo int NOT NULL, EsUsuario bit NOT NULL);
-    DECLARE @Bloqueos TABLE (EsUsuario bit NOT NULL, Fallos int NOT NULL);
+    DECLARE @Bloqueos TABLE (EsUsuario bit NOT NULL);
+    DECLARE @Vigente int;
 
     SET @Usuario = LEFT(LOWER(LTRIM(RTRIM(ISNULL(@Usuario, N'')))), 100);
     SET @Ip = NULLIF(LTRIM(RTRIM(@Ip)), '');
@@ -315,57 +311,105 @@ BEGIN
       AND (Ilo_BloqueadoHasta IS NULL OR Ilo_BloqueadoHasta < @Ahora);
 
     BEGIN TRAN;
-        INSERT INTO seguridad.tbIntentosLogin (Ilo_Clave, Ilo_Fallos, Ilo_PrimerFallo, Ilo_UltimoFallo)
-        SELECT c.Clave, 0, @Ahora, @Ahora
+        -- Las claves (existan o no) quedan tomadas hasta el COMMIT: los intentos simultáneos esperan su turno.
+        SELECT @Vigente = MAX(CASE WHEN t.Ilo_BloqueadoHasta > @Ahora THEN DATEDIFF(SECOND, @Ahora, t.Ilo_BloqueadoHasta) END)
         FROM @Claves c
-        WHERE NOT EXISTS (SELECT 1 FROM seguridad.tbIntentosLogin t WITH (UPDLOCK, HOLDLOCK) WHERE t.Ilo_Clave = c.Clave);
+        LEFT JOIN seguridad.tbIntentosLogin t WITH (UPDLOCK, HOLDLOCK) ON t.Ilo_Clave = c.Clave;
 
-        -- Conteo nuevo si la ventana ya pasó o si el bloqueo anterior ya venció.
-        UPDATE t
-        SET Ilo_Fallos         = CASE WHEN t.Ilo_PrimerFallo < @Desde OR t.Ilo_BloqueadoHasta <= @Ahora THEN 1 ELSE t.Ilo_Fallos + 1 END,
-            Ilo_PrimerFallo    = CASE WHEN t.Ilo_PrimerFallo < @Desde OR t.Ilo_BloqueadoHasta <= @Ahora THEN @Ahora ELSE t.Ilo_PrimerFallo END,
-            Ilo_BloqueadoHasta = CASE WHEN t.Ilo_BloqueadoHasta <= @Ahora THEN NULL ELSE t.Ilo_BloqueadoHasta END,
-            Ilo_UltimoFallo    = @Ahora
-        FROM seguridad.tbIntentosLogin t WITH (UPDLOCK, HOLDLOCK)
-        INNER JOIN @Claves c ON c.Clave = t.Ilo_Clave;
-
-        UPDATE t
-        SET Ilo_BloqueadoHasta = DATEADD(MINUTE, @BloqueoMinutos, @Ahora)
-        OUTPUT c.EsUsuario, inserted.Ilo_Fallos INTO @Bloqueos (EsUsuario, Fallos)
-        FROM seguridad.tbIntentosLogin t
-        INNER JOIN @Claves c ON c.Clave = t.Ilo_Clave
-        WHERE t.Ilo_Fallos >= c.Maximo AND t.Ilo_BloqueadoHasta IS NULL;
-
-        IF @Usu_Id IS NOT NULL AND EXISTS (SELECT 1 FROM seguridad.tbUsuarios WHERE Usu_Id = @Usu_Id)
+        IF @Vigente IS NULL
         BEGIN
-            INSERT INTO seguridad.tbBitacora (Usu_Id, Bit_Accion, Bit_Tabla, Bit_RegistroId, Bit_Descripcion, Bit_Ip)
-            VALUES (@Usu_Id, 'Inicio de sesión fallido', 'seguridad.tbUsuarios', @Usu_Id, LEFT(@Motivo, 500), @Ip);
+            INSERT INTO seguridad.tbIntentosLogin (Ilo_Clave, Ilo_Fallos, Ilo_PrimerFallo, Ilo_UltimoFallo)
+            SELECT c.Clave, 0, @Ahora, @Ahora
+            FROM @Claves c
+            WHERE NOT EXISTS (SELECT 1 FROM seguridad.tbIntentosLogin t WITH (UPDLOCK, HOLDLOCK) WHERE t.Ilo_Clave = c.Clave);
 
-            INSERT INTO seguridad.tbBitacora (Usu_Id, Bit_Accion, Bit_Tabla, Bit_RegistroId, Bit_Descripcion, Bit_Ip)
-            SELECT @Usu_Id, 'Inicio de sesión bloqueado', 'seguridad.tbUsuarios', @Usu_Id,
-                   CONCAT('Bloqueado ', @BloqueoMinutos, ' minutos por ', b.Fallos, ' intentos fallidos',
-                          CASE WHEN b.EsUsuario = 1 THEN ' con este usuario.' ELSE ' desde esta IP.' END),
-                   @Ip
-            FROM @Bloqueos b;
+            -- Conteo nuevo si la ventana ya pasó o si hubo un bloqueo (aquí ya vencido).
+            UPDATE t
+            SET Ilo_Fallos         = CASE WHEN t.Ilo_PrimerFallo < @Desde OR t.Ilo_BloqueadoHasta IS NOT NULL THEN 1 ELSE t.Ilo_Fallos + 1 END,
+                Ilo_PrimerFallo    = CASE WHEN t.Ilo_PrimerFallo < @Desde OR t.Ilo_BloqueadoHasta IS NOT NULL THEN @Ahora ELSE t.Ilo_PrimerFallo END,
+                Ilo_BloqueadoHasta = NULL,
+                Ilo_UltimoFallo    = @Ahora
+            FROM seguridad.tbIntentosLogin t
+            INNER JOIN @Claves c ON c.Clave = t.Ilo_Clave;
+
+            UPDATE t
+            SET Ilo_BloqueadoHasta = DATEADD(MINUTE, @BloqueoMinutos, @Ahora)
+            OUTPUT c.EsUsuario INTO @Bloqueos (EsUsuario)
+            FROM seguridad.tbIntentosLogin t
+            INNER JOIN @Claves c ON c.Clave = t.Ilo_Clave
+            WHERE t.Ilo_Fallos >= c.Maximo;
         END
     COMMIT;
 
-    SELECT ISNULL(MAX(DATEDIFF(SECOND, @Ahora, t.Ilo_BloqueadoHasta)), 0) AS Segundos
-    FROM seguridad.tbIntentosLogin t
-    INNER JOIN @Claves c ON c.Clave = t.Ilo_Clave
-    WHERE t.Ilo_BloqueadoHasta > @Ahora;
+    SELECT CAST(CASE WHEN @Vigente IS NULL THEN 1 ELSE 0 END AS int) AS Permitido,
+           ISNULL(@Vigente, CASE WHEN EXISTS (SELECT 1 FROM @Bloqueos) THEN @BloqueoMinutos * 60 ELSE 0 END) AS Segundos,
+           CAST(CASE WHEN EXISTS (SELECT 1 FROM @Bloqueos WHERE EsUsuario = 1) THEN 1 ELSE 0 END AS int) AS BloqueoUsuario,
+           CAST(CASE WHEN EXISTS (SELECT 1 FROM @Bloqueos WHERE EsUsuario = 0) THEN 1 ELSE 0 END AS int) AS BloqueoIp;
 END
 GO
 
--- Entrada correcta: el usuario empieza de cero (la IP no, para que una cuenta propia no sirva
--- para seguir probando otras).
-CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_RegistrarExito
-    @Usuario nvarchar(100)
+-- Contraseña incorrecta (el intento ya se contó en PR_tbIntentosLogin_Reservar): deja el fallo en la
+-- bitácora y, si ese intento inició un bloqueo, también el bloqueo. Solo para usuarios que existen.
+-- Responde { Filas } (registros de bitácora).
+CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_RegistrarFallo
+    @Usu_Id          int          = NULL,
+    @Ip              varchar(45)  = NULL,
+    @Motivo          varchar(500) = NULL,
+    @BloqueoUsuario  bit          = 0,
+    @BloqueoIp       bit          = 0,
+    @BloqueoMinutos  int          = 15
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    DECLARE @Filas int = 0;
+
+    IF @Usu_Id IS NOT NULL AND EXISTS (SELECT 1 FROM seguridad.tbUsuarios WHERE Usu_Id = @Usu_Id)
+    BEGIN
+        BEGIN TRAN;
+            INSERT INTO seguridad.tbBitacora (Usu_Id, Bit_Accion, Bit_Tabla, Bit_RegistroId, Bit_Descripcion, Bit_Ip)
+            VALUES (@Usu_Id, 'Inicio de sesión fallido', 'seguridad.tbUsuarios', @Usu_Id, LEFT(@Motivo, 500), @Ip);
+            SET @Filas = 1;
+
+            INSERT INTO seguridad.tbBitacora (Usu_Id, Bit_Accion, Bit_Tabla, Bit_RegistroId, Bit_Descripcion, Bit_Ip)
+            SELECT @Usu_Id, 'Inicio de sesión bloqueado', 'seguridad.tbUsuarios', @Usu_Id,
+                   CONCAT('Bloqueado ', @BloqueoMinutos, ' minutos por demasiados intentos fallidos', b.Texto), @Ip
+            FROM (SELECT ' con este usuario.' AS Texto WHERE @BloqueoUsuario = 1
+                  UNION ALL
+                  SELECT ' desde esta IP.' WHERE @BloqueoIp = 1) b;
+            SET @Filas += @@ROWCOUNT;
+        COMMIT;
+    END
+
+    SELECT @Filas AS Filas;
+END
+GO
+
+-- Contraseña correcta: el usuario empieza de cero y a la IP se le descuenta el intento reservado
+-- (una entrada correcta no cuenta como fallo, pero tampoco borra los fallos de la IP: una cuenta
+-- propia no sirve para seguir probando otras).
+CREATE OR ALTER PROCEDURE seguridad.PR_tbIntentosLogin_RegistrarExito
+    @Usuario nvarchar(100),
+    @Ip      varchar(45) = NULL,
+    @MaxIp   int         = 20
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    DECLARE @Filas int;
     SET @Usuario = LEFT(LOWER(LTRIM(RTRIM(ISNULL(@Usuario, N'')))), 100);
-    DELETE FROM seguridad.tbIntentosLogin WHERE Ilo_Clave = N'u:' + @Usuario;
-    SELECT @@ROWCOUNT AS Filas;
+    SET @Ip = NULLIF(LTRIM(RTRIM(@Ip)), '');
+
+    BEGIN TRAN;
+        DELETE FROM seguridad.tbIntentosLogin WHERE Ilo_Clave = N'u:' + @Usuario;
+        SET @Filas = @@ROWCOUNT;
+
+        UPDATE seguridad.tbIntentosLogin
+        SET Ilo_Fallos         = Ilo_Fallos - 1,
+            Ilo_BloqueadoHasta = CASE WHEN Ilo_Fallos - 1 < @MaxIp THEN NULL ELSE Ilo_BloqueadoHasta END
+        WHERE Ilo_Clave = N'ip:' + @Ip AND Ilo_Fallos > 0;
+    COMMIT;
+
+    SELECT @Filas AS Filas;
 END
 GO

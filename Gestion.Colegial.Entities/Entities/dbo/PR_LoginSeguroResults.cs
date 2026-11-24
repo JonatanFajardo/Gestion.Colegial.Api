@@ -13,10 +13,16 @@ namespace Gestion.Colegial.Entities.Entities
         public int Habilitado { get; set; }
     }
 
-    /// <summary>Segundos de bloqueo que faltan (0 = puede intentar).</summary>
-    public class PR_tbIntentosLogin_SegundosResult
+    /// <summary>
+    /// seguridad.PR_tbIntentosLogin_Reservar. Permitido = 0: bloqueado (Segundos = lo que falta).
+    /// Permitido = 1: se puede revisar la contraseña; Segundos &gt; 0 si este intento inició un bloqueo.
+    /// </summary>
+    public class PR_tbIntentosLogin_ReservarResult
     {
+        public int Permitido { get; set; }
         public int Segundos { get; set; }
+        public int BloqueoUsuario { get; set; }
+        public int BloqueoIp { get; set; }
     }
 
     /// <summary>Filas afectadas por el procedimiento.</summary>

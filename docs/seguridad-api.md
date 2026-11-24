@@ -126,8 +126,10 @@ del portal) recibe la huella ya calculada con `Contrasenas.Crear`.
 | `Login:BloqueoMinutos` | 15 | Duración del bloqueo. |
 
 - Se configuran en `appsettings.json` o con variables de entorno (`Login__BloqueoMinutos=1`).
-- Los conteos viven en `seguridad.tbIntentosLogin`. Una entrada correcta borra el conteo del
-  usuario, no el de la IP.
+- Los conteos viven en `seguridad.tbIntentosLogin`. Cada intento se cuenta **antes** de revisar
+  la contraseña (`PR_tbIntentosLogin_Reservar`, en un solo paso): así varios intentos al mismo
+  tiempo no pasan del máximo. Si la contraseña es correcta se descuenta: el conteo del usuario se
+  borra y a la IP solo se le quita ese intento (sus fallos siguen contando).
 - Los fallos de usuarios que existen y los bloqueos quedan en `seguridad.tbBitacora`.
 - Mensajes siempre genéricos: "Usuario o contraseña incorrectos." o "Demasiados intentos
   fallidos. Espere N minutos…", con el mismo tiempo de respuesta exista o no el usuario.

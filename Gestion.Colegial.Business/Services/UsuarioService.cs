@@ -45,10 +45,15 @@ namespace Gestion.Colegial.Business.Services
                 if (usuario.Length > 100) usuario = usuario.Substring(0, 100);
                 string clave = loginRequest.Password ?? string.Empty;
 
-                int bloqueo = await SegundosDeBloqueo(usuario, userIp);
-                if (bloqueo > 0)
+                // El intento se cuenta antes de revisar la contraseña (así no se puede probar en paralelo).
+                PR_tbIntentosLogin_ReservarResult? reserva = await ReservarIntento(usuario, userIp);
+                if (reserva == null)
                 {
-                    return Rechazo(response, MensajeBloqueo(bloqueo));
+                    return Rechazo(response, "No se pudo iniciar sesión. Intente de nuevo.");
+                }
+                if (reserva.Permitido != 1)
+                {
+                    return Rechazo(response, MensajeBloqueo(reserva.Segundos));
                 }
 
                 var datos = (await _usuarioRepository.DatosLoginAsync(usuario, null)).Data as PR_tbUsuarios_DatosLoginResult;
@@ -59,11 +64,11 @@ namespace Gestion.Colegial.Business.Services
                     string motivo = datos == null ? "Usuario no existe"
                         : !verificacion.Correcta ? "Contraseña incorrecta"
                         : "Cuenta inactiva, suspendida o eliminada";
-                    int segundos = await RegistrarFallo(usuario, userIp, datos?.Usu_Id, motivo);
-                    return Rechazo(response, segundos > 0 ? MensajeBloqueo(segundos) : MensajeIncorrecto);
+                    await RegistrarFallo(datos?.Usu_Id, userIp, motivo, reserva);
+                    return Rechazo(response, reserva.Segundos > 0 ? MensajeBloqueo(reserva.Segundos) : MensajeIncorrecto);
                 }
 
-                await _usuarioRepository.RegistrarExitoAsync(usuario);
+                await _usuarioRepository.RegistrarExitoAsync(usuario, userIp, MaxFallosIp);
 
                 if (verificacion.DebeActualizar)
                 {
@@ -155,17 +160,22 @@ namespace Gestion.Colegial.Business.Services
                 }
 
                 string usuario = datos.Usu_Name ?? string.Empty;
-                int bloqueo = await SegundosDeBloqueo(usuario, dto.IpCliente);
-                if (bloqueo > 0)
+                PR_tbIntentosLogin_ReservarResult? reserva = await ReservarIntento(usuario, dto.IpCliente);
+                if (reserva == null)
                 {
-                    return Error(answer, MensajeBloqueo(bloqueo));
+                    return Error(answer, "No se pudo cambiar la contraseña.");
+                }
+                if (reserva.Permitido != 1)
+                {
+                    return Error(answer, MensajeBloqueo(reserva.Segundos));
                 }
 
                 if (!Contrasenas.Verificar(dto.ContrasenaActual, datos.Usu_Contrasena).Correcta)
                 {
-                    int segundos = await RegistrarFallo(usuario, dto.IpCliente, datos.Usu_Id, "Cambio de contraseña: la actual no coincide");
-                    return Error(answer, segundos > 0 ? MensajeBloqueo(segundos) : "La contraseña actual no es correcta.");
+                    await RegistrarFallo(datos.Usu_Id, dto.IpCliente, "Cambio de contraseña: la actual no coincide", reserva);
+                    return Error(answer, reserva.Segundos > 0 ? MensajeBloqueo(reserva.Segundos) : "La contraseña actual no es correcta.");
                 }
+                await _usuarioRepository.RegistrarExitoAsync(usuario, dto.IpCliente, MaxFallosIp);
 
                 if (dto.ContrasenaNueva == dto.ContrasenaActual)
                 {
@@ -218,18 +228,20 @@ namespace Gestion.Colegial.Business.Services
         private int Limite(string clave, int porDefecto) =>
             int.TryParse(_configuration[clave], out int valor) && valor >= 0 ? valor : porDefecto;
 
-        private async Task<int> SegundosDeBloqueo(string usuario, string? ip)
+        /// <summary>Cuenta el intento antes de revisar la contraseña. null = no se pudo (se rechaza).</summary>
+        private async Task<PR_tbIntentosLogin_ReservarResult?> ReservarIntento(string usuario, string? ip)
         {
-            Answer a = await _usuarioRepository.ConsultarBloqueoAsync(usuario, ip);
-            return a.Data is PR_tbIntentosLogin_SegundosResult r ? r.Segundos : 0;
-        }
-
-        private async Task<int> RegistrarFallo(string usuario, string? ip, int? usuId, string motivo)
-        {
-            Answer a = await _usuarioRepository.RegistrarFalloAsync(usuario, ip, usuId, motivo,
+            Answer a = await _usuarioRepository.ReservarIntentoAsync(usuario, ip,
                 MaxFallosUsuario, MaxFallosIp, Math.Max(1, VentanaMinutos), Math.Max(1, BloqueoMinutos));
             if (a.Access) Logs.Error(a);
-            return a.Data is PR_tbIntentosLogin_SegundosResult r ? r.Segundos : 0;
+            return a.Data as PR_tbIntentosLogin_ReservarResult;
+        }
+
+        private async Task RegistrarFallo(int? usuId, string? ip, string motivo, PR_tbIntentosLogin_ReservarResult reserva)
+        {
+            Answer a = await _usuarioRepository.RegistrarFalloAsync(usuId, ip, motivo,
+                reserva.BloqueoUsuario == 1, reserva.BloqueoIp == 1, Math.Max(1, BloqueoMinutos));
+            if (a.Access && usuId != null) Logs.Error(a);
         }
 
         private static string MensajeBloqueo(int segundos)

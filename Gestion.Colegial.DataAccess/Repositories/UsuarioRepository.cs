@@ -35,34 +35,42 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return await Search<PR_FilasResult>("seguridad.PR_tbUsuarios_GuardarContrasena", sqlParameters);
         }
 
-        public async Task<Answer> ConsultarBloqueoAsync(string usuario, string? ip)
+        /// <summary>Cuenta el intento ANTES de revisar la contraseña (o dice que está bloqueado).</summary>
+        public async Task<Answer> ReservarIntentoAsync(string usuario, string? ip, int maxUsuario, int maxIp, int ventanaMinutos, int bloqueoMinutos)
         {
             SqlParameter[] sqlParameters = {
                 Texto("@Usuario", usuario, 100),
                 Ascii("@Ip", ip, 45),
-            };
-            return await Search<PR_tbIntentosLogin_SegundosResult>("seguridad.PR_tbIntentosLogin_Consultar", sqlParameters);
-        }
-
-        public async Task<Answer> RegistrarFalloAsync(string usuario, string? ip, int? usuId, string motivo,
-            int maxUsuario, int maxIp, int ventanaMinutos, int bloqueoMinutos)
-        {
-            SqlParameter[] sqlParameters = {
-                Texto("@Usuario", usuario, 100),
-                Ascii("@Ip", ip, 45),
-                Entero("@Usu_Id", usuId),
-                Ascii("@Motivo", motivo, 500),
                 Entero("@MaxUsuario", maxUsuario),
                 Entero("@MaxIp", maxIp),
                 Entero("@VentanaMinutos", ventanaMinutos),
                 Entero("@BloqueoMinutos", bloqueoMinutos),
             };
-            return await Search<PR_tbIntentosLogin_SegundosResult>("seguridad.PR_tbIntentosLogin_RegistrarFallo", sqlParameters);
+            return await Search<PR_tbIntentosLogin_ReservarResult>("seguridad.PR_tbIntentosLogin_Reservar", sqlParameters);
         }
 
-        public async Task<Answer> RegistrarExitoAsync(string usuario)
+        /// <summary>Contraseña incorrecta: solo la bitácora (el intento ya se contó al reservarlo).</summary>
+        public async Task<Answer> RegistrarFalloAsync(int? usuId, string? ip, string motivo, bool bloqueoUsuario, bool bloqueoIp, int bloqueoMinutos)
         {
-            SqlParameter[] sqlParameters = { Texto("@Usuario", usuario, 100) };
+            SqlParameter[] sqlParameters = {
+                Entero("@Usu_Id", usuId),
+                Ascii("@Ip", ip, 45),
+                Ascii("@Motivo", motivo, 500),
+                new SqlParameter() { ParameterName = "@BloqueoUsuario", SqlDbType = SqlDbType.Bit, Value = bloqueoUsuario },
+                new SqlParameter() { ParameterName = "@BloqueoIp", SqlDbType = SqlDbType.Bit, Value = bloqueoIp },
+                Entero("@BloqueoMinutos", bloqueoMinutos),
+            };
+            return await Search<PR_FilasResult>("seguridad.PR_tbIntentosLogin_RegistrarFallo", sqlParameters);
+        }
+
+        /// <summary>Contraseña correcta: borra el conteo del usuario y descuenta el intento de la IP.</summary>
+        public async Task<Answer> RegistrarExitoAsync(string usuario, string? ip, int maxIp)
+        {
+            SqlParameter[] sqlParameters = {
+                Texto("@Usuario", usuario, 100),
+                Ascii("@Ip", ip, 45),
+                Entero("@MaxIp", maxIp),
+            };
             return await Search<PR_FilasResult>("seguridad.PR_tbIntentosLogin_RegistrarExito", sqlParameters);
         }
 
