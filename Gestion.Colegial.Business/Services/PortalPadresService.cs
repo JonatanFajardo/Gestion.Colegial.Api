@@ -1,5 +1,6 @@
-using Gestion.Colegial.Business.Extensions;
+﻿using Gestion.Colegial.Business.Extensions;
 using Gestion.Colegial.Business.Interfaces;
+using Gestion.Colegial.Business.Seguridad;
 using Gestion.Colegial.DataAccess.Interfaces;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs;
@@ -189,7 +190,7 @@ namespace Gestion.Colegial.Business.Services
                 return Rechazo("La contraseña debe tener al menos 8 caracteres, con letras y números.");
             if (string.IsNullOrWhiteSpace(obj.Usu_Name) || obj.Usu_Name.Trim().Length > 50)
                 return Rechazo("Escriba un nombre de usuario de hasta 50 caracteres.");
-            return Escritura(await _repository.InvitacionAceptar(Huella(obj.Token.ToLowerInvariant()), obj.Usu_Name.Trim(), Huella(clave)),
+            return Escritura(await _repository.InvitacionAceptar(Huella(obj.Token.ToLowerInvariant()), obj.Usu_Name.Trim(), Contrasenas.Crear(clave)),
                 "No se pudo activar la cuenta.");
         }
     }
