@@ -9,8 +9,8 @@
    3. Cinco procedimientos dejan de usar IDENT_CURRENT:
         - PR_tbEmpleados_Insert toma el Id de la persona que devuelve PR_tbPersonas_Insert.
         - PR_tbCursos_tb{CursosNiveles,Materias,Modalidades,Secciones}_Insert reciben un
-          @Cur_Id opcional; sin él usan el curso más reciente que existe (como antes), pero ya no
-          dependen del contador de identidad (que avanza aunque el alta se revierta).
+          @Cur_Id opcional (y, si no viene, el nombre y nivel del curso); sin ninguno usan el curso
+          más reciente (como antes). Ya no dependen del contador de identidad.
    4. Dashboard docente: app.PR_DashboardDocente_Hoy leía app.tbHorario (singular, vacía); ahora lee
       app.tbHorarios, que es la que tiene las clases. Mismas columnas y mismos parámetros.
    Idempotente.
@@ -120,14 +120,18 @@ AS
   END
 GO
 
--- Tablas puente del curso: @Cur_Id es opcional; sin él se usa el curso más reciente que existe.
+-- Tablas puente del curso: se usa @Cur_Id; si no viene, el curso con ese nombre y nivel (el más reciente);
+-- si tampoco, el curso más reciente que existe.
 CREATE OR ALTER PROCEDURE [dbo].[PR_tbCursos_tbCursosNiveles_Insert]
 	@Cun_Id int,
-	@Cur_Id int = NULL
+	@Cur_Id int = NULL,
+	@Cur_Nombre nvarchar(50) = NULL,
+	@Niv_Id int = NULL
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
+				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos] WHERE Cur_Nombre = @Cur_Nombre AND Niv_Id = @Niv_Id));
 				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos]));
 				INSERT INTO [app].[tbCursos_tbCursosNiveles] (Cur_Id, Cun_Id) VALUES (@Cur_Id, @Cun_Id)
 				COMMIT TRAN
@@ -141,11 +145,14 @@ GO
 
 CREATE OR ALTER PROCEDURE [dbo].[PR_tbCursos_tbMaterias_Insert]
 	@Mat_Id int,
-	@Cur_Id int = NULL
+	@Cur_Id int = NULL,
+	@Cur_Nombre nvarchar(50) = NULL,
+	@Niv_Id int = NULL
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
+				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos] WHERE Cur_Nombre = @Cur_Nombre AND Niv_Id = @Niv_Id));
 				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos]));
 				INSERT INTO [app].[tbCursos_tbMaterias] (Cur_Id, Mat_Id) VALUES (@Cur_Id, @Mat_Id)
 				COMMIT TRAN
@@ -159,11 +166,14 @@ GO
 
 CREATE OR ALTER PROCEDURE [dbo].[PR_tbCursos_tbModalidades_Insert]
 	@Mda_Id int,
-	@Cur_Id int = NULL
+	@Cur_Id int = NULL,
+	@Cur_Nombre nvarchar(50) = NULL,
+	@Niv_Id int = NULL
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
+				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos] WHERE Cur_Nombre = @Cur_Nombre AND Niv_Id = @Niv_Id));
 				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos]));
 				INSERT INTO [app].[tbCursos_tbModalidades] (Cur_Id, Mda_Id) VALUES (@Cur_Id, @Mda_Id)
 				COMMIT TRAN
@@ -177,11 +187,14 @@ GO
 
 CREATE OR ALTER PROCEDURE [dbo].[PR_tbCursos_tbSecciones_Insert]
 	@Sec_Id INT,
-	@Cur_Id int = NULL
+	@Cur_Id int = NULL,
+	@Cur_Nombre nvarchar(50) = NULL,
+	@Niv_Id int = NULL
 AS
 	BEGIN
 		BEGIN TRAN
 			BEGIN TRY
+				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos] WHERE Cur_Nombre = @Cur_Nombre AND Niv_Id = @Niv_Id));
 				SET @Cur_Id = ISNULL(@Cur_Id, (SELECT MAX(Cur_Id) FROM [app].[tbCursos]));
 				INSERT INTO [app].[tbCursos_tbSecciones] (Cur_Id, Sec_Id) VALUES (@Cur_Id, @Sec_Id)
 				COMMIT TRAN
