@@ -105,6 +105,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpGet]
         [Route("GetReciboAsync")]
+        [RequierePantalla("Crear pagos|Comprobante de pago|Corregir cuentas")]
         public async Task<IActionResult> GetRecibo(int pagoId)
         {
             Answer answer = await _pagoService.GetRecibo(pagoId);
