@@ -1,3 +1,4 @@
+using Gestion.Colegial.Api.Seguridad;
 using Gestion.Colegial.DataAccess.Interfaces.Finanzas;
 using Gestion.Colegial.Entities;
 using Gestion.Colegial.Entities.DTOs.finansas;
@@ -43,6 +44,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
+        [RequierePantalla("Editar catálogos de cobranza")]
         public async Task<IActionResult> Create([FromBody] ConceptoPagoFindDto entity)
         {
             Answer answer = await _conceptoPagoService.Create(entity);
@@ -51,6 +53,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("EditAsync")]
+        [RequierePantalla("Editar catálogos de cobranza")]
         public async Task<IActionResult> Edit([FromBody] ConceptoPagoFindDto entity)
         {
             Answer answer = await _conceptoPagoService.Edit(entity);
@@ -59,6 +62,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpDelete]
         [Route("DeleteAsync")]
+        [RequierePantalla("Editar catálogos de cobranza")]
         public async Task<IActionResult> Delete(int value)
         {
             Answer answer = await _conceptoPagoService.Delete(value);

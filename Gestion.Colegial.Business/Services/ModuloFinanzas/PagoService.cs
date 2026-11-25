@@ -300,7 +300,22 @@ namespace Gestion.Colegial.Business.Services.ModuloFinanzas
                     var result = answer.Data as PR_tbPagos_GetReciboResult;
                     if (result != null)
                     {
-                        answer.Data = _mapper.Map<PagoDetailDto>(result);
+                        var dto = new ReciboPagoDto
+                        {
+                            ReciboId = result.ReciboId, NumeroRecibo = result.NumeroRecibo, FechaEmision = result.FechaEmision,
+                            PagoId = result.PagoId, FechaPago = result.FechaPago, MontoTotal = result.MontoTotal,
+                            NumeroReferencia = result.NumeroReferencia ?? string.Empty, Observaciones = result.Observaciones ?? string.Empty,
+                            FormaPago = result.FormaPago, AlumnoNombre = result.AlumnoNombre,
+                            AlumnoIdentidad = result.AlumnoIdentidad ?? string.Empty, EncargadoNombre = result.EncargadoNombre ?? string.Empty,
+                            NombreCompletoUsuarioRegistra = result.NombreCompletoUsuarioRegistra, EsAnulado = result.EsAnulado,
+                            MotivoAnulacion = result.MotivoAnulacion ?? string.Empty, FechaAnulacion = result.FechaAnulacion,
+                            SaldoPendiente = result.SaldoPendiente, ColegioNombre = result.ColegioNombre ?? string.Empty,
+                            ColegioTelefono = result.ColegioTelefono ?? string.Empty, ColegioDireccion = result.ColegioDireccion ?? string.Empty
+                        };
+                        if (!string.IsNullOrWhiteSpace(result.Lineas))
+                            dto.Lineas = System.Text.Json.JsonSerializer.Deserialize<List<ReciboLineaDto>>(result.Lineas,
+                                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+                        answer.Data = dto;
                     }
                 }
 

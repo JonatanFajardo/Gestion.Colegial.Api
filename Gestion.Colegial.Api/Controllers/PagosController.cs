@@ -27,6 +27,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("AnularAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Corregir cuentas")]
         public async Task<IActionResult> Anular([FromBody] PagoAnularDto entity)
         {
             Answer answer = await _correcciones.AnularPago(entity);
@@ -84,6 +85,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("CreateAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Crear pagos")]
         public async Task<IActionResult> Create([FromBody] PagoFindDto entity)
         {
             Answer answer = await _pagoService.Create(entity);
@@ -94,6 +96,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpDelete]
         [Route("DeleteAsync")]
+        [RequierePantalla("Eliminar pagos")]
         public async Task<IActionResult> Delete(int value)
         {
             Answer answer = await _pagoService.Delete(value);
@@ -102,6 +105,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpGet]
         [Route("GetReciboAsync")]
+        [RequierePantalla("Crear pagos|Comprobante de pago|Corregir cuentas")]
         public async Task<IActionResult> GetRecibo(int pagoId)
         {
             Answer answer = await _pagoService.GetRecibo(pagoId);
