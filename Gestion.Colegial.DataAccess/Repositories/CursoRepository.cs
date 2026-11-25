@@ -137,7 +137,10 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			foreach (var idModalidades in obj.Mda)
 			{
 				SqlParameter[] sqlParameters = {
-				new SqlParameter(){ParameterName= "@Mda_Id", DbType = DbType.Int32, Value = idModalidades}
+				new SqlParameter(){ParameterName= "@Mda_Id", DbType = DbType.Int32, Value = idModalidades},
+					new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id > 0 ? obj.Cur_Id : (object)DBNull.Value},
+					new SqlParameter(){ParameterName= "@Cur_Nombre", DbType = DbType.String, Value = (object)obj.Cur_Nombre ?? DBNull.Value},
+					new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = obj.Niv_Id > 0 ? obj.Niv_Id : (object)DBNull.Value}
 				};
 				answer = await New(sql, sqlParameters);
 			}
@@ -193,7 +196,10 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			foreach (var idMaterias in obj.Mat)
 			{
 				SqlParameter[] sqlParameters = {
-					new SqlParameter(){ParameterName= "@Mat_Id", DbType = DbType.Int32, Value = idMaterias}
+					new SqlParameter(){ParameterName= "@Mat_Id", DbType = DbType.Int32, Value = idMaterias},
+					new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id > 0 ? obj.Cur_Id : (object)DBNull.Value},
+					new SqlParameter(){ParameterName= "@Cur_Nombre", DbType = DbType.String, Value = (object)obj.Cur_Nombre ?? DBNull.Value},
+					new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = obj.Niv_Id > 0 ? obj.Niv_Id : (object)DBNull.Value}
 				};
 				answer = await New(sql, sqlParameters);
 			}
@@ -248,7 +254,10 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			foreach (var idSecciones in obj.tbCursos_tbSecciones)
 			{
 				SqlParameter[] sqlParameters = {
-				new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = idSecciones}
+				new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = idSecciones},
+					new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id > 0 ? obj.Cur_Id : (object)DBNull.Value},
+					new SqlParameter(){ParameterName= "@Cur_Nombre", DbType = DbType.String, Value = (object)obj.Cur_Nombre ?? DBNull.Value},
+					new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = obj.Niv_Id > 0 ? obj.Niv_Id : (object)DBNull.Value}
 				};
 				answer = await New(sql, sqlParameters);
 			}
@@ -303,7 +312,10 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			foreach (var idCursoNiveles in obj.Cun)
 			{
 				SqlParameter[] sqlParameters = {
-				new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = idCursoNiveles}
+				new SqlParameter(){ParameterName= "@Cun_Id", DbType = DbType.Int32, Value = idCursoNiveles},
+					new SqlParameter(){ParameterName= "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id > 0 ? obj.Cur_Id : (object)DBNull.Value},
+					new SqlParameter(){ParameterName= "@Cur_Nombre", DbType = DbType.String, Value = (object)obj.Cur_Nombre ?? DBNull.Value},
+					new SqlParameter(){ParameterName= "@Niv_Id", DbType = DbType.Int32, Value = obj.Niv_Id > 0 ? obj.Niv_Id : (object)DBNull.Value}
 				};
 				answer = await New(sql, sqlParameters);
 			}

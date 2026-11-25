@@ -14,6 +14,7 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> RegistrarExitoAsync(string usuario, string? ip, int maxIp);
         Task<Answer> LoginInAsync(int usuId, string userIp);
         Task<Answer> LogoutAsync(int usuId);
+        Task<Answer> EstadoSesionAsync(int usuId);
         Task<Answer> GetPantallasByRolAsync(int rolId);
 
         // CRUD

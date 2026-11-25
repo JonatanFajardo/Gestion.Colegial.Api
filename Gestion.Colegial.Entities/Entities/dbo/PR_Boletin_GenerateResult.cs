@@ -14,5 +14,8 @@ namespace Gestion.Colegial.Entities.Entities
         public string Par_Descripcion { get; set; }
         public decimal? Not_Nota { get; set; }
         public int Anio { get; set; }
+        public int? Sem_Id { get; set; }
+        public string Sem_Descripcion { get; set; }
+        public string Par_Nombre { get; set; }
     }
 }

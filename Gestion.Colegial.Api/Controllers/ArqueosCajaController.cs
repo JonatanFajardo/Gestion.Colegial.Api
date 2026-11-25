@@ -38,6 +38,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost("CreateAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id", "UsuarioRegistra")]
+        [RequierePantalla("Arqueo de caja")]
         public async Task<IActionResult> Create([FromBody] ArqueoCajaRequest request)
         {
             Answer answer = await _service.Insert(request.Usu_Id, request.Arq_Fecha, request.Arq_TotalEfectivo, request.Arq_TotalTransferencia, request.Arq_TotalTarjeta, request.Arq_Observaciones, request.UsuarioRegistra);

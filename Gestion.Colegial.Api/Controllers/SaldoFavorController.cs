@@ -33,6 +33,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("DevolverAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Corregir cuentas")]
         public async Task<IActionResult> Devolver([FromBody] SaldoFavorDevolverDto entity)
         {
             Answer answer = await _service.DevolverSaldoFavor(entity);
@@ -42,6 +43,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("AplicarAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Corregir cuentas")]
         public async Task<IActionResult> Aplicar([FromBody] SaldoFavorAplicarDto entity)
         {
             Answer answer = await _service.AplicarSaldoFavor(entity);

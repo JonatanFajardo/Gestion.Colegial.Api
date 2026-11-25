@@ -11,6 +11,15 @@ namespace Gestion.Colegial.Entities.Entities
         public string? Usu_Contrasena { get; set; }
         /// <summary>1 = activo, no suspendido y no eliminado.</summary>
         public int Habilitado { get; set; }
+        /// <summary>Sello de sesión: cambia al cambiar la contraseña, desactivar la cuenta o cambiar el rol.</summary>
+        public string? Usu_SelloSesion { get; set; }
+    }
+
+    /// <summary>seguridad.PR_tbUsuarios_EstadoSesion.</summary>
+    public class PR_tbUsuarios_EstadoSesionResult
+    {
+        public int Habilitado { get; set; }
+        public string? Sello { get; set; }
     }
 
     /// <summary>

@@ -121,7 +121,8 @@ namespace Gestion.Colegial.Business.Services
                         Usu_Name = userData.Usu_Name,
                         Emp_Id = userData.Emp_Id,
                         Rol_Id = userData.Rol_Id,
-                        Rol_Nombre = userData.Rol_Nombre
+                        Rol_Nombre = userData.Rol_Nombre,
+                        Sello = datos.Usu_SelloSesion
                     },
                     Pantallas = pantallas
                 };
@@ -266,30 +267,24 @@ namespace Gestion.Colegial.Business.Services
         }
 
 
+        /// <summary>
+        /// Cierre de sesión: deja la hora en el registro del usuario. Answer.Access = true significa que se
+        /// registró (mismo criterio que usa AccountController.Logout).
+        /// </summary>
         public async Task<Answer> LogoutAsync(int usuId)
         {
             var response = new Answer();
 
             try
             {
-                var logoutResult = await _usuarioRepository.LogoutAsync(usuId);
+                Answer logoutResult = await _usuarioRepository.LogoutAsync(usuId);
 
-                if (logoutResult.Access && logoutResult.Data != null)
+                // Search deja Access = false cuando salió bien y Data con una sola fila.
+                if (!logoutResult.Access && logoutResult.Data is UDP_tbUsuarios_LogoutResult { Success: 1 })
                 {
-                    var dataList = logoutResult.Data as List<UDP_tbUsuarios_LogoutResult>;
-                    var result = dataList?.FirstOrDefault();
-
-                    if (result?.Success == 1)
-                    {
-                        response.Access = true;
-                        response.Message = "Logout exitoso";
-                        response.Data = "Sesion cerrada correctamente";
-                    }
-                    else
-                    {
-                        response.Access = false;
-                        response.Message = "Error al cerrar sesion";
-                    }
+                    response.Access = true;
+                    response.Message = "Logout exitoso";
+                    response.Data = "Sesion cerrada correctamente";
                 }
                 else
                 {
@@ -306,6 +301,14 @@ namespace Gestion.Colegial.Business.Services
             }
 
             return response;
+        }
+
+        /// <summary>Estado de la sesión del usuario: Data = PR_tbUsuarios_EstadoSesionResult (null si la cuenta no existe).</summary>
+        public async Task<Answer> EstadoSesionAsync(int usuId)
+        {
+            Answer a = await _usuarioRepository.EstadoSesionAsync(usuId);
+            if (a.Access && a.Data is string) Logs.Error(a); // error real; "sin fila" deja Data en null
+            return a;
         }
 
         // ==================== CRUD ====================
