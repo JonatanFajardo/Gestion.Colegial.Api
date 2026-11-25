@@ -95,6 +95,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("SetActivoAsync")]
+        [Seguridad.RequierePantalla("Listado de años lectivos")]
         public async Task<IActionResult> SetActivo(int value)
         {
             Answer answer = await _anioLectivoService.SetActivo(value);

@@ -215,6 +215,7 @@ builder.Services.AddScoped<IDocumentosEmitidosRepository, DocumentosEmitidosRepo
 builder.Services.AddScoped<IEscalaNotaRepository, EscalaNotaRepository>();
 builder.Services.AddScoped<IFichasSaludRepository, FichasSaludRepository>();
 builder.Services.AddScoped<IAspirantesRepository, AspirantesRepository>();
+builder.Services.AddScoped<IAnioConexionRepository, AnioConexionRepository>();
 builder.Services.AddScoped<IPlanesApoyoRepository, PlanesApoyoRepository>();
 builder.Services.AddScoped<IPortalPadresRepository, PortalPadresRepository>();
 builder.Services.AddScoped<ISustitucionesRepository, SustitucionesRepository>();
@@ -347,6 +348,7 @@ builder.Services.AddScoped<IDocumentosEmitidosService, DocumentosEmitidosService
 builder.Services.AddScoped<IEscalaNotaService, EscalaNotaService>();
 builder.Services.AddScoped<IFichasSaludService, FichasSaludService>();
 builder.Services.AddScoped<IAspirantesService, AspirantesService>();
+builder.Services.AddScoped<IAnioConexionService, AnioConexionService>();
 builder.Services.AddScoped<IPlanesApoyoService, PlanesApoyoService>();
 builder.Services.AddScoped<IPortalPadresService, PortalPadresService>();
 builder.Services.AddScoped<ISustitucionesService, SustitucionesService>();

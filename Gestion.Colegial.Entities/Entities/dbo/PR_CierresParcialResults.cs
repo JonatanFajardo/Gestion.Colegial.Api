@@ -36,6 +36,9 @@ namespace Gestion.Colegial.Entities.Entities
         public bool Publicado { get; set; }
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaLimite { get; set; }
+        public DateTime? SemestreInicio { get; set; }
+        public DateTime? SemestreFin { get; set; }
+        public bool SemestreVigente { get; set; }
         public bool LimiteVencido { get; set; }
         public DateTime? FechaCierre { get; set; }
         public string UsuarioCierre { get; set; }
