@@ -14,7 +14,9 @@ namespace Gestion.Colegial.Business.Services
     {
         private readonly INotasRepository _r;
         private readonly ICierresParcialRepository _cierres;
-        public NotasService(INotasRepository r, ICierresParcialRepository cierres) { _r = r; _cierres = cierres; }
+        private readonly IEvaluacionesRepository _evaluaciones;
+        public NotasService(INotasRepository r, ICierresParcialRepository cierres, IEvaluacionesRepository evaluaciones)
+        { _r = r; _cierres = cierres; _evaluaciones = evaluaciones; }
 
         private async Task<Answer> Wrap(Task<Answer> task, string msg = null)
         {
@@ -64,12 +66,24 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Insert(int Alu_Id, int Hor_Id, int Par_Id, decimal Not_Nota, int usuarioRegistra)
         {
+            // Notas ponderadas (script 089): con actividades, la nota del parcial sale del cálculo y no se escribe a mano.
+            // Si no se pudo revisar, no se escribe (mejor un "intente de nuevo" que una nota que el cálculo pisará).
+            Answer usa = await _evaluaciones.UsaActividades(Hor_Id, Par_Id);
+            if (usa.Access) return Rechazo(MessageShow.Error);
+            if (usa.Data is PR_Evaluacion_UsaActividadesResult u && u.UsaActividades) return Rechazo(NotaPorActividades);
             // El procedimiento revisa el cierre del parcial dentro de la transaccion (THROW 50070).
             return await Wrap(_r.Insert(Alu_Id, Hor_Id, Par_Id, Not_Nota, usuarioRegistra), MessageShow.SuccessSave);
         }
 
+        private const string NotaPorActividades = "Esta materia se califica con actividades en este parcial: la nota del parcial "
+            + "se calcula sola con los puntos de las actividades del cuaderno.";
+
         public async Task<Answer> Edit(int Not_Id, decimal Not_Nota, int usuarioModifica)
         {
+            // Notas ponderadas (script 089): tampoco se cambia a mano una nota que sale de las actividades.
+            Answer usa = await _evaluaciones.UsaActividadesNota(Not_Id);
+            if (usa.Access) return Rechazo(MessageShow.Error);
+            if (usa.Data is PR_Evaluacion_UsaActividadesResult u && u.UsaActividades) return Rechazo(NotaPorActividades);
             string cerrado = await PeriodoCerrado(null, null, null, Not_Id);
             if (cerrado != null) return Rechazo(cerrado);
             return await Wrap(_r.Edit(Not_Id, Not_Nota, usuarioModifica), MessageShow.SuccessEdit);
