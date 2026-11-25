@@ -10,7 +10,8 @@ namespace Gestion.Colegial.Api.Controllers
     /// <summary>
     /// Centro de reportes: reportes que no existían (lista de clase, saldos por alumno, ingresos por
     /// concepto, asistencia del personal) y el registro de reportes generados ("Recientes").
-    /// Quién puede ver cada reporte lo decide el ADM con los permisos de la sesión.
+    /// Quién puede ver cada reporte lo decide el ADM con los permisos de la sesión; además cada
+    /// lectura exige en la API la pantalla de origen del reporte (sin ella responde 403).
     /// Si una lectura falla se responde 500, para que el ADM la registre como fallida.
     /// </summary>
     [ApiController]
@@ -32,23 +33,27 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpGet]
         [Route("ListaClaseAsync")]
+        [RequierePantalla("Listado de alumnos")]
         public async Task<IActionResult> ListaClase(int aniId, int? nivId = null, int? cunId = null, int? seaId = null,
                                                     bool soloActivos = true, DateTime? hoy = null) =>
             Lista(await _service.ListaClase(aniId, nivId, cunId, seaId, soloActivos, hoy ?? DateTime.Today));
 
         [HttpGet]
         [Route("SaldosAlumnoAsync")]
+        [RequierePantalla("Listado de cuentas por cobrar")]
         public async Task<IActionResult> SaldosAlumno(int aniId, int? nivId = null, int? cunId = null, int? seaId = null,
                                                       bool soloConSaldo = true, DateTime? hoy = null) =>
             Lista(await _service.SaldosAlumno(aniId, nivId, cunId, seaId, soloConSaldo, hoy ?? DateTime.Today));
 
         [HttpGet]
         [Route("IngresosConceptoAsync")]
+        [RequierePantalla("Reportes financieros")]
         public async Task<IActionResult> IngresosConcepto(DateTime desde, DateTime hasta, int? cpaId = null, int? fpaId = null) =>
             Lista(await _service.IngresosConcepto(desde, hasta, cpaId, fpaId));
 
         [HttpGet]
         [Route("AsistenciaPersonalAsync")]
+        [RequierePantalla("Asistencia Empleados")]
         public async Task<IActionResult> AsistenciaPersonal(DateTime desde, DateTime hasta) =>
             Lista(await _service.AsistenciaPersonal(desde, hasta));
 
@@ -59,6 +64,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("RegistrarAsync")]
+        [RequierePantalla("Centro de reportes")]
         public async Task<IActionResult> Registrar([FromBody] ReporteGeneradoDTO obj)
         {
             Answer answer = await _service.Registrar(obj);

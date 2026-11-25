@@ -31,7 +31,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
                 con.Open();
                 using var reader = await cmd.ExecuteReaderAsync();
                 var dt1 = new DataTable(); dt1.Load(reader);
-                reader.NextResult();
+                // DataTable.Load ya deja el lector en el siguiente conjunto de resultados.
                 var dt2 = new DataTable(); dt2.Load(reader);
                 answer.Data = new DashboardDocenteResult
                 {
