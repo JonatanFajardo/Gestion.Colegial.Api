@@ -7,7 +7,7 @@ using Gestion.Colegial.Entities.Entities;
 
 namespace Gestion.Colegial.Business.Services
 {
-    /// <summary>Resultado de una escritura: lo que respondió el procedimiento y las notas del parcial que se pasaron a app.tbNotas.</summary>
+    /// <summary>Resultado de una escritura: lo que respondió el procedimiento y cuántas notas del parcial cambiaron en app.tbNotas.</summary>
     public class EvaluacionEscrituraRespuesta
     {
         public int Id { get; set; }
@@ -24,23 +24,18 @@ namespace Gestion.Colegial.Business.Services
 
     /// <summary>
     /// Notas ponderadas (espejo de RosarioSIS "Assignment Types" y de Skuul "assessment templates" + gradebook).
-    /// Permisos y alcance del docente: los revisa el procedimiento con el usuario. Después de cada cambio en
-    /// actividades o puntos, la nota calculada del parcial se escribe en app.tbNotas con el procedimiento de
-    /// siempre (app.PR_tbNotas_Insert, vía INotasRepository): así el boletín, las constancias y el cierre de
-    /// parciales ven lo mismo. Solo se escriben las notas que cambiaron.
+    /// Permisos y alcance del docente: los revisa el procedimiento con el usuario. Cada cambio en actividades,
+    /// puntos o pesos escribe la nota calculada del parcial en app.tbNotas dentro de su misma transacción
+    /// (app.PR_Evaluacion_EscribirNotas): el boletín, las constancias y el cierre de parciales ven lo mismo.
     /// </summary>
     public class EvaluacionesService : IEvaluacionesService
     {
         public static readonly string[] TiposOpcion = { "anio", "nivel", "materia" };
-        private const int EscriturasALaVez = 4;
-
         private readonly IEvaluacionesRepository _repository;
-        private readonly INotasRepository _notas;
 
-        public EvaluacionesService(IEvaluacionesRepository repository, INotasRepository notas)
+        public EvaluacionesService(IEvaluacionesRepository repository)
         {
             _repository = repository;
-            _notas = notas;
         }
 
         private static Answer Vacia() => new Answer { Access = false, Data = new List<object>() };
@@ -73,62 +68,16 @@ namespace Gestion.Colegial.Business.Services
             return !answer.Access && answer.Data is PR_Evaluacion_UsaActividadesResult r && r.UsaActividades;
         }
 
-        /// <summary>Escribe en app.tbNotas las notas calculadas que cambiaron (de un cuaderno o de los cuadernos abiertos de una plantilla).</summary>
-        private async Task EscribirNotas(EvaluacionEscrituraRespuesta respuesta, int? cevId, int? pleId, int usuId)
-        {
-            Answer pendientes = await _repository.NotasParaEscribir(cevId, pleId, usuId);
-            if (pendientes.Access || pendientes.Data is not List<PR_Evaluacion_NotaPendienteResult> lista)
-            {
-                if (pendientes.Access) Logs.Error(pendientes);
-                respuesta.AvisoNotas = "Se guardó, pero no se pudieron actualizar las notas del parcial. Use \"Actualizar notas del parcial\".";
-                return;
-            }
-
-            using var turno = new SemaphoreSlim(EscriturasALaVez);
-            string? primerError = null;
-            int escritas = 0, fallidas = 0;
-            await Task.WhenAll(lista.Select(async n =>
-            {
-                await turno.WaitAsync();
-                try
-                {
-                    Answer r = await _notas.Insert(n.Alu_Id, n.Hor_Id, n.Pac_Id, n.Nota, usuId);
-                    if (r.Access)
-                    {
-                        Interlocked.Increment(ref fallidas);
-                        string? validacion = EventosCalendarioService.MensajeDeValidacionSql(r);
-                        if (validacion == null && !string.IsNullOrEmpty(r.ErrorDetails)) Logs.Error(r);
-                        Interlocked.CompareExchange(ref primerError, validacion ?? r.Message, null);
-                    }
-                    else Interlocked.Increment(ref escritas);
-                }
-                finally { turno.Release(); }
-            }));
-
-            respuesta.NotasEscritas = escritas;
-            respuesta.NotasFallidas = fallidas;
-            if (fallidas > 0)
-                respuesta.AvisoNotas = $"No se pudieron actualizar {fallidas} nota(s) del parcial" + (primerError != null ? $": {primerError}" : ".");
-        }
-
-        private async Task<Answer> Escritura(Answer answer, string general, int usuId, bool porPlantilla)
+        private static Answer Escritura(Answer answer, string general)
         {
             answer = Revisar(answer, general);
             if (answer.Access) return answer;
             if (answer.Data is not PR_Evaluacion_EscrituraResult r) return Rechazo(general);
-
-            var respuesta = new EvaluacionEscrituraRespuesta
+            answer.Data = new EvaluacionEscrituraRespuesta
             {
                 Id = r.Id, Cev_Id = r.Cev_Id, Version = r.Version, Cantidad = r.Cantidad, Omitidas = r.Omitidas,
-                Sincronizados = r.Sincronizados ?? 0, Conservados = r.Conservados ?? 0
+                Sincronizados = r.Sincronizados ?? 0, Conservados = r.Conservados ?? 0, NotasEscritas = r.NotasEscritas ?? 0
             };
-            if (porPlantilla)
-            {
-                if (respuesta.Sincronizados > 0) await EscribirNotas(respuesta, null, r.Id, usuId);
-            }
-            else if (r.Cev_Id.HasValue)
-                await EscribirNotas(respuesta, r.Cev_Id, null, usuId);
-            answer.Data = respuesta;
             return answer;
         }
 
@@ -136,32 +85,28 @@ namespace Gestion.Colegial.Business.Services
         {
             if (obj?.Usuario is not > 0) return Rechazo("Inicie sesión de nuevo.");
             if (obj.Act_Id <= 0 && (obj.Hor_Id <= 0 || obj.Pac_Id <= 0)) return Rechazo("Elija la materia, la sección y el parcial.");
-            return await Escritura(await _repository.GuardarActividad(obj), "No se pudo guardar la actividad.", obj.Usuario.Value, false);
+            return Escritura(await _repository.GuardarActividad(obj), "No se pudo guardar la actividad.");
         }
 
         public async Task<Answer> QuitarActividad(ActividadEvaluacionQuitarDTO obj)
         {
             if (obj?.Usuario is not > 0) return Rechazo("Inicie sesión de nuevo.");
             if (obj.Act_Id <= 0) return Rechazo("Elija la actividad.");
-            return await Escritura(await _repository.QuitarActividad(obj), "No se pudo quitar la actividad.", obj.Usuario.Value, false);
+            return Escritura(await _repository.QuitarActividad(obj), "No se pudo quitar la actividad.");
         }
 
         public async Task<Answer> GuardarPuntos(PuntosEvaluacionGuardarDTO obj)
         {
             if (obj?.Usuario is not > 0) return Rechazo("Inicie sesión de nuevo.");
             if (obj.Cev_Id <= 0 || string.IsNullOrWhiteSpace(obj.Puntos)) return Rechazo("No hay cambios para guardar.");
-            return await Escritura(await _repository.GuardarPuntos(obj), "No se pudieron guardar los puntos.", obj.Usuario.Value, false);
+            return Escritura(await _repository.GuardarPuntos(obj), "No se pudieron guardar los puntos.");
         }
 
-        /// <summary>Vuelve a pasar a app.tbNotas las notas calculadas de un cuaderno (si alguna quedó sin escribir).</summary>
+        /// <summary>Vuelve a escribir en app.tbNotas las notas calculadas de un cuaderno (si alguien las cambió por otro camino).</summary>
         public async Task<Answer> ActualizarNotas(int cevId, int usuId)
         {
             if (cevId <= 0 || usuId <= 0) return Rechazo("Elija el cuaderno.");
-            var respuesta = new EvaluacionEscrituraRespuesta { Id = cevId, Cev_Id = cevId };
-            Answer pendientes = Revisar(await _repository.NotasParaEscribir(cevId, null, usuId), "No se pudieron actualizar las notas del parcial.");
-            if (pendientes.Access) return pendientes;
-            await EscribirNotas(respuesta, cevId, null, usuId);
-            return new Answer { Access = false, Data = respuesta };
+            return Escritura(await _repository.ActualizarNotas(cevId, usuId), "No se pudieron actualizar las notas del parcial.");
         }
 
         public async Task<Answer> Plantillas(int anio, int usuId) =>
@@ -176,14 +121,14 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> GuardarPlantilla(PlantillaEvaluacionGuardarDTO obj)
         {
             if (obj?.Usuario is not > 0) return Rechazo("Inicie sesión de nuevo.");
-            return await Escritura(await _repository.GuardarPlantilla(obj), "No se pudo guardar la plantilla.", obj.Usuario.Value, true);
+            return Escritura(await _repository.GuardarPlantilla(obj), "No se pudo guardar la plantilla.");
         }
 
         public async Task<Answer> QuitarPlantilla(PlantillaEvaluacionQuitarDTO obj)
         {
             if (obj?.Usuario is not > 0) return Rechazo("Inicie sesión de nuevo.");
             if (obj.Ple_Id <= 0) return Rechazo("Elija la plantilla.");
-            return await Escritura(await _repository.QuitarPlantilla(obj), "No se pudo quitar la plantilla.", obj.Usuario.Value, true);
+            return Escritura(await _repository.QuitarPlantilla(obj), "No se pudo quitar la plantilla.");
         }
 
         public async Task<Answer> Avance(int anio, int semId, int pacId, int usuId) =>

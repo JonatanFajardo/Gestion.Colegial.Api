@@ -42,9 +42,11 @@ namespace Gestion.Colegial.DataAccess.Repositories
             Search<PR_Evaluacion_UsaActividadesResult>("app.PR_Evaluacion_UsaActividades",
                 new[] { Entero("@Hor_Id", horId), Entero("@Pac_Id", pacId) });
 
-        public Task<Answer> NotasParaEscribir(int? cevId, int? pleId, int usuId) =>
-            Read<PR_Evaluacion_NotaPendienteResult>("app.PR_Evaluacion_NotasParaEscribir",
-                new[] { Entero("@Cev_Id", cevId), Entero("@Ple_Id", pleId), Entero("@Usu_Id", usuId) });
+        public Task<Answer> UsaActividadesNota(int notId) =>
+            Search<PR_Evaluacion_UsaActividadesResult>("app.PR_Evaluacion_UsaActividadesNota", new[] { Entero("@Not_Id", notId) });
+
+        public Task<Answer> ActualizarNotas(int cevId, int usuId) =>
+            Escribir("app.PR_Evaluacion_ActualizarNotas", new[] { Entero("@Cev_Id", cevId), Entero("@Usuario", usuId) });
 
         public Task<Answer> GuardarActividad(ActividadEvaluacionGuardarDTO obj) => Escribir("app.PR_Evaluacion_GuardarActividad", new[]
         {

@@ -17,8 +17,12 @@
      o vacio (sin calificar: no cuenta todavía). Vacío nunca es cero.
    - Cálculo (FN_Evaluacion_Calculo): por tipo, la parte lograda (puntos / máximo) según su forma de
      juntar; la nota = suma(parte x peso) / suma(pesos de los tipos con algo calificado) x 100.
-     La nota entera (redondeo normal) se escribe en app.tbNotas con app.PR_tbNotas_Insert desde la API
-     (procedimiento existente: boletín, constancias y cierre de parciales siguen igual).
+     La nota entera (2 decimales con ,5 hacia arriba y luego el entero) se escribe en app.tbNotas DENTRO de la
+     misma transacción que cambió puntos, actividades o pesos (app.PR_Evaluacion_EscribirNotas, mismas columnas
+     que app.PR_tbNotas_Insert): boletín, constancias y cierre de parciales siguen igual.
+   - Concurrencia: candado compartido para escribir cuadernos y exclusivo para guardar plantillas
+     (app.PR_Evaluacion_Candado), y luego el cuaderno con UPDLOCK: dos pestañas no se pisan y el recálculo
+     por cambio de pesos no se cruza con un docente que guarda.
    - Parcial cerrado (script 075): toda escritura llama a app.PR_CierresParcial_ValidarAbierto dentro
      de su transacción (THROW 50070).
    - Control de versión: plantilla, actividad y cada calificación llevan versión; si otra persona
@@ -269,38 +273,119 @@ GO
      calificadas (puntos) y "no entregó" (0). Excusado y vacío no cuentan.
    - Por tipo: suma = puntos / máximo sumados (RosarioSIS); promedio = promedio de cada actividad;
      mejor = la mejor actividad (Skuul "highest").
-   - Los tipos sin nada calificado para ese alumno no entran: los pesos se reparten entre los que sí. */
+   - Los tipos sin nada calificado para ese alumno (o todo excusado) no entran: su peso se reparte
+     entre los que sí (RosarioSIS: total / suma de los pesos de los tipos con algo). Sin nada = NULL.
+   - Redondeo (el mismo en cuaderno-actividades.js, para que la nota en vivo sea la guardada):
+     se calcula en float (IEEE 754, igual que JavaScript), se redondea a 2 decimales con ,5 hacia
+     arriba (Nota, la que se ve) y el entero sale de esa Nota: ,50 o más sube (Entera, la del boletín).
+     El 0.000001 absorbe el error de punto flotante (1/3 x 30 = 9,9999999...) y nunca cambia un
+     valor que no esté pegado al límite. */
 CREATE OR ALTER FUNCTION app.FN_Evaluacion_Calculo (@Cev_Id int)
 RETURNS TABLE
 AS
 RETURN
     WITH celdas AS (
         SELECT p.Alu_Id, a.Cet_Id,
-               CAST(a.Act_PuntosMax AS decimal(18,6)) AS Maximo,
-               CAST(CASE WHEN p.Acp_Estado = 'calificado' THEN p.Acp_Puntos ELSE 0 END AS decimal(18,6)) AS Puntos
+               CAST(a.Act_PuntosMax AS float) AS Maximo,
+               CAST(CASE WHEN p.Acp_Estado = 'calificado' THEN p.Acp_Puntos ELSE 0 END AS float) AS Puntos
         FROM app.tbActividadesEvaluacion a
         JOIN app.tbActividadesPuntos p ON p.Act_Id = a.Act_Id
         WHERE a.Cev_Id = @Cev_Id AND a.Act_EsEliminado = 0 AND a.Act_NoCuenta = 0
           AND p.Acp_Estado IN ('calificado', 'no_entrego')
     ),
     porTipo AS (
-        SELECT c.Alu_Id, t.Cet_Peso,
-               CAST(CASE t.Cet_Combinacion
-                        WHEN 'promedio' THEN AVG(c.Puntos / c.Maximo)
-                        WHEN 'mejor'    THEN MAX(c.Puntos / c.Maximo)
-                        ELSE SUM(c.Puntos) / SUM(c.Maximo) END AS decimal(18,8)) AS Parte
+        SELECT c.Alu_Id, CAST(t.Cet_Peso AS float) AS Peso,
+               CASE t.Cet_Combinacion
+                    WHEN 'promedio' THEN AVG(c.Puntos / c.Maximo)
+                    WHEN 'mejor'    THEN MAX(c.Puntos / c.Maximo)
+                    ELSE SUM(c.Puntos) / SUM(c.Maximo) END AS Parte
         FROM celdas c
         JOIN app.tbCuadernosEvaluacionTipos t ON t.Cet_Id = c.Cet_Id AND t.Cet_EsEliminado = 0
         GROUP BY c.Alu_Id, t.Cet_Id, t.Cet_Peso, t.Cet_Combinacion
     ),
     total AS (
-        SELECT Alu_Id, CAST(SUM(Parte * Cet_Peso) / NULLIF(SUM(Cet_Peso), 0) * 100 AS decimal(18,6)) AS Valor
+        SELECT Alu_Id, SUM(Parte * Peso) / NULLIF(SUM(Peso), 0) * 100 AS Valor
         FROM porTipo
         GROUP BY Alu_Id
+    ),
+    centesimos AS (
+        SELECT Alu_Id, CAST(FLOOR(Valor * 100 + 0.5 + 0.000001) AS int) AS Cent
+        FROM total
+        WHERE Valor IS NOT NULL
     )
-    SELECT Alu_Id, CAST(ROUND(Valor, 2) AS decimal(6,2)) AS Nota, CAST(ROUND(Valor, 0) AS int) AS Entera
-    FROM total
-    WHERE Valor IS NOT NULL;
+    SELECT Alu_Id, CAST(Cent / 100.0 AS decimal(6,2)) AS Nota, (Cent + 50) / 100 AS Entera
+    FROM centesimos;
+GO
+
+/* Escribe en app.tbNotas la nota entera calculada del cuaderno (solo las que cambiaron). Se llama DENTRO de
+   la transacción de quien cambió puntos, actividades o pesos, después de cambiarlos: la nota del parcial
+   queda igual al cálculo en el mismo COMMIT (sin carreras entre dos pestañas ni con el recálculo de una
+   plantilla). Mismas columnas que app.PR_tbNotas_Insert (aula del horario, Not_Año = 1 de enero del año);
+   si el alumno tiene más de una fila de nota en ese parcial, todas quedan con el mismo valor. No toca
+   parciales cerrados ni otros años (el cuaderno es de un año y solo cuenta alumnos activos de ese año).
+   Quien llama ya revisó permisos y alcance. */
+CREATE OR ALTER PROCEDURE app.PR_Evaluacion_EscribirNotas
+    @Cev_Id   int,
+    @Usuario  int,
+    @Escritas int OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET @Escritas = 0;
+    DECLARE @Anio int, @Sem int, @Pac int, @Sec int, @Mat int, @Cur int, @Cun int, @Aul int;
+    SELECT @Anio = Cev_Anio, @Sem = Sem_Id, @Pac = Pac_Id, @Sec = Sec_Id, @Mat = Mat_Id, @Cur = Cur_Id, @Cun = Cun_Id
+    FROM app.tbCuadernosEvaluacion WHERE Cev_Id = @Cev_Id;
+    IF @Anio IS NULL OR app.FN_Evaluacion_Cerrado(@Anio, @Sem, @Pac) = 1 RETURN;
+
+    SELECT @Aul = (SELECT TOP (1) h.Aul_Id FROM app.tbHorarios h
+                   WHERE h.Hor_Año = @Anio AND h.Sem_Id = @Sem AND h.Sec_Id = @Sec AND h.Mat_Id = @Mat
+                     AND h.Cur_Id = @Cur AND h.Cun_Id = @Cun AND ISNULL(h.Hor_EsEliminado, 0) = 0
+                   ORDER BY h.Hor_Id);
+
+    DECLARE @Calc TABLE (Alu_Id int PRIMARY KEY, Entera int NOT NULL);
+    INSERT INTO @Calc (Alu_Id, Entera)
+    SELECT k.Alu_Id, k.Entera
+    FROM app.FN_Evaluacion_Calculo(@Cev_Id) k
+    JOIN app.FN_Evaluacion_Alumnos(@Anio, @Sec, @Cur, @Cun) al ON al.Alu_Id = k.Alu_Id
+    WHERE k.Entera BETWEEN 0 AND 100;
+
+    DECLARE @Ahora datetime = GETDATE();
+    DECLARE @Cambiadas TABLE (Alu_Id int);
+    UPDATE n
+    SET Not_Nota = c.Entera, Not_UsuarioModifica = @Usuario, Not_FechaModifica = @Ahora
+    OUTPUT inserted.Alu_Id INTO @Cambiadas (Alu_Id)
+    FROM app.tbNotas n WITH (UPDLOCK, HOLDLOCK)
+    JOIN @Calc c ON c.Alu_Id = n.Alu_Id
+    WHERE n.Sec_Id = @Sec AND n.Mat_Id = @Mat AND n.Pac_Id = @Pac AND n.Sem_Id = @Sem
+      AND YEAR(n.Not_Año) = @Anio AND n.Not_EsEliminado = 0
+      AND (n.Not_Nota IS NULL OR n.Not_Nota <> c.Entera);
+
+    INSERT INTO app.tbNotas (Alu_Id, Aul_Id, Sec_Id, Mat_Id, Sem_Id, Pac_Id, Not_Nota, Not_Año, Not_EsActivo, Not_EsEliminado,
+                             Not_UsuarioRegistra, Not_FechaRegistra)
+    OUTPUT inserted.Alu_Id INTO @Cambiadas (Alu_Id)
+    SELECT c.Alu_Id, @Aul, @Sec, @Mat, @Sem, @Pac, c.Entera, DATEFROMPARTS(@Anio, 1, 1), 1, 0, @Usuario, @Ahora
+    FROM @Calc c
+    WHERE NOT EXISTS (SELECT 1 FROM app.tbNotas n WITH (UPDLOCK, HOLDLOCK)
+                      WHERE n.Alu_Id = c.Alu_Id AND n.Sec_Id = @Sec AND n.Mat_Id = @Mat AND n.Pac_Id = @Pac
+                        AND n.Sem_Id = @Sem AND YEAR(n.Not_Año) = @Anio AND n.Not_EsEliminado = 0);
+
+    SET @Escritas = (SELECT COUNT(DISTINCT Alu_Id) FROM @Cambiadas);
+END
+GO
+
+/* Candado de las notas ponderadas: toda escritura de cuadernos lo toma compartido (varias a la vez) y
+   guardar o quitar una plantilla, exclusivo (espera a que terminen y frena las nuevas mientras recalcula).
+   Va primero en la transacción, antes de cualquier otro candado: así no hay bloqueos cruzados. */
+CREATE OR ALTER PROCEDURE app.PR_Evaluacion_Candado
+    @Exclusivo bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @Modo nvarchar(32) = CASE WHEN @Exclusivo = 1 THEN N'Exclusive' ELSE N'Shared' END, @R int;
+    EXEC @R = sp_getapplock @Resource = N'app.NotasPonderadas', @LockMode = @Modo, @LockOwner = N'Transaction', @LockTimeout = 20000;
+    IF @R < 0
+        THROW 50099, N'El cuaderno está ocupado con otro cambio (por ejemplo, Dirección está cambiando los pesos). Intente de nuevo en unos segundos.', 1;
+END
 GO
 
 /* ───────────────────────────── Lecturas ───────────────────────────── */
@@ -432,44 +517,28 @@ BEGIN
 END
 GO
 
-/* Notas del parcial que hay que escribir en app.tbNotas (la API llama a app.PR_tbNotas_Insert con cada una):
-   alumnos con nota calculada distinta de la guardada (o sin nota), en cuadernos de parciales abiertos.
-   @Cev_Id = un cuaderno; si no, todos los cuadernos abiertos de la plantilla @Ple_Id.
-   Hor_Id: el horario del grupo que el usuario puede usar (un docente, uno suyo). */
-CREATE OR ALTER PROCEDURE app.PR_Evaluacion_NotasParaEscribir
-    @Cev_Id int = NULL,
-    @Ple_Id int = NULL,
-    @Usu_Id int
+-- ¿La nota @Not_Id es de un parcial que se califica con actividades? (para editar la nota directa)
+CREATE OR ALTER PROCEDURE app.PR_Evaluacion_UsaActividadesNota
+    @Not_Id int
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @Cuaderno bit, @Plantillas bit, @Emp int;
-    SELECT @Cuaderno = Cuaderno, @Plantillas = Plantillas, @Emp = EmpDocente FROM app.FN_Evaluacion_Permisos(@Usu_Id);
-    IF ISNULL(@Cuaderno, 0) = 0 AND ISNULL(@Plantillas, 0) = 0
-        THROW 50090, N'No tiene permiso para usar el cuaderno de notas.', 1;
-    IF @Cev_Id IS NULL AND (@Ple_Id IS NULL OR ISNULL(@Plantillas, 0) = 0)
-        THROW 50090, N'No tiene permiso para cambiar plantillas de evaluación.', 1;
-
-    SELECT c.Cev_Id, hor.Hor_Id, c.Pac_Id, k.Alu_Id, k.Entera AS Nota, n.Not_Nota AS NotaActual
-    FROM app.tbCuadernosEvaluacion c
-    CROSS APPLY app.FN_Evaluacion_Calculo(c.Cev_Id) k
-    CROSS APPLY (SELECT MIN(h.Hor_Id) AS Hor_Id FROM app.tbHorarios h
-                 WHERE h.Hor_Año = c.Cev_Anio AND h.Sem_Id = c.Sem_Id AND h.Sec_Id = c.Sec_Id AND h.Mat_Id = c.Mat_Id
-                   AND h.Cur_Id = c.Cur_Id AND h.Cun_Id = c.Cun_Id AND ISNULL(h.Hor_EsEliminado, 0) = 0
-                   AND (@Emp IS NULL OR h.Emp_Id = @Emp)) hor
-    JOIN app.tbAlumnos a ON a.Alu_Id = k.Alu_Id AND a.Sec_Id = c.Sec_Id AND a.Cur_Id = c.Cur_Id AND a.Cun_Id = c.Cun_Id
-                        AND a.AnioCursado = c.Cev_Anio AND a.Est_Id = 1
-    OUTER APPLY (SELECT TOP (1) x.Not_Nota FROM app.tbNotas x
-                 WHERE x.Alu_Id = k.Alu_Id AND x.Sec_Id = c.Sec_Id AND x.Mat_Id = c.Mat_Id AND x.Pac_Id = c.Pac_Id
-                   AND x.Sem_Id = c.Sem_Id AND YEAR(x.Not_Año) = c.Cev_Anio AND x.Not_EsEliminado = 0
-                 ORDER BY x.Not_Id DESC) n
-    WHERE (c.Cev_Id = @Cev_Id OR (@Cev_Id IS NULL AND c.Ple_Id = @Ple_Id))
-      AND app.FN_Evaluacion_Cerrado(c.Cev_Anio, c.Sem_Id, c.Pac_Id) = 0
-      AND hor.Hor_Id IS NOT NULL
-      AND (@Cev_Id IS NULL OR app.FN_Evaluacion_PuedeGrupo(@Emp, c.Cev_Anio, c.Sem_Id, c.Sec_Id, c.Mat_Id, c.Cur_Id, c.Cun_Id) = 1)
-      AND (n.Not_Nota IS NULL OR n.Not_Nota <> k.Entera)
-    ORDER BY c.Cev_Id, k.Alu_Id;
+    SELECT CAST(CASE WHEN EXISTS (
+               SELECT 1
+               FROM app.tbNotas n
+               JOIN app.tbAlumnos al ON al.Alu_Id = n.Alu_Id
+               JOIN app.tbCuadernosEvaluacion c
+                 ON c.Cev_Anio = YEAR(n.Not_Año) AND c.Sem_Id = n.Sem_Id AND c.Pac_Id = n.Pac_Id AND c.Sec_Id = n.Sec_Id
+                AND c.Mat_Id = n.Mat_Id AND c.Cur_Id = al.Cur_Id AND c.Cun_Id = al.Cun_Id
+               JOIN app.tbActividadesEvaluacion a ON a.Cev_Id = c.Cev_Id AND a.Act_EsEliminado = 0
+               WHERE n.Not_Id = @Not_Id)
+           THEN 1 ELSE 0 END AS bit) AS UsaActividades;
 END
+GO
+
+-- La lectura que usaba la API para escribir nota por nota ya no hace falta (las notas se escriben en la transacción).
+IF OBJECT_ID(N'app.PR_Evaluacion_NotasParaEscribir', N'P') IS NOT NULL
+    DROP PROCEDURE app.PR_Evaluacion_NotasParaEscribir;
 GO
 
 /* ───────────────────────────── Escrituras del cuaderno ───────────────────────────── */
@@ -581,6 +650,9 @@ BEGIN
         END
 
         BEGIN TRANSACTION;
+            EXEC app.PR_Evaluacion_Candado;
+            DECLARE @Bloqueo int;
+            SELECT @Bloqueo = Cev_Version FROM app.tbCuadernosEvaluacion WITH (UPDLOCK, HOLDLOCK) WHERE Cev_Id = @Cev;
             DECLARE @VActual int;
             SELECT @VActual = Act_Version FROM app.tbActividadesEvaluacion WITH (UPDLOCK, HOLDLOCK)
             WHERE Act_Id = @Act_Id AND Act_EsEliminado = 0;
@@ -613,9 +685,13 @@ BEGIN
             UPDATE app.tbCuadernosEvaluacion
             SET Cev_Version = Cev_Version + 1, Cev_UsuarioModifica = @Usuario, Cev_FechaModifica = @Ahora
             WHERE Cev_Id = @Cev;
+
+            -- Máximo, tipo o "no cuenta" cambian la nota: se escribe en el mismo COMMIT.
+            DECLARE @EscritasE int = 0;
+            EXEC app.PR_Evaluacion_EscribirNotas @Cev, @Usuario, @EscritasE OUTPUT;
         COMMIT TRANSACTION;
 
-        SELECT @Act_Id AS Id, @Cev AS Cev_Id, 1 AS Cantidad, 0 AS Omitidas;
+        SELECT @Act_Id AS Id, @Cev AS Cev_Id, 1 AS Cantidad, 0 AS Omitidas, @EscritasE AS NotasEscritas;
         RETURN;
     END
 
@@ -639,6 +715,7 @@ BEGIN
     DECLARE @NuevoId int, @Creadas int = 0, @Omitidas int = 0, @PltBase int, @NombreTipo nvarchar(60);
 
     BEGIN TRANSACTION;
+        EXEC app.PR_Evaluacion_Candado;
         EXEC app.PR_CierresParcial_ValidarAbierto @Anio, @Sem, @Pac_Id;
         EXEC app.PR_Evaluacion_ObtenerCuaderno @Anio, @Sem, @Pac_Id, @Sec, @Mat, @Cur, @Cun, @Niv, @Usuario, @Cev OUTPUT;
 
@@ -710,7 +787,8 @@ BEGIN
         DEALLOCATE otras;
     COMMIT TRANSACTION;
 
-    SELECT @NuevoId AS Id, @Cev AS Cev_Id, @Creadas AS Cantidad, @Omitidas AS Omitidas;
+    -- Una actividad nueva no tiene puntos: no cambia ninguna nota.
+    SELECT @NuevoId AS Id, @Cev AS Cev_Id, @Creadas AS Cantidad, @Omitidas AS Omitidas, 0 AS NotasEscritas;
 END
 GO
 
@@ -741,6 +819,9 @@ BEGIN
 
     DECLARE @Ahora datetime = app.FN_AhoraHonduras();
     BEGIN TRANSACTION;
+        EXEC app.PR_Evaluacion_Candado;
+        DECLARE @Bloqueo int;
+        SELECT @Bloqueo = Cev_Version FROM app.tbCuadernosEvaluacion WITH (UPDLOCK, HOLDLOCK) WHERE Cev_Id = @Cev;
         DECLARE @VActual int;
         SELECT @VActual = Act_Version FROM app.tbActividadesEvaluacion WITH (UPDLOCK, HOLDLOCK)
         WHERE Act_Id = @Act_Id AND Act_EsEliminado = 0;
@@ -757,9 +838,12 @@ BEGIN
         UPDATE app.tbCuadernosEvaluacion
         SET Cev_Version = Cev_Version + 1, Cev_UsuarioModifica = @Usuario, Cev_FechaModifica = @Ahora
         WHERE Cev_Id = @Cev;
+
+        DECLARE @Escritas int = 0;
+        EXEC app.PR_Evaluacion_EscribirNotas @Cev, @Usuario, @Escritas OUTPUT;
     COMMIT TRANSACTION;
 
-    SELECT @Act_Id AS Id, @Cev AS Cev_Id, 1 AS Cantidad, 0 AS Omitidas;
+    SELECT @Act_Id AS Id, @Cev AS Cev_Id, 1 AS Cantidad, 0 AS Omitidas, @Escritas AS NotasEscritas;
 END
 GO
 
@@ -824,6 +908,10 @@ BEGIN
 
     DECLARE @Ahora datetime = app.FN_AhoraHonduras();
     BEGIN TRANSACTION;
+        -- Candado compartido y luego el cuaderno: dos pestañas del mismo cuaderno guardan una tras otra.
+        EXEC app.PR_Evaluacion_Candado;
+        DECLARE @Bloqueo int;
+        SELECT @Bloqueo = Cev_Version FROM app.tbCuadernosEvaluacion WITH (UPDLOCK, HOLDLOCK) WHERE Cev_Id = @Cev_Id;
         EXEC app.PR_CierresParcial_ValidarAbierto @Anio, @Sem, @Pac;
 
         DECLARE @Conflictos int = (
@@ -852,9 +940,45 @@ BEGIN
         UPDATE app.tbCuadernosEvaluacion
         SET Cev_Version = Cev_Version + 1, Cev_UsuarioModifica = @Usuario, Cev_FechaModifica = @Ahora
         WHERE Cev_Id = @Cev_Id;
+
+        DECLARE @Escritas int = 0;
+        EXEC app.PR_Evaluacion_EscribirNotas @Cev_Id, @Usuario, @Escritas OUTPUT;
     COMMIT TRANSACTION;
 
-    SELECT @Cev_Id AS Id, @Cev_Id AS Cev_Id, @N AS Cantidad, 0 AS Omitidas;
+    SELECT @Cev_Id AS Id, @Cev_Id AS Cev_Id, @N AS Cantidad, 0 AS Omitidas, @Escritas AS NotasEscritas;
+END
+GO
+
+/* Vuelve a escribir en app.tbNotas la nota calculada del cuaderno (por si alguien la cambió por otro camino). */
+CREATE OR ALTER PROCEDURE app.PR_Evaluacion_ActualizarNotas
+    @Cev_Id  int,
+    @Usuario int
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+    DECLARE @Puede bit, @Emp int;
+    SELECT @Puede = Cuaderno, @Emp = EmpDocente FROM app.FN_Evaluacion_Permisos(@Usuario);
+    IF ISNULL(@Puede, 0) = 0
+        THROW 50090, N'No tiene permiso para usar el cuaderno de notas.', 1;
+
+    DECLARE @Anio int, @Sem int, @Pac int, @Sec int, @Mat int, @Cur int, @Cun int;
+    SELECT @Anio = Cev_Anio, @Sem = Sem_Id, @Pac = Pac_Id, @Sec = Sec_Id, @Mat = Mat_Id, @Cur = Cur_Id, @Cun = Cun_Id
+    FROM app.tbCuadernosEvaluacion WHERE Cev_Id = @Cev_Id;
+    IF @Anio IS NULL
+        THROW 50093, N'El cuaderno ya no existe. Recargue la página.', 1;
+    IF app.FN_Evaluacion_PuedeGrupo(@Emp, @Anio, @Sem, @Sec, @Mat, @Cur, @Cun) = 0
+        THROW 50072, N'Ese cuaderno no es de una materia asignada a su usuario.', 1;
+
+    DECLARE @Escritas int = 0, @Bloqueo int;
+    BEGIN TRANSACTION;
+        EXEC app.PR_Evaluacion_Candado;
+        SELECT @Bloqueo = Cev_Version FROM app.tbCuadernosEvaluacion WITH (UPDLOCK, HOLDLOCK) WHERE Cev_Id = @Cev_Id;
+        EXEC app.PR_CierresParcial_ValidarAbierto @Anio, @Sem, @Pac;
+        EXEC app.PR_Evaluacion_EscribirNotas @Cev_Id, @Usuario, @Escritas OUTPUT;
+    COMMIT TRANSACTION;
+
+    SELECT @Cev_Id AS Id, @Cev_Id AS Cev_Id, 0 AS Cantidad, 0 AS Omitidas, @Escritas AS NotasEscritas;
 END
 GO
 
@@ -1014,8 +1138,10 @@ BEGIN
         THROW 50092, @Msg, 1;
     END
 
-    DECLARE @Ahora datetime = app.FN_AhoraHonduras(), @Sinc int = 0, @Conservados int = 0, @NuevaVersion int;
+    DECLARE @Ahora datetime = app.FN_AhoraHonduras(), @Sinc int = 0, @Conservados int = 0, @NuevaVersion int, @Escritas int = 0;
     BEGIN TRANSACTION;
+        -- Exclusivo: espera a que terminen los guardados de puntos en curso y los frena mientras recalcula.
+        EXEC app.PR_Evaluacion_Candado 1;
         IF @Ple_Id IS NOT NULL
         BEGIN
             DECLARE @VActual int, @AnioA int, @NivA int, @MatA int;
@@ -1117,10 +1243,26 @@ BEGIN
         UPDATE c SET Cev_Version = Cev_Version + 1, Cev_UsuarioModifica = @Usuario, Cev_FechaModifica = @Ahora
         FROM app.tbCuadernosEvaluacion c JOIN @Abiertos o ON o.Cev_Id = c.Cev_Id;
 
+        -- Nuevos pesos = nuevas notas en los parciales abiertos (los cerrados no se tocan).
+        DECLARE @Cuad int, @EscCuad int;
+        DECLARE abiertos CURSOR LOCAL FAST_FORWARD FOR SELECT Cev_Id FROM @Abiertos ORDER BY Cev_Id;
+        OPEN abiertos;
+        FETCH NEXT FROM abiertos INTO @Cuad;
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            SET @EscCuad = 0;
+            EXEC app.PR_Evaluacion_EscribirNotas @Cuad, @Usuario, @EscCuad OUTPUT;
+            SET @Escritas += @EscCuad;
+            FETCH NEXT FROM abiertos INTO @Cuad;
+        END
+        CLOSE abiertos;
+        DEALLOCATE abiertos;
+
         SET @NuevaVersion = (SELECT Ple_Version FROM app.tbPlantillasEvaluacion WHERE Ple_Id = @Ple_Id);
     COMMIT TRANSACTION;
 
-    SELECT @Ple_Id AS Id, @NuevaVersion AS Version, @Sinc AS Sincronizados, @Conservados AS Conservados, 0 AS Cantidad, 0 AS Omitidas;
+    SELECT @Ple_Id AS Id, @NuevaVersion AS Version, @Sinc AS Sincronizados, @Conservados AS Conservados, 0 AS Cantidad, 0 AS Omitidas,
+           @Escritas AS NotasEscritas;
 END
 GO
 
@@ -1138,6 +1280,7 @@ BEGIN
         THROW 50090, N'No tiene permiso para cambiar plantillas de evaluación.', 1;
 
     BEGIN TRANSACTION;
+        EXEC app.PR_Evaluacion_Candado 1;
         DECLARE @VActual int;
         SELECT @VActual = Ple_Version FROM app.tbPlantillasEvaluacion WITH (UPDLOCK, HOLDLOCK)
         WHERE Ple_Id = @Ple_Id AND Ple_EsEliminado = 0;
@@ -1158,7 +1301,7 @@ BEGIN
         UPDATE app.tbPlantillasEvaluacionTipos SET Plt_EsEliminado = 1 WHERE Ple_Id = @Ple_Id;
     COMMIT TRANSACTION;
 
-    SELECT @Ple_Id AS Id, @VActual + 1 AS Version, 0 AS Sincronizados, 0 AS Conservados, 1 AS Cantidad, 0 AS Omitidas;
+    SELECT @Ple_Id AS Id, @VActual + 1 AS Version, 0 AS Sincronizados, 0 AS Conservados, 1 AS Cantidad, 0 AS Omitidas, 0 AS NotasEscritas;
 END
 GO
 

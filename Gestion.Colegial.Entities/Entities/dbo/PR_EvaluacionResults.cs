@@ -17,17 +17,8 @@ namespace Gestion.Colegial.Entities.Entities
         public int Omitidas { get; set; }
         public int? Sincronizados { get; set; }
         public int? Conservados { get; set; }
-    }
-
-    /// <summary>Nota del parcial que hay que escribir en app.tbNotas con app.PR_tbNotas_Insert.</summary>
-    public class PR_Evaluacion_NotaPendienteResult
-    {
-        public int Cev_Id { get; set; }
-        public int Hor_Id { get; set; }
-        public int Pac_Id { get; set; }
-        public int Alu_Id { get; set; }
-        public int Nota { get; set; }
-        public int? NotaActual { get; set; }
+        /// <summary>Notas del parcial que cambiaron en app.tbNotas en la misma transacción.</summary>
+        public int? NotasEscritas { get; set; }
     }
 
     public class PR_Evaluacion_UsaActividadesResult

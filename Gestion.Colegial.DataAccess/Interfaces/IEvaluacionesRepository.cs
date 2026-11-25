@@ -8,7 +8,8 @@ namespace Gestion.Colegial.DataAccess.Interfaces
     {
         Task<Answer> Cuaderno(int horId, int pacId, int usuId);
         Task<Answer> UsaActividades(int horId, int pacId);
-        Task<Answer> NotasParaEscribir(int? cevId, int? pleId, int usuId);
+        Task<Answer> UsaActividadesNota(int notId);
+        Task<Answer> ActualizarNotas(int cevId, int usuId);
         Task<Answer> GuardarActividad(ActividadEvaluacionGuardarDTO obj);
         Task<Answer> QuitarActividad(ActividadEvaluacionQuitarDTO obj);
         Task<Answer> GuardarPuntos(PuntosEvaluacionGuardarDTO obj);
