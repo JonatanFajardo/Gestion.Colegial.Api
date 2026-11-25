@@ -274,17 +274,12 @@ namespace Gestion.Colegial.DataAccess.Repositories
 		public async Task<Answer> CursosSeccionesEdit(tbCursos obj)
 		{
 			obj.Cur_UsuarioModifica = 1;
-			const string sql = "PR_tbCursos_tbSecciones_Update";
-			Answer answer = new Answer();
-			foreach (var idSecciones in IdsSecciones(obj))
-			{
-				SqlParameter[] sqlParameters = {
-					new SqlParameter() { ParameterName = "@Sec_Id", DbType = DbType.Int32, Value = idSecciones },
-					new SqlParameter() { ParameterName = "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id }
-				};
-				answer = await New(sql, sqlParameters);
-			}
-			return answer;
+			const string sql = "PR_tbCursos_tbSecciones_Sincronizar";
+			SqlParameter[] sqlParameters = {
+				new SqlParameter() { ParameterName = "@Cur_Id", DbType = DbType.Int32, Value = obj.Cur_Id },
+				new SqlParameter() { ParameterName = "@Secciones", DbType = DbType.String, Value = string.Join(",", IdsSecciones(obj)) }
+			};
+			return await New(sql, sqlParameters);
 		}
 
 		public async Task<Answer> CursosSeccionesFind(int id)

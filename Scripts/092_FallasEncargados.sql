@@ -70,6 +70,49 @@ AS
 	END
 GO
 
+/* Sincroniza las secciones de un curso con la lista pedida (ids separados por coma):
+   quita las que ya no están, deja intactas las que siguen (conservan su aula) y agrega las nuevas
+   con el primer aula que ningún curso-sección usa (si todas están usadas, la de menor Id). */
+CREATE OR ALTER PROCEDURE dbo.PR_tbCursos_tbSecciones_Sincronizar
+	@Cur_Id INT,
+	@Secciones NVARCHAR(MAX) = ''
+AS
+BEGIN
+	BEGIN TRAN
+	BEGIN TRY
+		DECLARE @Ids TABLE (Sec_Id INT PRIMARY KEY);
+		INSERT INTO @Ids SELECT DISTINCT TRY_CAST(LTRIM(RTRIM(value)) AS INT) FROM STRING_SPLIT(ISNULL(@Secciones, ''), ',')
+			WHERE TRY_CAST(LTRIM(RTRIM(value)) AS INT) IS NOT NULL;
+
+		DELETE FROM app.tbCursos_tbSecciones WHERE Cur_Id = @Cur_Id AND Sec_Id NOT IN (SELECT Sec_Id FROM @Ids);
+
+		DECLARE @Sec INT;
+		DECLARE c CURSOR LOCAL FAST_FORWARD FOR
+			SELECT i.Sec_Id FROM @Ids i
+			WHERE EXISTS (SELECT 1 FROM app.tbSecciones s WHERE s.Sec_Id = i.Sec_Id)
+			  AND NOT EXISTS (SELECT 1 FROM app.tbCursos_tbSecciones x WHERE x.Cur_Id = @Cur_Id AND x.Sec_Id = i.Sec_Id)
+			ORDER BY i.Sec_Id;
+		OPEN c; FETCH NEXT FROM c INTO @Sec;
+		WHILE @@FETCH_STATUS = 0
+		BEGIN
+			DECLARE @Aul INT = (SELECT TOP 1 a.Aul_Id FROM app.tbAulas a
+				WHERE a.Aul_EsEliminado = 0
+				  AND NOT EXISTS (SELECT 1 FROM app.tbCursos_tbSecciones x WHERE x.Aul_Id = a.Aul_Id)
+				ORDER BY a.Aul_Id);
+			SET @Aul = ISNULL(@Aul, (SELECT MIN(Aul_Id) FROM app.tbAulas WHERE Aul_EsEliminado = 0));
+			INSERT INTO app.tbCursos_tbSecciones (Cur_Id, Sec_Id, Aul_Id) VALUES (@Cur_Id, @Sec, @Aul);
+			FETCH NEXT FROM c INTO @Sec;
+		END
+		CLOSE c; DEALLOCATE c;
+		COMMIT TRAN
+	END TRY
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0 ROLLBACK TRAN;
+		THROW;
+	END CATCH
+END
+GO
+
 /* Alumnos activos sin encargado (@Tipo = 'alumnos') o encargados sin hijos (@Tipo = 'encargados').
    Misma forma para los dos: Id, Nombre, Identidad, Telefono y Detalle (grado y sección del alumno,
    u ocupación del encargado). */

@@ -665,7 +665,7 @@ namespace Gestion.Colegial.Business.Services
             {
                 return new Answer();
             }
-            await CursosSeccionesDelete(obj.Cur_Id);
+            // El procedimiento quita las secciones sobrantes y deja las que siguen con su aula.
             Answer answer = await _repository.CursosSeccionesEdit(obj);
             try
             {

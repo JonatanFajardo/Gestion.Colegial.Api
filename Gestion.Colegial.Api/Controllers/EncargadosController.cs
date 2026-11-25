@@ -150,6 +150,7 @@ namespace Gestion.Colegial.Api.Controllers
         /// <summary>Alumnos activos sin encargado (tipo=alumnos) o encargados sin hijos (tipo=encargados).</summary>
         [HttpGet]
         [Route("SinVinculoAsync")]
+        [RequierePantalla("Editar alumnos|Matrícula nueva|Crear alumnos")]
         public async Task<IActionResult> SinVinculo(string tipo)
         {
             Answer answer = await _encargadoService.SinVinculo(tipo);
