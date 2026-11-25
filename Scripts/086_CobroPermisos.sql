@@ -33,12 +33,13 @@ BEGIN
     BEGIN TRY
         INSERT INTO finanza.tbRecibos (Pag_Id, Rec_NumeroRecibo, Rec_FechaEmision, Rec_EsEliminado, Rec_UsuarioRegistra, Rec_FechaRegistra)
         SELECT p.Pag_Id,
-               N'REC-' + CONVERT(nvarchar(4), YEAR(p.Pag_FechaPago)) + N'-' + RIGHT(N'0000' + CONVERT(nvarchar(10), p.Pag_Id), 4),
+               N'REC-' + CONVERT(nvarchar(4), YEAR(p.Pag_FechaPago)) + N'-' + FORMAT(p.Pag_Id, '0000'),  -- 4 cifras como mínimo, sin recortar Ids mayores
                p.Pag_FechaRegistra, 0, p.Pag_UsuarioRegistra, SYSDATETIME()
         FROM finanza.tbPagos p WHERE p.Pag_Id = @Pag_Id;
     END TRY
     BEGIN CATCH
-        -- otra consulta la creó al mismo tiempo: se sigue con la existente
+        -- 2627/2601: otra consulta la creó al mismo tiempo; se sigue con la existente
+        IF ERROR_NUMBER() NOT IN (2627, 2601) THROW;
     END CATCH;
 
     SELECT
