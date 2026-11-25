@@ -58,6 +58,26 @@ namespace Gestion.Colegial.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Estado de la sesión del usuario firmado: si su cuenta sigue habilitada y su sello actual.
+        /// El ADM lo consulta cada pocos minutos y cierra la sesión si el sello cambió o la cuenta ya no sirve.
+        /// </summary>
+        [HttpGet("EstadoSesion")]
+        [DatoDelServidor(DatoUsuario.Usuario, "value")]
+        public async Task<IActionResult> EstadoSesion(int value)
+        {
+            var respuesta = await _usuarioService.EstadoSesionAsync(value);
+            if (respuesta.Access)
+            {
+                return StatusCode(500, new { Message = "No se pudo consultar la sesión." });
+            }
+            if (respuesta.Data is not Gestion.Colegial.Entities.Entities.PR_tbUsuarios_EstadoSesionResult estado)
+            {
+                return Ok(new { Habilitado = 0, Sello = (string?)null });
+            }
+            return Ok(new { Habilitado = estado.Habilitado, estado.Sello });
+        }
+
         /// <summary>Cambio de la propia contraseña (el Usu_Id lo pone la API con el usuario firmado).</summary>
         [HttpPost("CambiarContrasena")]
         [DatoDelServidor(DatoUsuario.Usuario, "Usu_Id")]

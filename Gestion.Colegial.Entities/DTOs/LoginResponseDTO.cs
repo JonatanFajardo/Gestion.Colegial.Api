@@ -18,5 +18,7 @@ namespace Gestion.Colegial.Entities.DTOs
         public int Emp_Id { get; set; }
         public int Rol_Id { get; set; }
         public string Rol_Nombre { get; set; }
+        /// <summary>Sello de sesión del usuario (ver seguridad.tbUsuarios.Usu_SelloSesion).</summary>
+        public string? Sello { get; set; }
     }
 }

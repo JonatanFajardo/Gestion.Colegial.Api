@@ -87,6 +87,13 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
+        /// <summary>Si la cuenta sigue habilitada y su sello de sesión actual.</summary>
+        public async Task<Answer> EstadoSesionAsync(int usuId)
+        {
+            SqlParameter[] sqlParameters = { Entero("@Usu_Id", usuId) };
+            return await Search<PR_tbUsuarios_EstadoSesionResult>("seguridad.PR_tbUsuarios_EstadoSesion", sqlParameters);
+        }
+
         public async Task<Answer> LogoutAsync(int usuId)
         {
             const string sql = "Seguridad.UDP_tbUsuarios_Logout";
