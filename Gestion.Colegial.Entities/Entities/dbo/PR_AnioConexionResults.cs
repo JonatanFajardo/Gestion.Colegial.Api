@@ -66,6 +66,13 @@ namespace Gestion.Colegial.Entities.Entities
         public int CursoPorRevisar { get; set; }
     }
 
+    public class PR_tbAnioLectivo_UbicacionPreviaResult
+    {
+        public int Mover { get; set; }
+        public int CursoPorRevisar { get; set; }
+        public int NoActivos { get; set; }
+    }
+
     public class PR_AnioConexion_SemestresResult
     {
         public int Sem_Id { get; set; }

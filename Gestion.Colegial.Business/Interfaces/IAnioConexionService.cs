@@ -11,6 +11,7 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> VerificarCupo(int? aniId, int nivId, int cunId, int? mdaId, int secId);
         Task<Answer> InscribirAlumno(InscribirAlumnoDTO obj);
         Task<Answer> AplicarUbicacion(AplicarUbicacionDTO obj);
+        Task<Answer> UbicacionPrevia(int aniId);
         Task<Answer> Semestres(int anio);
     }
 }

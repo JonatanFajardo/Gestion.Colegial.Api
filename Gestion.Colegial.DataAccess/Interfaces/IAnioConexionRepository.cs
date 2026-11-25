@@ -9,7 +9,8 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> AniosInscripcion();
         Task<Answer> VerificarCupo(int? aniId, int nivId, int cunId, int? mdaId, int secId);
         Task<Answer> InscribirAlumno(int aluId, int? aniId, int? usuario);
-        Task<Answer> AplicarUbicacion(int aniId, int? usuario);
+        Task<Answer> AplicarUbicacion(int aniId, int? usuario, bool activar);
+        Task<Answer> UbicacionPrevia(int aniId);
         Task<Answer> Semestres(int anio);
     }
 }

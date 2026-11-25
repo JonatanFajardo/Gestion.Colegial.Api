@@ -30,9 +30,13 @@ namespace Gestion.Colegial.DataAccess.Repositories
             await Search<PR_AnioConexion_InscribirAlumnoResult>("app.PR_AnioConexion_InscribirAlumno",
                 new[] { Entero("@Alu_Id", aluId), Entero("@Ani_Id", aniId), Entero("@Usuario", usuario) });
 
-        public async Task<Answer> AplicarUbicacion(int aniId, int? usuario) =>
+        public async Task<Answer> AplicarUbicacion(int aniId, int? usuario, bool activar) =>
             await Search<PR_tbAnioLectivo_AplicarUbicacionResult>("app.PR_tbAnioLectivo_AplicarUbicacion",
-                new[] { Entero("@Ani_Id", aniId), Entero("@Usuario", usuario) });
+                new[] { Entero("@Ani_Id", aniId), Entero("@Usuario", usuario),
+                        new SqlParameter() { ParameterName = "@Activar", SqlDbType = SqlDbType.Bit, Value = activar } });
+
+        public async Task<Answer> UbicacionPrevia(int aniId) =>
+            await Search<PR_tbAnioLectivo_UbicacionPreviaResult>("app.PR_tbAnioLectivo_UbicacionPrevia", new[] { Entero("@Ani_Id", aniId) });
 
         public async Task<Answer> Semestres(int anio) =>
             await Read<PR_AnioConexion_SemestresResult>("app.PR_AnioConexion_Semestres", new[] { Entero("@Anio", anio) });

@@ -64,8 +64,10 @@ namespace Gestion.Colegial.Business.Services
         public async Task<Answer> AplicarUbicacion(AplicarUbicacionDTO obj)
         {
             if (obj == null || obj.Ani_Id <= 0) return Rechazo("Falta el año lectivo.");
-            return Escritura(await _repository.AplicarUbicacion(obj.Ani_Id, obj.Usuario), "No se pudo pasar la ubicación de los alumnos al año.");
+            return Escritura(await _repository.AplicarUbicacion(obj.Ani_Id, obj.Usuario, obj.Activar), "No se pudo pasar la ubicación de los alumnos al año.");
         }
+
+        public async Task<Answer> UbicacionPrevia(int aniId) => Revisar(await _repository.UbicacionPrevia(aniId));
 
         public async Task<Answer> Semestres(int anio) => Revisar(await _repository.Semestres(anio));
     }

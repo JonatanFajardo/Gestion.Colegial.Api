@@ -84,6 +84,17 @@ namespace Gestion.Colegial.Api.Controllers
         }
 
         [HttpGet]
+        [Route("UbicacionPreviaAsync")]
+        [RequierePantalla("Listado de años lectivos")]
+        public async Task<IActionResult> UbicacionPrevia(int aniId)
+        {
+            Answer answer = await _service.UbicacionPrevia(aniId);
+            if (answer.Access || answer.Data is not PR_tbAnioLectivo_UbicacionPreviaResult r)
+                return Ok(Fallo(answer, "No se pudo calcular la vista previa."));
+            return Ok(new { Ok = true, Mensaje = (string?)null, r.Mover, r.CursoPorRevisar, r.NoActivos });
+        }
+
+        [HttpGet]
         [Route("SemestresAsync")]
         public async Task<IActionResult> Semestres(int anio)
         {

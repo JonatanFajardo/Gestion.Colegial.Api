@@ -15,6 +15,9 @@
       _InscribirAlumno (valida cupo y que el año admita inscripciones) y
       PR_tbAnioLectivo_AplicarUbicacion (al abrir el año como activo, la ubicación actual de
       los inscritos pasa a la sección de ese año; antes de eso no se toca).
+   5. Abrir el año activo: vista previa (PR_tbAnioLectivo_UbicacionPrevia), solo alumnos Activos,
+      registro en tbAnioLectivoUbicacionLog y activación en la misma transacción (@Activar).
+      PR_GenerarMensualidad no cobra a quien tiene AnioCursado posterior al año cobrado.
    Idempotente. Cambia (misma firma): fn_SemestreActivo, FN_Sustitucion_Ciclo,
    FN_Temario_AvanceGrupos, FN_Temarios_Detalle, PR_tbTemarioTemas_List, PR_tbTemarioAvance_Marcar,
    PR_tbTemarios_Crear / _Editar / _Copiar, FN_CierresParcial_Alumnos, PR_CierresParcial_Estado
@@ -773,6 +776,13 @@ BEGIN
     FROM app.tbAlumnos WHERE Alu_Id = @Alu_Id;
     IF @Existe = 0 THROW 50093, N'El alumno no existe.', 1;
 
+    -- Alumno nuevo (sin otra inscripción) que entra a un año posterior: su año de cursado es ese año.
+    -- Se fija ANTES de inscribir: si la inscripción falla (p. ej. otra persona tomó el último cupo),
+    -- igual no aparece en las listas, cobros ni pase de lista del año activo.
+    IF @Ani_Id <> @Activo AND ISNULL(@AnioCursado, 0) < @anio
+       AND NOT EXISTS (SELECT 1 FROM app.tbMatriculaAnio WHERE Alu_Id = @Alu_Id AND Ani_Id <> @Ani_Id AND Mta_EsEliminado = 0)
+        UPDATE app.tbAlumnos SET AnioCursado = @anio WHERE Alu_Id = @Alu_Id;
+
     DECLARE @Sea_Id int;
     SELECT TOP (1) @Sea_Id = s.Sea_Id FROM app.tbSeccionesAnio s
     WHERE s.Ani_Id = @Ani_Id AND s.Sea_EsEliminado = 0 AND s.Sea_Estado IN (1, 2, 3)
@@ -794,24 +804,31 @@ BEGIN
         BEGIN TRY
             BEGIN TRANSACTION;
             DECLARE @cupo int, @sn nvarchar(120), @ins int;
+            -- Ya inscrito (vigente) en este año: no se duplica ni se mueve de sección.
+            DECLARE @Ya int = (SELECT TOP (1) Sea_Id FROM app.tbMatriculaAnio
+                               WHERE Alu_Id = @Alu_Id AND Ani_Id = @Ani_Id AND Mta_EsEliminado = 0 AND Mta_Estado = 1);
+            IF @Ya IS NOT NULL SET @Sea_Id = @Ya;
             SELECT @cupo = Sea_Cupo, @sn = ISNULL(Sea_Nombre, N'la sección')
             FROM app.tbSeccionesAnio WITH (UPDLOCK, HOLDLOCK) WHERE Sea_Id = @Sea_Id;
             SELECT @ins = COUNT(*) FROM app.tbMatriculaAnio
             WHERE Sea_Id = @Sea_Id AND Mta_EsEliminado = 0 AND Mta_Estado = 1 AND Alu_Id <> @Alu_Id;
-            IF @cupo IS NOT NULL AND @ins >= @cupo
+            IF @Ya IS NULL AND @cupo IS NOT NULL AND @ins >= @cupo
             BEGIN
                 DECLARE @m nvarchar(300) = CONCAT(@sn, N' ya no tiene cupo (', @ins, N' de ', @cupo, N').');
                 THROW 50095, @m, 1;
             END
 
             DECLARE @Mta_Id int = (SELECT TOP (1) Mta_Id FROM app.tbMatriculaAnio WHERE Alu_Id = @Alu_Id AND Ani_Id = @Ani_Id);
-            IF @Mta_Id IS NULL
-                INSERT INTO app.tbMatriculaAnio (Alu_Id, Ani_Id, Sea_Id, Mta_Estado, Mta_EsEliminado, Mta_UsuarioRegistra, Mta_FechaRegistra)
-                VALUES (@Alu_Id, @Ani_Id, @Sea_Id, 1, 0, @Usuario, GETDATE());
-            ELSE
-                UPDATE app.tbMatriculaAnio
-                SET Sea_Id = @Sea_Id, Mta_Estado = 1, Mta_EsEliminado = 0, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
-                WHERE Mta_Id = @Mta_Id;
+            IF @Ya IS NULL
+            BEGIN
+                IF @Mta_Id IS NULL
+                    INSERT INTO app.tbMatriculaAnio (Alu_Id, Ani_Id, Sea_Id, Mta_Estado, Mta_EsEliminado, Mta_UsuarioRegistra, Mta_FechaRegistra)
+                    VALUES (@Alu_Id, @Ani_Id, @Sea_Id, 1, 0, @Usuario, GETDATE());
+                ELSE
+                    UPDATE app.tbMatriculaAnio
+                    SET Sea_Id = @Sea_Id, Mta_Estado = 1, Mta_EsEliminado = 0, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
+                    WHERE Mta_Id = @Mta_Id;
+            END
             COMMIT TRANSACTION;
         END TRY
         BEGIN CATCH
@@ -820,11 +837,6 @@ BEGIN
         END CATCH;
     END
 
-    -- Alumno nuevo (sin otra inscripción) que entra a un año posterior: su año de cursado es ese año.
-    IF @Ani_Id <> @Activo AND ISNULL(@AnioCursado, 0) < @anio
-       AND NOT EXISTS (SELECT 1 FROM app.tbMatriculaAnio WHERE Alu_Id = @Alu_Id AND Ani_Id <> @Ani_Id AND Mta_EsEliminado = 0)
-        UPDATE app.tbAlumnos SET AnioCursado = @anio WHERE Alu_Id = @Alu_Id;
-
     SELECT m.Mta_Id, m.Sea_Id, ISNULL(s.Sea_Nombre, N'') AS Sea_Nombre, @nombre AS Ani_Nombre, s.Sea_Cupo AS Cupo,
            (SELECT COUNT(*) FROM app.tbMatriculaAnio x WHERE x.Sea_Id = m.Sea_Id AND x.Mta_EsEliminado = 0 AND x.Mta_Estado = 1) AS Inscritos
     FROM app.tbMatriculaAnio m JOIN app.tbSeccionesAnio s ON s.Sea_Id = m.Sea_Id
@@ -832,42 +844,94 @@ BEGIN
 END
 GO
 
--- Al abrir un año como activo: la ubicación actual de los alumnos inscritos en él pasa a su
+-- Registro de lo que cambió al abrir un año como activo (ubicación anterior y nueva por alumno).
+IF OBJECT_ID('app.tbAnioLectivoUbicacionLog') IS NULL
+    CREATE TABLE app.tbAnioLectivoUbicacionLog (
+        Log_Id int IDENTITY(1,1) PRIMARY KEY,
+        Log_Lote uniqueidentifier NOT NULL,
+        Ani_Id int NOT NULL,
+        Alu_Id int NOT NULL,
+        Niv_Antes int NULL, Cun_Antes int NULL, Mda_Antes int NULL, Sec_Antes int NULL, Cur_Antes int NULL, Anio_Antes int NULL,
+        Niv_Despues int NULL, Cun_Despues int NULL, Mda_Despues int NULL, Sec_Despues int NULL, Cur_Despues int NULL, Anio_Despues int NULL,
+        Log_Usuario int NULL,
+        Log_Fecha datetime NOT NULL CONSTRAINT DF_tbAnioLectivoUbicacionLog_Fecha DEFAULT GETDATE()
+    );
+GO
+
+-- Quién cambiaría de sección al abrir el año Ani_Id: solo alumnos Activos (no retirados,
+-- suspendidos ni graduados) con inscripción vigente en ese año y todavía en un año anterior.
+CREATE OR ALTER VIEW app.VW_AnioLectivo_UbicacionPendiente
+AS
+SELECT a.Alu_Id, m.Ani_Id, an.Ani_Anio,
+       a.Niv_Id AS Niv_Antes, a.Cun_Id AS Cun_Antes, a.Mda_Id AS Mda_Antes, a.Sec_Id AS Sec_Antes, a.Cur_Id AS Cur_Antes, a.AnioCursado AS Anio_Antes,
+       sa.Niv_Id, sa.Cun_Id, ISNULL(sa.Mda_Id, a.Mda_Id) AS Mda_Id, sa.Sec_Id,
+       CASE WHEN a.Niv_Id = sa.Niv_Id THEN a.Cur_Id ELSE ISNULL(cc.Cur_Id, a.Cur_Id) END AS Cur_Id,
+       CAST(CASE WHEN a.Niv_Id <> sa.Niv_Id AND cc.Cur_Id IS NULL THEN 1 ELSE 0 END AS int) AS Revisar
+FROM app.tbAlumnos a
+JOIN app.tbMatriculaAnio m ON m.Alu_Id = a.Alu_Id AND m.Mta_EsEliminado = 0 AND m.Mta_Estado = 1
+JOIN app.tbSeccionesAnio sa ON sa.Sea_Id = m.Sea_Id
+JOIN app.tbAnioLectivo an ON an.Ani_Id = m.Ani_Id
+OUTER APPLY (SELECT MIN(c.Cur_Id) AS Cur_Id FROM app.tbCursos c
+             WHERE c.Niv_Id = sa.Niv_Id AND ISNULL(c.Cur_EsEliminado, 0) = 0 HAVING COUNT(*) = 1) cc
+WHERE ISNULL(a.Est_Id, 1) = 1 AND ISNULL(a.AnioCursado, 0) < an.Ani_Anio;
+GO
+
+-- Vista previa: cuántos alumnos cambiarían de sección al abrir el año (no cambia nada).
+CREATE OR ALTER PROCEDURE app.PR_tbAnioLectivo_UbicacionPrevia
+    @Ani_Id int
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF NOT EXISTS (SELECT 1 FROM app.tbAnioLectivo WHERE Ani_Id = @Ani_Id AND Ani_EsEliminado = 0)
+        THROW 50091, N'El año lectivo no existe.', 1;
+    SELECT (SELECT COUNT(*) FROM app.VW_AnioLectivo_UbicacionPendiente WHERE Ani_Id = @Ani_Id) AS Mover,
+           (SELECT ISNULL(SUM(Revisar), 0) FROM app.VW_AnioLectivo_UbicacionPendiente WHERE Ani_Id = @Ani_Id) AS CursoPorRevisar,
+           (SELECT COUNT(*) FROM app.tbMatriculaAnio m JOIN app.tbAlumnos a ON a.Alu_Id = m.Alu_Id
+            WHERE m.Ani_Id = @Ani_Id AND m.Mta_EsEliminado = 0 AND m.Mta_Estado = 1 AND ISNULL(a.Est_Id, 1) <> 1) AS NoActivos;
+END
+GO
+
+-- Al abrir un año como activo: la ubicación actual de los alumnos Activos inscritos en él pasa a su
 -- sección de ese año (y su año de cursado). Solo mueve a quien todavía está en un año anterior,
 -- así que repetirlo no cambia nada. El curso (carrera) solo cambia si el nivel cambia y el
 -- nivel nuevo tiene un único curso; si no, se deja y se cuenta en CursoPorRevisar.
+-- Todo en una transacción, con registro en tbAnioLectivoUbicacionLog. Con @Activar = 1 el año
+-- también se marca como activo en la MISMA transacción (si algo falla, no cambia nada).
 CREATE OR ALTER PROCEDURE app.PR_tbAnioLectivo_AplicarUbicacion
     @Ani_Id int,
-    @Usuario int = NULL
+    @Usuario int = NULL,
+    @Activar bit = 0
 AS
 BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
-    DECLARE @aplicados int = 0, @revisar int = 0;
+    DECLARE @aplicados int = 0, @revisar int = 0, @lote uniqueidentifier = NEWID();
 
     IF NOT EXISTS (SELECT 1 FROM app.tbAnioLectivo WHERE Ani_Id = @Ani_Id AND Ani_EsEliminado = 0)
         THROW 50091, N'El año lectivo no existe.', 1;
 
-    SELECT a.Alu_Id,
-           sa.Niv_Id, sa.Cun_Id, ISNULL(sa.Mda_Id, a.Mda_Id) AS Mda_Id, sa.Sec_Id, an.Ani_Anio,
-           CASE WHEN a.Niv_Id = sa.Niv_Id THEN a.Cur_Id ELSE ISNULL(cc.Cur_Id, a.Cur_Id) END AS Cur_Id,
-           CAST(CASE WHEN a.Niv_Id <> sa.Niv_Id AND cc.Cur_Id IS NULL THEN 1 ELSE 0 END AS int) AS Revisar
-    INTO #mover
-    FROM app.tbAlumnos a
-    JOIN app.tbMatriculaAnio m ON m.Alu_Id = a.Alu_Id AND m.Ani_Id = @Ani_Id AND m.Mta_EsEliminado = 0 AND m.Mta_Estado = 1
-    JOIN app.tbSeccionesAnio sa ON sa.Sea_Id = m.Sea_Id
-    JOIN app.tbAnioLectivo an ON an.Ani_Id = m.Ani_Id
-    OUTER APPLY (SELECT MIN(c.Cur_Id) AS Cur_Id FROM app.tbCursos c
-                 WHERE c.Niv_Id = sa.Niv_Id AND ISNULL(c.Cur_EsEliminado, 0) = 0 HAVING COUNT(*) = 1) cc
-    WHERE ISNULL(a.AnioCursado, 0) < an.Ani_Anio;
-
     BEGIN TRY
         BEGIN TRANSACTION;
+
+        SELECT * INTO #mover FROM app.VW_AnioLectivo_UbicacionPendiente WHERE Ani_Id = @Ani_Id;
+
+        INSERT INTO app.tbAnioLectivoUbicacionLog (Log_Lote, Ani_Id, Alu_Id, Niv_Antes, Cun_Antes, Mda_Antes, Sec_Antes, Cur_Antes, Anio_Antes,
+                                                   Niv_Despues, Cun_Despues, Mda_Despues, Sec_Despues, Cur_Despues, Anio_Despues, Log_Usuario)
+        SELECT @lote, Ani_Id, Alu_Id, Niv_Antes, Cun_Antes, Mda_Antes, Sec_Antes, Cur_Antes, Anio_Antes,
+               Niv_Id, Cun_Id, Mda_Id, Sec_Id, Cur_Id, Ani_Anio, @Usuario
+        FROM #mover;
+
         UPDATE a
         SET Niv_Id = x.Niv_Id, Cun_Id = x.Cun_Id, Mda_Id = x.Mda_Id, Sec_Id = x.Sec_Id, Cur_Id = x.Cur_Id, AnioCursado = x.Ani_Anio
         FROM app.tbAlumnos a JOIN #mover x ON x.Alu_Id = a.Alu_Id;
         SET @aplicados = @@ROWCOUNT;
         SELECT @revisar = ISNULL(SUM(Revisar), 0) FROM #mover;
+
+        IF @Activar = 1
+        BEGIN
+            CREATE TABLE #act (Ani_Id int);
+            INSERT INTO #act EXEC app.PR_tbAnioLectivo_SetActivo @Ani_Id;
+        END
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
@@ -886,5 +950,169 @@ AS
 BEGIN
     SET NOCOUNT ON;
     SELECT Sem_Id, Nombre, Inicio, Fin FROM app.FN_SemestresAnio(@Anio) ORDER BY Sem_Id;
+END
+GO
+
+-- Cargos mensuales: no cobra a quien entra a un año posterior (AnioCursado mayor al año cobrado).
+-- =============================================
+-- PASO 2: Actualizar procedimiento PR_GenerarMensualidad
+-- =============================================
+
+CREATE OR ALTER PROCEDURE finanza.PR_GenerarMensualidad
+    @Mes TINYINT,              -- 1-12
+    @Anio SMALLINT,            -- 2025
+    @Usu_Id INT,               -- Usuario que ejecuta
+    @ConceptoMensualidadId INT = NULL  -- ID del concepto "Mensualidad" (si es NULL, se busca automáticamente)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Variables
+    DECLARE @FechaEmision DATE = GETDATE()
+    DECLARE @FechaVencimiento DATE = DATEADD(DAY, 10, @FechaEmision)
+    DECLARE @EstadoPendienteId INT = 1  -- ID del estado "Pendiente"
+    DECLARE @TotalGenerados INT = 0
+    DECLARE @MontoTotal DECIMAL(18,2) = 0
+    DECLARE @NombreMes NVARCHAR(20)
+
+    -- Validaciones
+    IF @Mes < 1 OR @Mes > 12
+    BEGIN
+        RAISERROR('El mes debe estar entre 1 y 12', 16, 1)
+        RETURN
+    END
+
+    IF @Anio < 2020 OR @Anio > 2100
+    BEGIN
+        RAISERROR('El año debe estar entre 2020 y 2100', 16, 1)
+        RETURN
+    END
+
+    -- Obtener concepto de mensualidad si no se especificó
+    IF @ConceptoMensualidadId IS NULL
+    BEGIN
+        SELECT TOP 1 @ConceptoMensualidadId = Cpa_Id
+        FROM finanza.tbConceptosPago
+        WHERE Cpa_Descripcion LIKE '%Mensualidad%'
+          AND Cpa_EsEliminado = 0
+
+        IF @ConceptoMensualidadId IS NULL
+        BEGIN
+            RAISERROR('No se encontró un concepto de pago tipo "Mensualidad"', 16, 1)
+            RETURN
+        END
+    END
+
+    -- Obtener nombre del mes
+    SET @NombreMes = CASE @Mes
+        WHEN 1 THEN 'Enero' WHEN 2 THEN 'Febrero' WHEN 3 THEN 'Marzo'
+        WHEN 4 THEN 'Abril' WHEN 5 THEN 'Mayo' WHEN 6 THEN 'Junio'
+        WHEN 7 THEN 'Julio' WHEN 8 THEN 'Agosto' WHEN 9 THEN 'Septiembre'
+        WHEN 10 THEN 'Octubre' WHEN 11 THEN 'Noviembre' WHEN 12 THEN 'Diciembre'
+    END
+
+    BEGIN TRY
+        BEGIN TRANSACTION
+
+        -- Insertar cuentas por cobrar para todos los alumnos activos
+        INSERT INTO finanza.tbCuentasCobrar (
+            Alu_Id,
+            Cpa_Id,
+            Tar_Id,
+            Cco_MontoOriginal,
+            Cco_MontoDescuento,
+            Cco_MontoMora,
+            Cco_MontoTotal,
+            Cco_MontoPendiente,
+            Cco_FechaEmision,
+            Cco_FechaVencimiento,
+            Epa_Id,
+            Cco_Mes,
+            Cco_Anio,
+            Cco_Observaciones,
+            Cco_EsEliminado,
+            Cco_UsuarioRegistra,
+            Cco_FechaRegistra
+        )
+        SELECT
+            A.Alu_Id,
+            @ConceptoMensualidadId,
+            TM.TarMen_Id,
+            TM.TarMen_Monto,                -- Monto original
+            0,                               -- Sin descuento inicial
+            0,                               -- Sin mora inicial
+            TM.TarMen_Monto,                 -- Monto total
+            TM.TarMen_Monto,                 -- Monto pendiente
+            @FechaEmision,
+            @FechaVencimiento,
+            @EstadoPendienteId,
+            @Mes,
+            @Anio,
+            'Mensualidad ' + @NombreMes + ' ' + CAST(@Anio AS NVARCHAR(4)),
+            0,
+            @Usu_Id,
+            GETDATE()
+        FROM app.tbAlumnos A
+        INNER JOIN app.tbPersonas P ON A.Per_Id = P.Per_Id
+        INNER JOIN finanza.tbTarifasMensualidades TM
+            ON TM.Cun_Id = A.Cun_Id
+            AND TM.Mda_Id = A.Mda_Id
+            AND TM.TarMen_EsActivo = 1
+            AND TM.TarMen_EsEliminado = 0
+        WHERE P.Per_EsEliminado = 0
+          AND A.Est_Id = 1  -- Estado Activo
+          AND ISNULL(A.AnioCursado, 0) <= @Anio  -- no cobra a quien entra a un año posterior
+          -- Evitar duplicados: no generar si ya existe
+          AND NOT EXISTS (
+              SELECT 1
+              FROM finanza.tbCuentasCobrar CC
+              WHERE CC.Alu_Id = A.Alu_Id
+                AND CC.Cpa_Id = @ConceptoMensualidadId
+                AND CC.Cco_Mes = @Mes
+                AND CC.Cco_Anio = @Anio
+                AND CC.Cco_EsEliminado = 0
+          )
+
+        -- Obtener totales
+        SET @TotalGenerados = @@ROWCOUNT
+
+        SELECT @MontoTotal = SUM(TM.TarMen_Monto)
+        FROM app.tbAlumnos A
+        INNER JOIN app.tbPersonas P ON A.Per_Id = P.Per_Id
+        INNER JOIN finanza.tbTarifasMensualidades TM
+            ON TM.Cun_Id = A.Cun_Id
+            AND TM.Mda_Id = A.Mda_Id
+            AND TM.TarMen_EsActivo = 1
+        INNER JOIN finanza.tbCuentasCobrar CC
+            ON CC.Alu_Id = A.Alu_Id
+            AND CC.Cco_Mes = @Mes
+            AND CC.Cco_Anio = @Anio
+            AND CC.Cco_EsEliminado = 0
+        WHERE P.Per_EsEliminado = 0
+          AND A.Est_Id = 1
+          AND ISNULL(A.AnioCursado, 0) <= @Anio
+
+        COMMIT TRANSACTION
+
+        -- Retornar resumen
+        SELECT
+            @TotalGenerados AS TotalGenerados,
+            ISNULL(@MontoTotal, 0) AS MontoTotal,
+            @Mes AS Mes,
+            @NombreMes AS NombreMes,
+            @Anio AS Anio,
+            'Mensualidades generadas exitosamente' AS Mensaje
+
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION
+
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE()
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY()
+        DECLARE @ErrorState INT = ERROR_STATE()
+
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState)
+    END CATCH
 END
 GO

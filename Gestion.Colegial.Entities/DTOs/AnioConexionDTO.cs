@@ -21,5 +21,7 @@ namespace Gestion.Colegial.Entities.DTOs
     {
         public int Ani_Id { get; set; }
         public int? Usuario { get; set; }
+        /// <summary>true = además marca el año como activo, en la misma transacción.</summary>
+        public bool Activar { get; set; }
     }
 }
