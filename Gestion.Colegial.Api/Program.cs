@@ -219,6 +219,7 @@ builder.Services.AddScoped<IPlanesApoyoRepository, PlanesApoyoRepository>();
 builder.Services.AddScoped<IPortalPadresRepository, PortalPadresRepository>();
 builder.Services.AddScoped<ISustitucionesRepository, SustitucionesRepository>();
 builder.Services.AddScoped<ICierresParcialRepository, CierresParcialRepository>();
+builder.Services.AddScoped<ICierreAnioRepository, CierreAnioRepository>();
 builder.Services.AddScoped<ITemariosRepository, TemariosRepository>();
 builder.Services.AddScoped<IEvaluacionesRepository, EvaluacionesRepository>();
 // Repositorios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
@@ -351,6 +352,7 @@ builder.Services.AddScoped<IPlanesApoyoService, PlanesApoyoService>();
 builder.Services.AddScoped<IPortalPadresService, PortalPadresService>();
 builder.Services.AddScoped<ISustitucionesService, SustitucionesService>();
 builder.Services.AddScoped<ICierresParcialService, CierresParcialService>();
+builder.Services.AddScoped<ICierreAnioService, CierreAnioService>();
 builder.Services.AddScoped<ITemariosService, TemariosService>();
 builder.Services.AddScoped<IEvaluacionesService, EvaluacionesService>();
 // Servicios Año Lectivo — Fases 2-5 (períodos, enfoque, secciones, ofertas)
