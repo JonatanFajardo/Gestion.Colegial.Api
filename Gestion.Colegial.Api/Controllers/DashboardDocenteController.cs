@@ -1,5 +1,6 @@
 using Gestion.Colegial.Business.Interfaces;
 using Gestion.Colegial.Entities;
+using Gestion.Colegial.Api.Seguridad;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -12,10 +13,12 @@ namespace Gestion.Colegial.Api.Controllers
         private readonly IDashboardDocenteService _service;
         public DashboardDocenteController(IDashboardDocenteService service) { _service = service; }
 
+        // El empleado sale siempre del usuario firmado, no de lo que mande el navegador.
         [HttpGet("ResumenAsync")]
-        public async Task<IActionResult> Resumen(int Emp_Id, int Dia_Id, int Anio)
+        [DatoDelServidor(DatoUsuario.Empleado, "Emp_Id")]
+        public async Task<IActionResult> Resumen(int? Emp_Id, int Dia_Id, int Anio)
         {
-            Answer answer = await _service.Resumen(Emp_Id, Dia_Id, Anio);
+            Answer answer = await _service.Resumen(Emp_Id ?? 0, Dia_Id, Anio);
             return Ok(answer.Data);
         }
     }
