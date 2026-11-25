@@ -14,7 +14,9 @@ namespace Gestion.Colegial.Business.Services
     {
         private readonly INotasRepository _r;
         private readonly ICierresParcialRepository _cierres;
-        public NotasService(INotasRepository r, ICierresParcialRepository cierres) { _r = r; _cierres = cierres; }
+        private readonly IEvaluacionesRepository _evaluaciones;
+        public NotasService(INotasRepository r, ICierresParcialRepository cierres, IEvaluacionesRepository evaluaciones)
+        { _r = r; _cierres = cierres; _evaluaciones = evaluaciones; }
 
         private async Task<Answer> Wrap(Task<Answer> task, string msg = null)
         {
@@ -64,6 +66,11 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> Insert(int Alu_Id, int Hor_Id, int Par_Id, decimal Not_Nota, int usuarioRegistra)
         {
+            // Notas ponderadas (script 089): con actividades, la nota del parcial sale del cálculo y no se escribe a mano.
+            Answer usa = await _evaluaciones.UsaActividades(Hor_Id, Par_Id);
+            if (!usa.Access && usa.Data is PR_Evaluacion_UsaActividadesResult u && u.UsaActividades)
+                return Rechazo("Esta materia se califica con actividades en este parcial: la nota del parcial se calcula sola "
+                             + "con los puntos de las actividades del cuaderno.");
             // El procedimiento revisa el cierre del parcial dentro de la transaccion (THROW 50070).
             return await Wrap(_r.Insert(Alu_Id, Hor_Id, Par_Id, Not_Nota, usuarioRegistra), MessageShow.SuccessSave);
         }
