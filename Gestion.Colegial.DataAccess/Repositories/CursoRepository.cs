@@ -246,12 +246,19 @@ namespace Gestion.Colegial.DataAccess.Repositories
 
 		#region CursosSecciones
 
+		/// <summary>Ids de las secciones pedidas: el arreglo que envía la pantalla (Secciones) o, si no viene, las entidades del vínculo.</summary>
+		private static IEnumerable<int> IdsSecciones(tbCursos obj)
+		{
+			if (obj.Secciones != null) return obj.Secciones.Distinct();
+			return (obj.tbCursos_tbSecciones ?? new List<tbCursos_tbSecciones>()).Select(x => x.Sec_Id).Distinct();
+		}
+
 		public async Task<Answer> CursosSeccionesCreate(tbCursos obj)
 		{
 			obj.Cur_UsuarioModifica = 1;
 			const string sql = "PR_tbCursos_tbSecciones_Insert";
 			Answer answer = new Answer();
-			foreach (var idSecciones in obj.tbCursos_tbSecciones)
+			foreach (var idSecciones in IdsSecciones(obj))
 			{
 				SqlParameter[] sqlParameters = {
 				new SqlParameter(){ParameterName= "@Sec_Id", DbType = DbType.Int32, Value = idSecciones},
@@ -269,7 +276,7 @@ namespace Gestion.Colegial.DataAccess.Repositories
 			obj.Cur_UsuarioModifica = 1;
 			const string sql = "PR_tbCursos_tbSecciones_Update";
 			Answer answer = new Answer();
-			foreach (var idSecciones in obj.tbCursos_tbSecciones)
+			foreach (var idSecciones in IdsSecciones(obj))
 			{
 				SqlParameter[] sqlParameters = {
 					new SqlParameter() { ParameterName = "@Sec_Id", DbType = DbType.Int32, Value = idSecciones },

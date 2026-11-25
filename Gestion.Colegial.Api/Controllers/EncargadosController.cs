@@ -147,6 +147,16 @@ namespace Gestion.Colegial.Api.Controllers
             return Ok(answer.Data);
         }
 
+        /// <summary>Alumnos activos sin encargado (tipo=alumnos) o encargados sin hijos (tipo=encargados).</summary>
+        [HttpGet]
+        [Route("SinVinculoAsync")]
+        public async Task<IActionResult> SinVinculo(string tipo)
+        {
+            Answer answer = await _encargadoService.SinVinculo(tipo);
+            if (answer.Access) return BadRequest(new { Message = answer.ErrorDetails ?? "No se pudo leer la lista." });
+            return Ok(answer.Data);
+        }
+
         /// <summary>Liga un encargado existente a un alumno con su parentesco (si ya estaba ligado, cambia el parentesco).</summary>
         [HttpPost]
         [Route("VincularAsync")]

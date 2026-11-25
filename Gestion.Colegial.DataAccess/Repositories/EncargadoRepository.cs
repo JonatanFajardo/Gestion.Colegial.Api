@@ -102,6 +102,15 @@ namespace Gestion.Colegial.DataAccess.Repositories
             return answer;
         }
 
+        public async Task<Answer> SinVinculo(string tipo)
+        {
+            const string sql = "PR_tbEncargados_SinVinculo";
+            SqlParameter[] sqlParameters = {
+                new SqlParameter(){ ParameterName = "@Tipo", DbType = DbType.String, Value = tipo },
+            };
+            return await Read<PR_tbEncargados_SinVinculoResult>(sql, sqlParameters);
+        }
+
         public async Task<Answer> Vincular(int Enc_Id, int Alu_Id, int Par_Id)
         {
             const string sql = "PR_tbEncargados_Vincular";

@@ -12,6 +12,7 @@ namespace Gestion.Colegial.Business.Interfaces
         Task<Answer> Edit(EncargadosFindDto obj);
         Task<Answer> Delete(int id);
         Task<Answer> ByAlumno(int Alu_Id);
+        Task<Answer> SinVinculo(string tipo);
         Task<Answer> Vincular(int Enc_Id, int Alu_Id, int Par_Id);
         Task<Answer> Desvincular(int Enc_Id, int Alu_Id);
     }

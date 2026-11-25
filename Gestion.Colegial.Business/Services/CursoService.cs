@@ -660,6 +660,11 @@ namespace Gestion.Colegial.Business.Services
 
         public async Task<Answer> CursosSeccionesEdit(tbCursos obj)
         {
+            // Si la pantalla no envió las secciones no se tocan las que ya tiene el curso (antes se borraban todas).
+            if (obj.Secciones == null && (obj.tbCursos_tbSecciones == null || obj.tbCursos_tbSecciones.Count == 0))
+            {
+                return new Answer();
+            }
             await CursosSeccionesDelete(obj.Cur_Id);
             Answer answer = await _repository.CursosSeccionesEdit(obj);
             try
