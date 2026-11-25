@@ -26,6 +26,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("PerdonarAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Corregir cuentas")]
         public async Task<IActionResult> Perdonar([FromBody] CuentaCobrarPerdonarDto entity)
         {
             Answer answer = await _correcciones.PerdonarCargo(entity);
@@ -82,6 +83,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CreateAsync")]
+        [RequierePantalla("Crear pagos|Crear cuentas por cobrar")]
         public async Task<IActionResult> Create([FromBody] CuentaCobrarFindDto entity)
         {
             Answer answer = await _cuentaCobrarService.Create(entity);
@@ -90,6 +92,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPut]
         [Route("EditAsync")]
+        [RequierePantalla("Editar cuentas por cobrar")]
         public async Task<IActionResult> Edit([FromBody] CuentaCobrarFindDto entity)
         {
             Answer answer = await _cuentaCobrarService.Edit(entity);
@@ -98,6 +101,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpDelete]
         [Route("DeleteAsync")]
+        [RequierePantalla("Eliminar cuentas por cobrar")]
         public async Task<IActionResult> Delete(int value)
         {
             Answer answer = await _cuentaCobrarService.Delete(value);
@@ -106,6 +110,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GenerarCargosAlumnoAsync")]
+        [RequierePantalla("Crear pagos|Crear cuentas por cobrar")]
         public async Task<IActionResult> GenerarCargosAlumno(int alumnoId, int anio)
         {
             Answer answer = await _cuentaCobrarService.GenerarCargosAlumno(alumnoId, anio);
@@ -114,6 +119,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("AplicarDescuentoAsync")]
+        [RequierePantalla("Asignador masivo de descuentos|Editar cuentas por cobrar")]
         public async Task<IActionResult> AplicarDescuento(int cuentaCobrarId, int descuentoId, decimal monto, string justificacion)
         {
             Answer answer = await _cuentaCobrarService.AplicarDescuento(cuentaCobrarId, descuentoId, monto, justificacion);
@@ -122,6 +128,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("CalcularMoratoriaAsync")]
+        [RequierePantalla("Editar cuentas por cobrar")]
         public async Task<IActionResult> CalcularMoratoria(int cuentaCobrarId)
         {
             Answer answer = await _cuentaCobrarService.CalcularMoratoria(cuentaCobrarId);
@@ -138,6 +145,7 @@ namespace Gestion.Colegial.Api.Controllers
 
         [HttpPost]
         [Route("GenerarCargosMasivosAsync")]
+        [RequierePantalla("Crear pagos|Crear cuentas por cobrar")]
         public async Task<IActionResult> GenerarCargosMasivos([FromBody] object filtros)
         {
             Answer answer = await _cuentaCobrarService.GenerarCargosMasivos(filtros);
@@ -155,6 +163,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("GenerarMensualidadAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Crear pagos|Crear cuentas por cobrar")]
         public async Task<IActionResult> GenerarMensualidad([FromBody] GenerarMensualidadRequestDto request)
         {
             Answer answer = await _cuentaCobrarService.GenerarMensualidad(request);
@@ -164,6 +173,7 @@ namespace Gestion.Colegial.Api.Controllers
         [HttpPost]
         [Route("GenerarMensualidadesRangoAsync")]
         [DatoDelServidor(DatoUsuario.Usuario, "UsuarioId")]
+        [RequierePantalla("Crear pagos|Crear cuentas por cobrar")]
         public async Task<IActionResult> GenerarMensualidadesRango([FromBody] GenerarMensualidadesRangoRequestDto request)
         {
             Answer answer = await _cuentaCobrarService.GenerarMensualidadesRango(request);
