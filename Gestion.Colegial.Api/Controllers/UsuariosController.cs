@@ -50,12 +50,18 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Create(tbUsuarios entity)
         {
             // Sin contraseña por omisión: quien crea la cuenta escribe la inicial.
-            string? problema = Contrasenas.Validar(entity.Usu_Contraseña, entity.Usu_Name);
+            string? problema = NombresUsuario.Validar(entity.Usu_Name)
+                ?? Contrasenas.Validar(entity.Usu_Contraseña, entity.Usu_Name);
             if (problema != null)
             {
                 return BadRequest(new { Message = problema });
             }
+            entity.Usu_Name = entity.Usu_Name.Trim();
             Answer answer = await _usuarioService.Create(entity);
+            if (answer.Access)
+            {
+                return BadRequest(new { Message = "No se pudo guardar el usuario. Revise que el nombre no esté en uso." });
+            }
             return Ok(answer.Data);
         }
 
@@ -65,6 +71,13 @@ namespace Gestion.Colegial.Api.Controllers
         public async Task<IActionResult> Edit(tbUsuarios entity)
         {
             // Si viene una contraseña, se restablece (mismo camino que cualquier cambio de contraseña).
+            string? nombreMalo = NombresUsuario.Validar(entity.Usu_Name);
+            if (nombreMalo != null)
+            {
+                return BadRequest(new { Message = nombreMalo });
+            }
+            entity.Usu_Name = entity.Usu_Name.Trim();
+
             bool restablece = !string.IsNullOrEmpty(entity.Usu_Contraseña);
             if (restablece)
             {
@@ -76,6 +89,10 @@ namespace Gestion.Colegial.Api.Controllers
             }
 
             Answer answer = await _usuarioService.Edit(entity);
+            if (answer.Access)
+            {
+                return BadRequest(new { Message = "No se pudo guardar el usuario. Revise que el nombre no esté en uso." });
+            }
 
             if (restablece)
             {

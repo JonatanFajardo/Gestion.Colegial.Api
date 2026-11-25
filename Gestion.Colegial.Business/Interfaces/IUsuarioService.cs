@@ -9,6 +9,7 @@ namespace Gestion.Colegial.Business.Interfaces
     {
         Task<Answer> AuthenticateAsync(LoginRequestDTO loginRequest, string userIp);
         Task<Answer> LogoutAsync(int usuId);
+        Task<Answer> EstadoSesionAsync(int usuId);
         Task<Answer> CambiarContrasenaAsync(CambiarContrasenaDTO dto);
         Task<Answer> GuardarContrasenaAsync(int usuId, string usuName, string? nueva, int? actorId, string accion, string? ip);
 
