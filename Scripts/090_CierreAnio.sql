@@ -19,11 +19,16 @@
                         Honduras); si no hay escala, 70. Máximo inicial de materias en
                         recuperación: 2. Se pueden cambiar mientras el año no esté cerrado.
      3. Decisiones    : por alumno, propuesta automática (promovido / repite / se gradúa si cursa
-                        el último grado de su nivel / pendiente de recuperación) que Dirección
-                        cambia con motivo. Al confirmar una sección: la matrícula del año
+                        el último grado de su carrera / pendiente de recuperación) que Dirección
+                        cambia con motivo. Solo se gradúa el último grado de la educación media
+                        (Duodécimo en los BTP); Noveno aprobado es «promovido» a Décimo (termina la
+                        educación básica: dato aparte, Pra_TerminaNivel; la carrera BTP se elige al
+                        abrir el año siguiente). Al confirmar una sección: la matrícula del año
                         (app.tbMatriculaAnio) queda Promovido / Repite / Graduado y, si existe el
                         año siguiente, se inscribe al alumno con app.PR_tbMatriculaAnio_Enroll en la
-                        sección equivalente del grado que le toca (o sin sección si no existe). Los
+                        sección equivalente del grado que le toca (o sin sección si no existe); si ya
+                        estaba inscrito en ese año (Matrícula) en otro grado, se le pasa al que le toca,
+                        y a quien se gradúa se le quita esa inscripción (deshacer lo devuelve). Los
                         resultados de los alumnos confirmados quedan congelados. La pantalla de
                         Graduación toma la decisión confirmada (app.vCandidatosGraduacion).
      4. Cerrar        : el año pasa a Cerrado (5). Si la revisión tiene algo que bloquea, solo se
@@ -38,7 +43,10 @@
      - acciones de Cierre de parciales del año: app.PR_CierresParcial_ValidarAccion;
      - el cuaderno de actividades se muestra cerrado: app.FN_Evaluacion_Cerrado (script 089);
      - pase de lista, tareas y entregas: disparadores sobre app.tbAsistencia, app.tbTareas y
-       app.tbEntregasTarea (insertar o cambiar; el borrado del archivo de graduados sigue igual).
+       app.tbEntregasTarea (insertar o cambiar);
+     - Inscripción y promociones: app.PR_tbMatriculaAnio_Promover, _Enroll e _InscribirDesdeUbicacion
+       no inscriben en un año cerrado o archivado, y no se promueve desde un año en cierre, cerrado o
+       archivado (eso lo decide este asistente).
    Reabrir (Cerrado → Cerrando) solo con el permiso "Reabrir el año escolar" y motivo. Archivado:
    solo lectura y fuera de los selectores de año del ADM; no vuelve atrás.
    Historial de cada paso: app.tbAnioLectivoHistorial (acción, estados, motivo, usuario, revisión).
@@ -51,9 +59,16 @@
      app.PR_tbAnioLectivo_SetActivo: un año archivado no puede ser el año de trabajo,
      app.PR_tbAnioLectivo_Delete   : no da de baja un año en cierre, cerrado o archivado,
      app.vCandidatosGraduacion     : con decisión confirmada en el cierre, la decisión manda sobre
-                                     el promedio de notas (sin decisión, igual que antes),
-     app.spGraduarAlumno           : archiva y quita la matrícula por año (app.tbMatriculaAnio) en
-                                     vez de la tabla vacía app.tbMatriculas.
+                                     el promedio de notas (sin decisión, igual que antes); candidatos
+                                     solo del último grado de su carrera (ya no Noveno),
+     app.spGraduarAlumno           : ya no borra nada: el alumno queda Graduado (Est_Id 3) con todo
+                                     su expediente (notas, pagos, asistencia, salud, disciplina,
+                                     documentos, matrículas...) y su matrícula del año, Graduado (5);
+                                     el registro de graduados (app.tbAlumnosGraduados) sigue igual,
+     app.spBackfillGraduadosHistoricos: no vuelve a listar a quien ya está en el registro de graduados,
+     app.PR_tbMatriculaAnio_Promover / _Enroll / _InscribirDesdeUbicacion: rechazan años cerrados (ver
+                                     arriba); _InscribirDesdeUbicacion ya no regresa a Activo a quien
+                                     se graduó.
    Permisos:
      Cierre del año          = ver el asistente, resultados, decisiones e historial (admin, director, secretaria)
      Cerrar el año           = iniciar el cierre, calcular, recuperaciones, decidir, confirmar,
@@ -182,6 +197,9 @@ BEGIN
         Pra_AniDestino        int           NULL,
         Pra_MtaDestino        int           NULL,
         Pra_CreoDestino       bit           NOT NULL CONSTRAINT DF_tbPromocionesAnio_CreoDestino DEFAULT (0),
+        Pra_TerminaNivel      bit           NOT NULL CONSTRAINT DF_tbPromocionesAnio_TerminaNivel DEFAULT (0),
+        Pra_AjusteDestino     varchar(10)   NULL,
+        Pra_SeaDestAnterior   int           NULL,
         Pra_EsEliminado       bit           NOT NULL CONSTRAINT DF_tbPromocionesAnio_EsEliminado DEFAULT (0),
         Pra_UsuarioModifica   int           NULL,
         Pra_FechaModifica     datetime      NULL,
@@ -191,6 +209,20 @@ BEGIN
     );
     CREATE INDEX IX_tbPromocionesAnio_Seccion ON app.tbPromocionesAnio (Ani_Id, Sea_Id);
 END
+GO
+
+-- Columnas agregadas después de la primera versión de la tabla:
+--   Pra_TerminaNivel   : aprobó el último grado de su nivel sin ser el último de su carrera (Noveno →
+--                        Décimo: «termina la educación básica»). Es un dato aparte, no una graduación.
+--   Pra_AjusteDestino  : qué hizo la confirmación con una inscripción del año siguiente que ya existía:
+--                        'movio' (estaba en otro grado: pasó a la sección que le toca) o 'quito' (se gradúa).
+--   Pra_SeaDestAnterior: la sección que tenía esa inscripción, para deshacer.
+IF COL_LENGTH('app.tbPromocionesAnio', 'Pra_TerminaNivel') IS NULL
+    ALTER TABLE app.tbPromocionesAnio ADD Pra_TerminaNivel bit NOT NULL CONSTRAINT DF_tbPromocionesAnio_TerminaNivel DEFAULT (0);
+IF COL_LENGTH('app.tbPromocionesAnio', 'Pra_AjusteDestino') IS NULL
+    ALTER TABLE app.tbPromocionesAnio ADD Pra_AjusteDestino varchar(10) NULL;
+IF COL_LENGTH('app.tbPromocionesAnio', 'Pra_SeaDestAnterior') IS NULL
+    ALTER TABLE app.tbPromocionesAnio ADD Pra_SeaDestAnterior int NULL;
 GO
 
 /* ───────────────────── Año de solo lectura (guardas) ───────────────────── */
@@ -291,7 +323,7 @@ END
 GO
 
 -- Pase de lista, tareas y entregas: rechazan insertar o cambiar filas de un año cerrado (el año es el
--- del horario). El borrado físico (archivo de graduados) no se bloquea.
+-- del horario).
 CREATE OR ALTER TRIGGER app.TR_tbAsistencia_AnioCerrado ON app.tbAsistencia
 AFTER INSERT, UPDATE
 AS
@@ -430,7 +462,32 @@ BEGIN
 END
 GO
 
+-- 1 si el grado es el último de la carrera del alumno: se gradúa al aprobarlo. No lo es si después
+-- viene un grado de otro nivel (Noveno → Décimo: de básica a media) ni si, en su nivel, sigue otro
+-- grado de su carrera (app.tbCursos_tbCursosNiveles; si la carrera no tiene grados asociados, cualquier
+-- grado posterior del nivel). Con los datos de hoy solo Duodécimo es último grado.
+CREATE OR ALTER FUNCTION app.FN_CierreAnio_EsUltimoGrado (@Cun_Id int, @Cur_Id int)
+RETURNS bit
+AS
+BEGIN
+    DECLARE @Orden int, @Niv int;
+    SELECT @Orden = Cun_Orden, @Niv = Niv_Id FROM app.tbCursosNiveles WHERE Cun_Id = @Cun_Id;
+    IF @Orden IS NULL RETURN 0;
+    IF EXISTS (SELECT 1 FROM app.tbCursosNiveles
+               WHERE Cun_EsEliminado = 0 AND Niv_Id <> @Niv AND Cun_Orden > @Orden)
+        RETURN 0;
+    IF EXISTS (SELECT 1 FROM app.tbCursosNiveles c
+               WHERE c.Cun_EsEliminado = 0 AND c.Niv_Id = @Niv AND c.Cun_Orden > @Orden
+                 AND (NOT EXISTS (SELECT 1 FROM app.tbCursos_tbCursosNiveles x WHERE x.Cur_Id = @Cur_Id)
+                      OR EXISTS (SELECT 1 FROM app.tbCursos_tbCursosNiveles x WHERE x.Cur_Id = @Cur_Id AND x.Cun_Id = c.Cun_Id)))
+        RETURN 0;
+    RETURN 1;
+END
+GO
+
 -- Alumnos inscritos en el año (no retirados) con su ubicación del año y nombre.
+-- EsUltimoGrado: último grado de su carrera (se gradúa). TerminaNivel: último grado de su nivel sin
+-- ser el último de la carrera (Noveno: termina la educación básica y pasa a Décimo).
 CREATE OR ALTER FUNCTION app.FN_CierreAnio_Inscritos (@Ani_Id int)
 RETURNS TABLE
 AS
@@ -447,15 +504,17 @@ RETURN
            CAST(s.Sea_Nombre AS varchar(100)) AS Seccion,
            CAST(cn.Cun_Descripcion AS varchar(100)) AS Grado,
            cn.Cun_Orden,
-           CAST(CASE WHEN cn.Cun_Id IS NOT NULL AND NOT EXISTS (
+           u.EsUltimoGrado,
+           CAST(CASE WHEN u.EsUltimoGrado = 0 AND cn.Cun_Id IS NOT NULL AND NOT EXISTS (
                          SELECT 1 FROM app.tbCursosNiveles c2
                          WHERE c2.Niv_Id = cn.Niv_Id AND c2.Cun_EsEliminado = 0 AND c2.Cun_Orden > cn.Cun_Orden)
-                     THEN 1 ELSE 0 END AS bit) AS EsUltimoGrado
+                     THEN 1 ELSE 0 END AS bit) AS TerminaNivel
     FROM app.tbMatriculaAnio m
     INNER JOIN app.tbAlumnos a ON a.Alu_Id = m.Alu_Id
     INNER JOIN app.tbPersonas p ON p.Per_Id = a.Per_Id
     LEFT JOIN app.tbSeccionesAnio s ON s.Sea_Id = m.Sea_Id
     LEFT JOIN app.tbCursosNiveles cn ON cn.Cun_Id = COALESCE(s.Cun_Id, a.Cun_Id)
+    CROSS APPLY (SELECT app.FN_CierreAnio_EsUltimoGrado(cn.Cun_Id, a.Cur_Id) AS EsUltimoGrado) u
     WHERE m.Ani_Id = @Ani_Id AND m.Mta_EsEliminado = 0 AND m.Mta_Estado <> 4;
 GO
 
@@ -698,7 +757,7 @@ BEGIN
         GROUP BY x.Alu_Id
     ),
     src AS (
-        SELECT i.Alu_Id, i.Sea_Id, i.Niv_Id, i.Cun_Id, i.Sec_Id, i.Mda_Id, i.Alumno, i.Identidad, i.EsUltimoGrado,
+        SELECT i.Alu_Id, i.Sea_Id, i.Niv_Id, i.Cun_Id, i.Sec_Id, i.Mda_Id, i.Alumno, i.Identidad, i.EsUltimoGrado, i.TerminaNivel,
                ISNULL(s.Materias, 0) AS Materias, ISNULL(s.Aprobadas, 0) AS Aprobadas,
                ISNULL(s.EnRecuperacion, 0) AS EnRecuperacion, ISNULL(s.Reprobadas, 0) AS Reprobadas,
                ISNULL(s.SinNotas, 0) AS SinNotas, s.Promedio,
@@ -715,7 +774,7 @@ BEGIN
     USING src ON t.Ani_Id = @Ani_Id AND t.Alu_Id = src.Alu_Id
     WHEN MATCHED THEN UPDATE SET
         Sea_Id = src.Sea_Id, Niv_Id = src.Niv_Id, Cun_Id = src.Cun_Id, Sec_Id = src.Sec_Id, Mda_Id = src.Mda_Id,
-        Pra_Alumno = src.Alumno, Pra_Identidad = src.Identidad, Pra_EsUltimoGrado = src.EsUltimoGrado,
+        Pra_Alumno = src.Alumno, Pra_Identidad = src.Identidad, Pra_EsUltimoGrado = src.EsUltimoGrado, Pra_TerminaNivel = src.TerminaNivel,
         Pra_Materias = src.Materias, Pra_Aprobadas = src.Aprobadas, Pra_EnRecuperacion = src.EnRecuperacion,
         Pra_Reprobadas = src.Reprobadas, Pra_SinNotas = src.SinNotas, Pra_Promedio = src.Promedio,
         Pra_Propuesta = src.Propuesta,
@@ -724,10 +783,10 @@ BEGIN
         Pra_Motivo   = CASE WHEN t.Pra_Decision = src.Propuesta THEN NULL ELSE t.Pra_Motivo END,
         Pra_EsEliminado = 0
     WHEN NOT MATCHED THEN INSERT
-        (Ani_Id, Alu_Id, Sea_Id, Niv_Id, Cun_Id, Sec_Id, Mda_Id, Pra_Alumno, Pra_Identidad, Pra_EsUltimoGrado,
+        (Ani_Id, Alu_Id, Sea_Id, Niv_Id, Cun_Id, Sec_Id, Mda_Id, Pra_Alumno, Pra_Identidad, Pra_EsUltimoGrado, Pra_TerminaNivel,
          Pra_Materias, Pra_Aprobadas, Pra_EnRecuperacion, Pra_Reprobadas, Pra_SinNotas, Pra_Promedio, Pra_Propuesta)
         VALUES (@Ani_Id, src.Alu_Id, src.Sea_Id, src.Niv_Id, src.Cun_Id, src.Sec_Id, src.Mda_Id, src.Alumno, src.Identidad,
-                src.EsUltimoGrado, src.Materias, src.Aprobadas, src.EnRecuperacion, src.Reprobadas, src.SinNotas,
+                src.EsUltimoGrado, src.TerminaNivel, src.Materias, src.Aprobadas, src.EnRecuperacion, src.Reprobadas, src.SinNotas,
                 src.Promedio, src.Propuesta);
 
     -- Decisiones sin confirmar de alumnos que ya no están inscritos (retirados o quitados).
@@ -882,12 +941,15 @@ BEGIN
            CAST(ISNULL(p.Pra_Decision, p.Pra_Propuesta) AS varchar(12)) AS Efectiva,
            p.Pra_Motivo AS Motivo, p.Pra_Confirmada AS Confirmada, p.Pra_FechaConfirmacion AS FechaConfirmacion,
            app.FN_NombreUsuario(p.Usu_IdConfirma) AS UsuarioConfirma,
-           p.Pra_EsUltimoGrado AS EsUltimoGrado,
+           p.Pra_EsUltimoGrado AS EsUltimoGrado, p.Pra_TerminaNivel AS TerminaNivel, p.Pra_AjusteDestino AS AjusteDestino,
            CAST(CASE WHEN EXISTS (SELECT 1 FROM app.tbCursosNiveles c2 INNER JOIN app.tbCursosNiveles c1 ON c1.Cun_Id = p.Cun_Id
                                   WHERE c2.Cun_EsEliminado = 0 AND c2.Cun_Orden > c1.Cun_Orden) THEN 1 ELSE 0 END AS bit) AS HaySiguienteGrado,
-           CAST(CASE WHEN p.Pra_MtaDestino IS NULL THEN NULL ELSE ISNULL(sd.Sea_Nombre, 'Sin sección') END AS varchar(100)) AS Destino,
+           CAST(CASE WHEN p.Pra_MtaDestino IS NULL OR p.Pra_AjusteDestino = 'quito' THEN NULL
+                     ELSE ISNULL(sd.Sea_Nombre, 'Sin sección') END AS varchar(100)) AS Destino,
            ad.Ani_Anio AS AnioDestino,
-           CAST(CASE WHEN EXISTS (SELECT 1 FROM app.tbAlumnos a WHERE a.Alu_Id = p.Alu_Id) THEN 0 ELSE 1 END AS bit) AS Archivado
+           -- Ya graduado en la pantalla de Graduación (o archivado por la versión anterior, que borraba al alumno).
+           CAST(CASE WHEN NOT EXISTS (SELECT 1 FROM app.tbAlumnos a WHERE a.Alu_Id = p.Alu_Id)
+                       OR EXISTS (SELECT 1 FROM app.tbAlumnosGraduados g WHERE g.AluGrad_AluIdOriginal = p.Alu_Id) THEN 1 ELSE 0 END AS bit) AS Archivado
     FROM app.tbPromocionesAnio p
     LEFT JOIN app.tbMatriculaAnio md ON md.Mta_Id = p.Pra_MtaDestino
     LEFT JOIN app.tbSeccionesAnio sd ON sd.Sea_Id = md.Sea_Id
@@ -1306,8 +1368,9 @@ BEGIN
         THROW 50092, N'Hay alumnos de esta sección que ya no están inscritos en el año: vuelva a calcular los resultados.', 1;
 
     DECLARE @Pra int, @Alu int, @Dec varchar(12), @Cun int, @Sec int, @Mda int, @CunDest int, @SeaDest int, @MtaDest int, @Creo bit;
+    DECLARE @MtaYa int, @SeaYa int, @CunYa int, @EstYa tinyint, @Ajuste varchar(10), @SeaAnt int;
     DECLARE @Nuevo TABLE (NewId int);
-    DECLARE @Inscritos int = 0, @SinSeccion int = 0;
+    DECLARE @Inscritos int = 0, @SinSeccion int = 0, @Movidos int = 0, @Quitados int = 0;
 
     BEGIN TRANSACTION;
 
@@ -1321,7 +1384,17 @@ BEGIN
             Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
         WHERE Ani_Id = @Ani_Id AND Alu_Id = @Alu AND Mta_EsEliminado = 0;
 
-        SELECT @MtaDest = NULL, @Creo = 0, @SeaDest = NULL, @CunDest = NULL;
+        SELECT @MtaDest = NULL, @Creo = 0, @SeaDest = NULL, @CunDest = NULL,
+               @MtaYa = NULL, @SeaYa = NULL, @CunYa = NULL, @EstYa = NULL, @Ajuste = NULL, @SeaAnt = NULL;
+        -- Inscripción que ya tenga en el año siguiente (Matrícula o «inscribir desde la ubicación» la
+        -- hacen con el grado de este año, antes de saber si pasa).
+        IF @Destino IS NOT NULL
+            SELECT TOP (1) @MtaYa = m.Mta_Id, @SeaYa = m.Sea_Id, @CunYa = s.Cun_Id, @EstYa = m.Mta_Estado
+            FROM app.tbMatriculaAnio m
+            LEFT JOIN app.tbSeccionesAnio s ON s.Sea_Id = m.Sea_Id
+            WHERE m.Alu_Id = @Alu AND m.Ani_Id = @Destino AND m.Mta_EsEliminado = 0
+            ORDER BY m.Mta_Id;
+
         IF @Dec IN ('promovido', 'repite') AND @Destino IS NOT NULL
         BEGIN
             SET @CunDest = CASE WHEN @Dec = 'repite' THEN @Cun
@@ -1333,8 +1406,7 @@ BEGIN
                             WHERE s.Ani_Id = @Destino AND s.Sea_EsEliminado = 0 AND s.Cun_Id = @CunDest
                               AND s.Sec_Id = @Sec AND ISNULL(s.Mda_Id, 0) = ISNULL(@Mda, 0)
                             ORDER BY s.Sea_Id);
-            SET @MtaDest = (SELECT TOP (1) Mta_Id FROM app.tbMatriculaAnio
-                            WHERE Alu_Id = @Alu AND Ani_Id = @Destino AND Mta_EsEliminado = 0);
+            SET @MtaDest = @MtaYa;
             IF @MtaDest IS NULL
             BEGIN
                 DELETE FROM @Nuevo;
@@ -1344,12 +1416,31 @@ BEGIN
                 SET @Inscritos += 1;
                 IF @SeaDest IS NULL SET @SinSeccion += 1;
             END
+            -- Ya inscrito en otro grado: pasa a la sección que le toca (o sin sección si no existe).
+            ELSE IF @EstYa = 1 AND @CunDest IS NOT NULL AND ISNULL(@CunYa, 0) <> @CunDest
+                    AND NOT (@SeaYa IS NULL AND @SeaDest IS NULL)
+            BEGIN
+                UPDATE app.tbMatriculaAnio
+                SET Sea_Id = @SeaDest, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
+                WHERE Mta_Id = @MtaYa;
+                SELECT @Ajuste = 'movio', @SeaAnt = @SeaYa, @Movidos += 1;
+                IF @SeaDest IS NULL SET @SinSeccion += 1;
+            END
+        END
+        -- Se gradúa: no sigue el año siguiente, se quita esa inscripción (deshacer la devuelve).
+        ELSE IF @Dec = 'gradua' AND @MtaYa IS NOT NULL AND @EstYa = 1
+        BEGIN
+            UPDATE app.tbMatriculaAnio
+            SET Mta_EsEliminado = 1, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
+            WHERE Mta_Id = @MtaYa;
+            SELECT @MtaDest = @MtaYa, @Ajuste = 'quito', @SeaAnt = @SeaYa, @Quitados += 1;
         END
 
         UPDATE app.tbPromocionesAnio
         SET Pra_Confirmada = 1, Pra_FechaConfirmacion = GETDATE(), Usu_IdConfirma = @Usuario,
             Pra_AniDestino = CASE WHEN @MtaDest IS NULL THEN NULL ELSE @Destino END,
             Pra_MtaDestino = @MtaDest, Pra_CreoDestino = @Creo,
+            Pra_AjusteDestino = @Ajuste, Pra_SeaDestAnterior = @SeaAnt,
             Pra_UsuarioModifica = @Usuario, Pra_FechaModifica = GETDATE()
         WHERE Pra_Id = @Pra;
 
@@ -1372,13 +1463,14 @@ BEGIN
            (SELECT COUNT(*) FROM @Lista WHERE Decision = 'promovido') AS Promovidos,
            (SELECT COUNT(*) FROM @Lista WHERE Decision = 'repite') AS Repiten,
            (SELECT COUNT(*) FROM @Lista WHERE Decision = 'gradua') AS Graduan,
-           @Inscritos AS Inscritos, @SinSeccion AS SinSeccion,
+           @Inscritos AS Inscritos, @SinSeccion AS SinSeccion, @Movidos AS Movidos, @Quitados AS Quitados,
            (SELECT Ani_Anio FROM app.tbAnioLectivo WHERE Ani_Id = @Destino) AS AnioDestino;
 END
 GO
 
--- Deshace la confirmación de una sección (con motivo): la matrícula del año vuelve a Activa y se quita
--- la inscripción del año siguiente que hizo la confirmación si sigue como la dejó (activa).
+-- Deshace la confirmación de una sección (con motivo): la matrícula del año vuelve a Activa; la inscripción
+-- del año siguiente que hizo la confirmación se quita si sigue como la dejó (activa), la que movió de
+-- grado vuelve a su sección anterior y la que quitó (se graduaba) vuelve.
 CREATE OR ALTER PROCEDURE app.PR_CierreAnio_DeshacerSeccion
     @Ani_Id      int,
     @Sea_Id      int,
@@ -1395,9 +1487,9 @@ BEGIN
     IF @Motivo IS NULL
         THROW 50092, N'Escriba el motivo para deshacer la confirmación.', 1;
 
-    DECLARE @Lista TABLE (Pra_Id int PRIMARY KEY, Alu_Id int, MtaDestino int NULL, Creo bit);
+    DECLARE @Lista TABLE (Pra_Id int PRIMARY KEY, Alu_Id int, MtaDestino int NULL, Creo bit, Ajuste varchar(10) NULL, SeaAnt int NULL);
     INSERT INTO @Lista
-    SELECT p.Pra_Id, p.Alu_Id, p.Pra_MtaDestino, p.Pra_CreoDestino
+    SELECT p.Pra_Id, p.Alu_Id, p.Pra_MtaDestino, p.Pra_CreoDestino, p.Pra_AjusteDestino, p.Pra_SeaDestAnterior
     FROM app.tbPromocionesAnio p
     WHERE p.Ani_Id = @Ani_Id AND p.Pra_EsEliminado = 0 AND p.Pra_Confirmada = 1
       AND ((@Sea_Id = 0 AND p.Sea_Id IS NULL) OR p.Sea_Id = @Sea_Id);
@@ -1405,10 +1497,12 @@ BEGIN
         THROW 50092, N'Esta sección no tiene decisiones confirmadas.', 1;
 
     DECLARE @Mensaje nvarchar(400);
-    DECLARE @Archivados int = (SELECT COUNT(*) FROM @Lista l WHERE NOT EXISTS (SELECT 1 FROM app.tbAlumnos a WHERE a.Alu_Id = l.Alu_Id));
+    DECLARE @Archivados int = (SELECT COUNT(*) FROM @Lista l
+                               WHERE NOT EXISTS (SELECT 1 FROM app.tbAlumnos a WHERE a.Alu_Id = l.Alu_Id)
+                                  OR EXISTS (SELECT 1 FROM app.tbAlumnosGraduados g WHERE g.AluGrad_AluIdOriginal = l.Alu_Id));
     IF @Archivados > 0
     BEGIN
-        SET @Mensaje = CONCAT(@Archivados, N' alumno(s) de esta sección ya se graduaron y fueron archivados en Graduación: la confirmación ya no se puede deshacer.');
+        SET @Mensaje = CONCAT(@Archivados, N' alumno(s) de esta sección ya se graduaron en la pantalla de Graduación: la confirmación ya no se puede deshacer.');
         THROW 50097, @Mensaje, 1;
     END
 
@@ -1418,6 +1512,18 @@ BEGIN
     INNER JOIN @Lista l ON l.MtaDestino = d.Mta_Id AND l.Creo = 1
     WHERE d.Mta_Estado = 1 AND d.Mta_EsEliminado = 0;
 
+    UPDATE d SET Sea_Id = l.SeaAnt, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
+    FROM app.tbMatriculaAnio d
+    INNER JOIN @Lista l ON l.MtaDestino = d.Mta_Id AND l.Ajuste = 'movio'
+    WHERE d.Mta_Estado = 1 AND d.Mta_EsEliminado = 0;
+
+    UPDATE d SET Mta_EsEliminado = 0, Sea_Id = l.SeaAnt, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
+    FROM app.tbMatriculaAnio d
+    INNER JOIN @Lista l ON l.MtaDestino = d.Mta_Id AND l.Ajuste = 'quito'
+    WHERE d.Mta_EsEliminado = 1
+      AND NOT EXISTS (SELECT 1 FROM app.tbMatriculaAnio o WHERE o.Alu_Id = d.Alu_Id AND o.Ani_Id = d.Ani_Id
+                                                          AND o.Mta_EsEliminado = 0 AND o.Mta_Id <> d.Mta_Id);
+
     UPDATE o SET Mta_Estado = 1, Mta_UsuarioModifica = @Usuario, Mta_FechaModifica = GETDATE()
     FROM app.tbMatriculaAnio o
     INNER JOIN @Lista l ON l.Alu_Id = o.Alu_Id
@@ -1425,6 +1531,7 @@ BEGIN
 
     UPDATE p SET Pra_Confirmada = 0, Pra_FechaConfirmacion = NULL, Usu_IdConfirma = NULL,
                  Pra_AniDestino = NULL, Pra_MtaDestino = NULL, Pra_CreoDestino = 0,
+                 Pra_AjusteDestino = NULL, Pra_SeaDestAnterior = NULL,
                  Pra_UsuarioModifica = @Usuario, Pra_FechaModifica = GETDATE()
     FROM app.tbPromocionesAnio p
     INNER JOIN @Lista l ON l.Pra_Id = p.Pra_Id;
@@ -1445,7 +1552,8 @@ GO
    app.vCandidatosGraduacion: si el alumno tiene una decisión CONFIRMADA en el cierre de un año
    (en cierre, cerrado o archivado), esa decisión manda sobre el promedio de notas: «se gradúa» deja
    las notas en regla; otra decisión (repite / pasa al grado siguiente) las bloquea con el motivo.
-   Sin decisión, se calcula igual que antes. */
+   Sin decisión, se calcula igual que antes. Candidatos: alumnos Activos en el último grado de su carrera
+   (app.FN_CierreAnio_EsUltimoGrado: Duodécimo; Noveno ya no, porque sigue a Décimo). */
 CREATE OR ALTER VIEW app.vCandidatosGraduacion
 AS
 WITH ConfigNota AS
@@ -1457,17 +1565,6 @@ WITH ConfigNota AS
                WHERE  Con_Clave = 'nota_minima_aprobacion'),
               70
            ) AS NotaMinima
-),
-UltimosCursos AS
-(
-    -- Identifica el Cun_Id "último" por nivel educativo.
-    SELECT  cn.Niv_Id,
-            cn.Cun_Id,
-            cn.Cun_Descripcion,
-            cn.Cun_Orden,
-            ROW_NUMBER() OVER (PARTITION BY cn.Niv_Id ORDER BY cn.Cun_Orden DESC) AS rn
-    FROM    app.tbCursosNiveles AS cn
-    WHERE   cn.Cun_EsEliminado = 0
 ),
 NotasAlumno AS
 (
@@ -1542,9 +1639,9 @@ FROM        app.tbAlumnos          AS a
 CROSS JOIN  ConfigNota             AS cfg
 INNER JOIN  app.tbPersonas         AS p   ON p.Per_Id = a.Per_Id
 INNER JOIN  app.tbNivelesEducativos AS n  ON n.Niv_Id = a.Niv_Id
-INNER JOIN  UltimosCursos          AS uc  ON uc.Niv_Id = a.Niv_Id
-                                         AND uc.Cun_Id = a.Cun_Id
-                                         AND uc.rn = 1
+INNER JOIN  app.tbCursosNiveles    AS uc  ON uc.Cun_Id = a.Cun_Id
+                                         AND uc.Niv_Id = a.Niv_Id
+                                         AND uc.Cun_EsEliminado = 0
 LEFT  JOIN  app.tbSecciones        AS s   ON s.Sec_Id = a.Sec_Id
 LEFT  JOIN  NotasAlumno            AS na  ON na.Alu_Id = a.Alu_Id
 LEFT  JOIN  DeudaAlumno            AS da  ON da.Alu_Id = a.Alu_Id
@@ -1555,12 +1652,17 @@ CROSS APPLY (SELECT CAST(CASE WHEN dc.Decision = 'gradua' THEN 1
                                    AND ISNULL(na.NotaMinima, 0)     >= cfg.NotaMinima THEN 1
                               ELSE 0 END AS BIT) AS Ok) AS nt
 WHERE   a.Est_Id = 1   -- Activo
+  AND   app.FN_CierreAnio_EsUltimoGrado(a.Cun_Id, a.Cur_Id) = 1
 ;
 GO
 
-/* app.spGraduarAlumno: igual que antes, salvo el paso 5.9, que ahora archiva y quita la matrícula por
-   año (app.tbMatriculaAnio) en vez de la tabla vacía app.tbMatriculas. Sin esto, la llave de
-   app.tbMatriculaAnio hacia app.tbAlumnos impedía graduar a cualquier alumno inscrito por año. */
+/* app.spGraduarAlumno: valida y guarda el registro de graduados (app.tbAlumnosGraduados y
+   app.tbBoletinesGraduados) igual que antes, pero ya no borra nada: el alumno queda Graduado (Est_Id 3)
+   con todo su expediente (notas, pagos, asistencia, salud, disciplina, documentos, encargados...).
+   Antes borraba al alumno y sus datos, y fallaba con cualquier alumno que tuviera ficha de salud,
+   casos de disciplina, matrícula por año u otros datos ligados.
+   Su matrícula del año en que se gradúa (el del cierre que lo decidió o, si no hay, el año activo)
+   queda Graduado (5); las inscripciones activas de años posteriores se quitan. */
 CREATE OR ALTER PROCEDURE app.spGraduarAlumno
     @Alu_Id               INT,
     @UsuarioId            INT,
@@ -1597,12 +1699,13 @@ BEGIN
     DECLARE @TituloObtenido    NVARCHAR(150);
     DECLARE @AnioIngreso       INT = NULL;            -- TODO: ver TODO arriba
     DECLARE @AnioGrad          INT = YEAR(GETDATE());
+    DECLARE @AniGrad           INT;
     DECLARE @TotalPagado       DECIMAL(18,2);
     DECLARE @EncargadosJson    NVARCHAR(MAX);
     DECLARE @MotivosBloqueo    NVARCHAR(500);
     DECLARE @EstadoValid       NVARCHAR(50);
     DECLARE @Filas             INT;
-    DECLARE @DetalleMatricula  NVARCHAR(MAX);
+    DECLARE @Quitadas          INT;
 
     BEGIN TRY
         BEGIN TRANSACTION;
@@ -1636,6 +1739,21 @@ BEGIN
                 CONCAT('El alumno ', @Alu_Id, ' no cumple los requisitos: ', @MotivosBloqueo);
             RAISERROR(@msg, 16, 1);
         END
+
+        -- Año en que se gradúa: el del cierre que lo decidió (confirmado) o, si no hay, el año activo.
+        SELECT TOP (1) @AniGrad = pr.Ani_Id
+        FROM   app.tbPromocionesAnio pr
+        INNER JOIN app.tbAnioLectivo an ON an.Ani_Id = pr.Ani_Id
+        WHERE  pr.Alu_Id = @Alu_Id AND pr.Pra_Confirmada = 1 AND pr.Pra_EsEliminado = 0
+          AND  ISNULL(pr.Pra_Decision, pr.Pra_Propuesta) = 'gradua' AND an.Ani_EsEliminado = 0
+        ORDER BY an.Ani_Anio DESC;
+        IF @AniGrad IS NULL
+            SET @AniGrad = (SELECT Ani_Id FROM app.tbAnioLectivo
+                            WHERE Ani_EsEliminado = 0
+                              AND Ani_Id = TRY_CONVERT(INT, (SELECT TOP (1) Con_Valor FROM app.tbConfiguracion
+                                                             WHERE Con_Clave = 'anio_lectivo_activo_id')));
+        IF @AniGrad IS NOT NULL
+            SELECT @AnioGrad = Ani_Anio FROM app.tbAnioLectivo WHERE Ani_Id = @AniGrad;
 
         ----------------------------------------------------------------------
         -- 2. CONSTRUIR SNAPSHOT (alumno + persona)
@@ -1765,125 +1883,38 @@ BEGIN
              'AGGREGATE', @Filas, N'Consolidación de notas por materia/año/parcial.', @UsuarioId);
 
         ----------------------------------------------------------------------
-        -- 5. PURGA DE DEPENDENCIAS (orden por FKs)
+        -- 5. ESTADO: el alumno queda Graduado con todo su expediente (no se borra nada)
         ----------------------------------------------------------------------
+        -- 5.1 Matrícula del año en que se gradúa: Graduado (5).
+        IF @AniGrad IS NOT NULL
+        BEGIN
+            UPDATE app.tbMatriculaAnio
+            SET    Mta_Estado = 5, Mta_UsuarioModifica = @UsuarioId, Mta_FechaModifica = GETDATE()
+            WHERE  Alu_Id = @Alu_Id AND Ani_Id = @AniGrad AND Mta_EsEliminado = 0 AND Mta_Estado <> 5;
+            SET @Filas = @@ROWCOUNT;
 
-        -- 5.1 Finanzas - hijas de tbCuentasCobrar y tbPagos (cascade-aware).
-        DELETE m
-        FROM   finanza.tbMoratorias m
-        INNER JOIN finanza.tbCuentasCobrar cc ON cc.Cco_Id = m.Cco_Id
-        WHERE  cc.Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'finanza.tbMoratorias', 'DELETE', @Filas, @UsuarioId);
+            -- 5.2 No sigue los años siguientes: se quitan sus inscripciones activas.
+            UPDATE m
+            SET    Mta_EsEliminado = 1, Mta_UsuarioModifica = @UsuarioId, Mta_FechaModifica = GETDATE()
+            FROM   app.tbMatriculaAnio m
+            INNER JOIN app.tbAnioLectivo an ON an.Ani_Id = m.Ani_Id
+            WHERE  m.Alu_Id = @Alu_Id AND m.Mta_EsEliminado = 0 AND m.Mta_Estado = 1 AND an.Ani_Anio > @AnioGrad;
+            SET @Quitadas = @@ROWCOUNT;
 
-        DELETE da
-        FROM   finanza.tbDescuentosAplicados da
-        INNER JOIN finanza.tbCuentasCobrar cc ON cc.Cco_Id = da.Cco_Id
-        WHERE  cc.Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'finanza.tbDescuentosAplicados', 'DELETE', @Filas, @UsuarioId);
+            INSERT INTO app.tbArchivoGraduadoLog
+                (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
+                 LogArc_Accion, LogArc_RegistrosAfectados, LogArc_Detalle, LogArc_UsuarioId)
+            VALUES (@AluGrad_Id, @Alu_Id, 'app.tbMatriculaAnio', 'UPDATE', @Filas + @Quitadas,
+                    CONCAT(N'Matrícula de ', @AnioGrad, N' en Graduado; inscripciones de años posteriores quitadas: ', @Quitadas, N'.'), @UsuarioId);
+        END
 
-        DELETE pd
-        FROM   finanza.tbPagosDetalle pd
-        INNER JOIN finanza.tbPagos pg ON pg.Pag_Id = pd.Pag_Id
-        WHERE  pg.Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'finanza.tbPagosDetalle', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.2 Pagos (ya agregados a AluGrad_TotalPagado).
-        DELETE FROM finanza.tbPagos WHERE Alu_Id = @Alu_Id;
+        -- 5.3 Alumno: Graduado.
+        UPDATE app.tbAlumnos SET Est_Id = 3 WHERE Alu_Id = @Alu_Id;
         SET @Filas = @@ROWCOUNT;
         INSERT INTO app.tbArchivoGraduadoLog
             (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
              LogArc_Accion, LogArc_RegistrosAfectados, LogArc_Detalle, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'finanza.tbPagos', 'AGGREGATE', @Filas,
-                CONCAT(N'Total agregado a AluGrad_TotalPagado=', @TotalPagado), @UsuarioId);
-
-        -- 5.3 Cuentas por cobrar (saldo ya validado en 0).
-        DELETE FROM finanza.tbCuentasCobrar WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'finanza.tbCuentasCobrar', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.4 Notas (ya consolidadas en tbBoletinesGraduados).
-        DELETE FROM app.tbNotas WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbNotas', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.5 Asistencia.
-        DELETE FROM app.tbAsistencia WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbAsistencia', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.6 Mensajes.
-        DELETE FROM app.tbMensajes WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbMensajes', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.7 Documentos del alumno.
-        DELETE FROM app.tbDocumentosAlumno WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbDocumentosAlumno', 'DELETE', @Filas, @UsuarioId);
-
-        -- 5.8 Encargados-Alumno (ya migrados a EncargadosJson).
-        DELETE FROM app.tbEncargados_tbAlumnos WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbEncargados_tbAlumnos', 'MIGRATE', @Filas, @UsuarioId);
-
-        -- 5.9 Matrícula por año (app.tbMatriculaAnio, script 058; antes la tabla vacía app.tbMatriculas):
-        --     los años, secciones y estados quedan en el detalle del registro (JSON) y se quita la matrícula.
-        SET @DetalleMatricula = (
-            SELECT  an.Ani_Anio AS anio, se.Sea_Nombre AS seccion, mt.Mta_Estado AS estado
-            FROM    app.tbMatriculaAnio mt
-            INNER JOIN app.tbAnioLectivo   an ON an.Ani_Id = mt.Ani_Id
-            LEFT  JOIN app.tbSeccionesAnio se ON se.Sea_Id = mt.Sea_Id
-            WHERE   mt.Alu_Id = @Alu_Id
-            ORDER BY an.Ani_Anio
-            FOR JSON PATH
-        );
-        DELETE FROM app.tbMatriculaAnio WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_Detalle, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbMatriculaAnio', 'MIGRATE', @Filas, @DetalleMatricula, @UsuarioId);
-
-        -- 5.10 Alumno (padre).
-        DELETE FROM app.tbAlumnos WHERE Alu_Id = @Alu_Id;
-        SET @Filas = @@ROWCOUNT;
-        INSERT INTO app.tbArchivoGraduadoLog
-            (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
-             LogArc_Accion, LogArc_RegistrosAfectados, LogArc_UsuarioId)
-        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbAlumnos', 'DELETE', @Filas, @UsuarioId);
-
-        -- NOTA: app.tbPersonas NO se elimina (compartida con encargados/docentes).
-        -- NOTA: bitacoras.tbAlumnosHistorial / tbHorarioAlumnosHistorial: SKIP.
+        VALUES (@AluGrad_Id, @Alu_Id, 'app.tbAlumnos', 'UPDATE', @Filas, N'Estado Graduado; el expediente se conserva.', @UsuarioId);
 
         COMMIT TRANSACTION;
 
@@ -1907,6 +1938,351 @@ BEGIN
 
         THROW;
     END CATCH;
+END;
+GO
+
+/* ─────────────── Inscripción y promociones: años cerrados ───────────────
+   Mismos procedimientos de los scripts 058 y 059, con estos cambios:
+     - app.PR_tbMatriculaAnio_Promover: no promueve desde un año en cierre, cerrado o archivado, ni
+       inscribe en un año cerrado o archivado.
+     - app.PR_tbMatriculaAnio_Enroll e _InscribirDesdeUbicacion: no inscriben en un año cerrado o
+       archivado; _InscribirDesdeUbicacion ya no regresa a Activo a quien se graduó.
+     - app.spBackfillGraduadosHistoricos: no vuelve a listar a quien ya está en el registro de graduados. */
+CREATE OR ALTER PROCEDURE [app].[PR_tbMatriculaAnio_Promover]
+    @Ani_Origen   INT,
+    @Sea_Origen   INT,
+    @Ani_Destino  INT,
+    @Sea_Destino  INT,
+    @Usuario      INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @promovidos INT = 0;
+
+    -- Cierre del año (script 090): no se promueve desde un año en cierre, cerrado o archivado (eso lo
+    -- decide el asistente de cierre) ni se inscribe en un año cerrado o archivado.
+    IF EXISTS (SELECT 1 FROM [app].[tbAnioLectivo] WHERE Ani_Id = @Ani_Origen AND Ani_Estado IN (4, 5, 6))
+        THROW 50093, N'Ese año está en cierre o ya cerró: las promociones se deciden en «Cierre del año».', 1;
+    IF EXISTS (SELECT 1 FROM [app].[tbAnioLectivo] WHERE Ani_Id = @Ani_Destino AND Ani_Estado IN (5, 6))
+        THROW 50093, N'El año de destino está cerrado o archivado: no se puede inscribir en él.', 1;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Alumnos activos en la sección-año de origen.
+        DECLARE @alumnos TABLE (Alu_Id INT PRIMARY KEY);
+        INSERT INTO @alumnos (Alu_Id)
+        SELECT Alu_Id
+        FROM   [app].[tbMatriculaAnio]
+        WHERE  Ani_Id = @Ani_Origen
+            AND Sea_Id = @Sea_Origen
+            AND Mta_Estado = 1
+            AND Mta_EsEliminado = 0;
+
+        SET @promovidos = (SELECT COUNT(*) FROM @alumnos);
+
+        -- 1) Marca el origen como Promovido.
+        UPDATE  mt
+        SET     mt.Mta_Estado         = 2,              -- Promovido
+                mt.Mta_UsuarioModifica = @Usuario,
+                mt.Mta_FechaModifica  = GETDATE()
+        FROM    [app].[tbMatriculaAnio] mt
+        INNER JOIN @alumnos al ON al.Alu_Id = mt.Alu_Id
+        WHERE   mt.Ani_Id = @Ani_Origen
+            AND mt.Sea_Id = @Sea_Origen
+            AND mt.Mta_Estado = 1
+            AND mt.Mta_EsEliminado = 0;
+
+        -- 2) Inserta la matrícula Activa en destino (solo quienes no tienen fila en @Ani_Destino).
+        INSERT INTO [app].[tbMatriculaAnio]
+            (Alu_Id, Ani_Id, Sea_Id, Mta_Estado, Mta_EsEliminado, Mta_UsuarioRegistra, Mta_FechaRegistra)
+        SELECT  al.Alu_Id, @Ani_Destino, @Sea_Destino, 1, 0, @Usuario, GETDATE()
+        FROM    @alumnos al
+        WHERE   NOT EXISTS (
+                    SELECT 1 FROM [app].[tbMatriculaAnio] d
+                    WHERE d.Alu_Id = al.Alu_Id AND d.Ani_Id = @Ani_Destino
+                );
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        DECLARE @msg NVARCHAR(2048) = ERROR_MESSAGE();
+        RAISERROR(@msg, 16, 1);
+        RETURN;
+    END CATCH
+
+    SELECT @promovidos AS Promovidos;
+END
+GO
+
+CREATE OR ALTER PROCEDURE [app].[PR_tbMatriculaAnio_Enroll]
+    @Alu_Id               INT,
+    @Ani_Id               INT,
+    @Sea_Id               INT = NULL,
+    @Mta_UsuarioRegistra  INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Cierre del año (script 090): un año cerrado o archivado es de solo lectura.
+    IF EXISTS (SELECT 1 FROM [app].[tbAnioLectivo] WHERE Ani_Id = @Ani_Id AND Ani_Estado IN (5, 6))
+        THROW 50093, N'Ese año escolar está cerrado o archivado: no se puede inscribir en él.', 1;
+
+    DECLARE @id INT = (
+        SELECT TOP 1 Mta_Id FROM [app].[tbMatriculaAnio]
+        WHERE Alu_Id = @Alu_Id AND Ani_Id = @Ani_Id
+    );
+
+    IF @id IS NOT NULL
+    BEGIN
+        UPDATE  [app].[tbMatriculaAnio]
+        SET     Sea_Id             = @Sea_Id,
+                Mta_Estado         = 1,                 -- Activa
+                Mta_EsEliminado    = 0,
+                Mta_UsuarioModifica = @Mta_UsuarioRegistra,
+                Mta_FechaModifica  = GETDATE()
+        WHERE   Mta_Id = @id;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO [app].[tbMatriculaAnio]
+            (Alu_Id, Ani_Id, Sea_Id, Mta_Estado, Mta_EsEliminado, Mta_UsuarioRegistra, Mta_FechaRegistra)
+        VALUES
+            (@Alu_Id, @Ani_Id, @Sea_Id, 1, 0, @Mta_UsuarioRegistra, GETDATE());
+
+        SET @id = CAST(SCOPE_IDENTITY() AS INT);
+    END
+
+    SELECT @id AS NewId;
+END
+GO
+
+CREATE OR ALTER PROCEDURE [app].[PR_tbMatriculaAnio_InscribirDesdeUbicacion]
+    @Ani_Id          INT = NULL,
+    @Alu_Id          INT = NULL,
+    @CrearSecciones  BIT = 1,
+    @ActivarEstado   BIT = 1,
+    @Usuario         INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    IF @Ani_Id IS NULL
+        SET @Ani_Id = TRY_CONVERT(INT, (SELECT TOP 1 Con_Valor FROM [app].[tbConfiguracion] WHERE Con_Clave = 'anio_lectivo_activo_id'));
+
+    DECLARE @anio INT, @estadoAnio TINYINT;
+    SELECT @anio = Ani_Anio, @estadoAnio = Ani_Estado FROM [app].[tbAnioLectivo] WHERE Ani_Id = @Ani_Id;
+
+    DECLARE @creadas INT = 0, @inscritos INT = 0, @reactivados INT = 0,
+            @yaInscritos INT = 0, @sinSeccion INT = 0, @activados INT = 0;
+
+    -- Cierre del año (script 090): un año cerrado o archivado es de solo lectura.
+    IF @estadoAnio IN (5, 6)
+        THROW 50093, N'Ese año escolar está cerrado o archivado: no se puede inscribir en él.', 1;
+
+    IF @anio IS NULL
+    BEGIN
+        SELECT 0 AS SeccionesCreadas, 0 AS Inscritos, 0 AS Reactivados, 0 AS YaInscritos, 0 AS SinSeccion, 0 AS Activados;
+        RETURN;
+    END
+
+    CREATE TABLE #alu (Alu_Id INT PRIMARY KEY, Niv_Id INT, Cun_Id INT, Mda_Id INT NULL, Sec_Id INT);
+    INSERT INTO #alu (Alu_Id, Niv_Id, Cun_Id, Mda_Id, Sec_Id)
+    SELECT Alu_Id, Niv_Id, Cun_Id, Mda_Id, Sec_Id
+    FROM   [app].[tbAlumnos]
+    WHERE  (@Alu_Id IS NULL AND AnioCursado = @anio) OR Alu_Id = @Alu_Id;
+
+    BEGIN TRANSACTION;
+
+    -- 1) Secciones del año que falten
+    IF @CrearSecciones = 1
+    BEGIN
+        INSERT INTO [app].[tbSeccionesAnio]
+            (Ani_Id, Niv_Id, Cun_Id, Sec_Id, Mda_Id, Emp_Id, Sea_Nombre, Sea_Cupo,
+             Sea_Estado, Sea_EsEliminado, Sea_UsuarioRegistra, Sea_FechaRegistra)
+        SELECT  @Ani_Id, g.Niv_Id, g.Cun_Id, g.Sec_Id, g.Mda_Id, NULL,
+                LEFT(CONCAT(c.Cun_Descripcion, ' ', s.Sec_Descripcion,
+                            CASE WHEN md.Mda_Descripcion IS NOT NULL THEN ' · ' + md.Mda_Descripcion ELSE '' END), 60),
+                NULL,
+                CASE WHEN @estadoAnio = 3 THEN 3 ELSE 2 END,
+                0, @Usuario, GETDATE()
+        FROM (SELECT DISTINCT Niv_Id, Cun_Id, Mda_Id, Sec_Id FROM #alu) g
+        LEFT JOIN [app].[tbCursosNiveles] c  ON c.Cun_Id  = g.Cun_Id
+        LEFT JOIN [app].[tbModalidades]   md ON md.Mda_Id = g.Mda_Id
+        LEFT JOIN [app].[tbSecciones]     s  ON s.Sec_Id  = g.Sec_Id
+        WHERE  g.Niv_Id IS NOT NULL AND g.Cun_Id IS NOT NULL AND g.Sec_Id IS NOT NULL
+          AND  NOT EXISTS (SELECT 1 FROM [app].[tbSeccionesAnio] sa
+                           WHERE sa.Ani_Id = @Ani_Id AND sa.Sea_EsEliminado = 0
+                             AND sa.Niv_Id = g.Niv_Id AND sa.Cun_Id = g.Cun_Id
+                             AND sa.Sec_Id = g.Sec_Id AND sa.Sea_MdaKey = ISNULL(g.Mda_Id, 0));
+        SET @creadas = @@ROWCOUNT;
+    END
+
+    -- 2) Sección del año y matrícula previa de cada alumno
+    CREATE TABLE #asig (Alu_Id INT PRIMARY KEY, Sea_Id INT NULL, Mta_Id INT NULL, Viva BIT NULL);
+    INSERT INTO #asig (Alu_Id, Sea_Id, Mta_Id, Viva)
+    SELECT  a.Alu_Id, sa.Sea_Id, m.Mta_Id,
+            CASE WHEN m.Mta_Id IS NULL THEN NULL WHEN m.Mta_EsEliminado = 0 THEN 1 ELSE 0 END
+    FROM    #alu a
+    OUTER APPLY (SELECT TOP 1 x.Sea_Id FROM [app].[tbSeccionesAnio] x
+                 WHERE x.Ani_Id = @Ani_Id AND x.Sea_EsEliminado = 0
+                   AND x.Niv_Id = a.Niv_Id AND x.Cun_Id = a.Cun_Id
+                   AND x.Sec_Id = a.Sec_Id AND x.Sea_MdaKey = ISNULL(a.Mda_Id, 0)) sa
+    OUTER APPLY (SELECT TOP 1 y.Mta_Id, y.Mta_EsEliminado FROM [app].[tbMatriculaAnio] y
+                 WHERE y.Alu_Id = a.Alu_Id AND y.Ani_Id = @Ani_Id) m;
+
+    SELECT @yaInscritos = COUNT(*) FROM #asig WHERE Viva = 1;
+    SELECT @sinSeccion  = COUNT(*) FROM #asig WHERE ISNULL(Viva, 0) = 0 AND Sea_Id IS NULL;
+
+    -- 3) Reactivar matrículas dadas de baja
+    UPDATE  m
+    SET     Sea_Id              = x.Sea_Id,
+            Mta_Estado          = 1,
+            Mta_EsEliminado     = 0,
+            Mta_UsuarioModifica = @Usuario,
+            Mta_FechaModifica   = GETDATE()
+    FROM    [app].[tbMatriculaAnio] m
+    JOIN    #asig x ON x.Mta_Id = m.Mta_Id
+    WHERE   x.Viva = 0 AND x.Sea_Id IS NOT NULL;
+    SET @reactivados = @@ROWCOUNT;
+
+    -- 4) Inscribir a los que nunca estuvieron en el año
+    INSERT INTO [app].[tbMatriculaAnio]
+        (Alu_Id, Ani_Id, Sea_Id, Mta_Estado, Mta_EsEliminado, Mta_UsuarioRegistra, Mta_FechaRegistra)
+    SELECT  x.Alu_Id, @Ani_Id, x.Sea_Id, 1, 0, @Usuario, GETDATE()
+    FROM    #asig x
+    WHERE   x.Mta_Id IS NULL AND x.Sea_Id IS NOT NULL;
+    SET @inscritos = @@ROWCOUNT;
+
+    -- 5) Quien está inscrito en el año no puede figurar como Graduado
+    IF @ActivarEstado = 1
+    BEGIN
+        UPDATE  al
+        SET     Est_Id = 1                                      -- Activo
+        FROM    [app].[tbAlumnos] al
+        JOIN    #alu a ON a.Alu_Id = al.Alu_Id
+        WHERE   al.Est_Id = 3                                   -- Graduado
+          AND   EXISTS (SELECT 1 FROM [app].[tbMatriculaAnio] m
+                        WHERE m.Alu_Id = al.Alu_Id AND m.Ani_Id = @Ani_Id AND m.Mta_EsEliminado = 0
+                          AND m.Mta_Estado = 1)                 -- inscripción activa (no la de Graduado)
+          -- quien se graduó en la pantalla de Graduación sigue Graduado (script 090)
+          AND   NOT EXISTS (SELECT 1 FROM [app].[tbAlumnosGraduados] g WHERE g.AluGrad_AluIdOriginal = al.Alu_Id);
+        SET @activados = @@ROWCOUNT;
+    END
+
+    COMMIT TRANSACTION;
+
+    SELECT  @creadas     AS SeccionesCreadas,
+            @inscritos   AS Inscritos,
+            @reactivados AS Reactivados,
+            @yaInscritos AS YaInscritos,
+            @sinSeccion  AS SinSeccion,
+            @activados   AS Activados;
+END
+GO
+
+CREATE OR ALTER PROCEDURE app.spBackfillGraduadosHistoricos
+    @Anio       INT  = NULL,
+    @TopN       INT  = 50,
+    @DryRun     BIT  = 1,
+    @UsuarioId  INT  = 0   -- usuario "sistema" por defecto
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Procesados INT = 0;
+    DECLARE @Exitos     INT = 0;
+    DECLARE @Fallos     INT = 0;
+
+    -- Candidatos: alumnos marcados como Graduado en app.tbAlumnos.
+    DECLARE @Candidatos TABLE
+    (
+        Alu_Id     INT PRIMARY KEY,
+        UltimoAnio INT NULL
+    );
+
+    INSERT INTO @Candidatos (Alu_Id, UltimoAnio)
+    SELECT TOP (@TopN)
+           a.Alu_Id,
+           ua.UltimoAnio
+    FROM   app.tbAlumnos a
+    OUTER APPLY (
+        SELECT MAX(YEAR(n.Not_Año)) AS UltimoAnio
+        FROM   app.tbNotas n
+        WHERE  n.Alu_Id = a.Alu_Id AND n.Not_EsEliminado = 0
+    ) ua
+    WHERE  a.Est_Id = 3 -- Graduado
+      -- quien ya está en el registro de graduados no se vuelve a listar (script 090: graduar ya no borra)
+      AND  NOT EXISTS (SELECT 1 FROM app.tbAlumnosGraduados g WHERE g.AluGrad_AluIdOriginal = a.Alu_Id)
+      AND  (@Anio IS NULL OR ua.UltimoAnio = @Anio)
+    ORDER BY a.Alu_Id;
+
+    -----------------------------------------------------------------
+    -- DRY RUN: sólo lista
+    -----------------------------------------------------------------
+    IF @DryRun = 1
+    BEGIN
+        SELECT  c.Alu_Id,
+                c.UltimoAnio,
+                LTRIM(RTRIM(
+                    ISNULL(p.Per_PrimerNombre,'')   + ' ' +
+                    ISNULL(p.Per_ApellidoPaterno,'')+ ' ' +
+                    ISNULL(p.Per_ApellidoMaterno,'')
+                ))                       AS NombreCompleto,
+                'DryRun - no ejecutado'  AS Accion
+        FROM    @Candidatos c
+        INNER JOIN app.tbAlumnos a ON a.Alu_Id = c.Alu_Id
+        INNER JOIN app.tbPersonas p ON p.Per_Id = a.Per_Id;
+
+        RETURN;
+    END
+
+    -----------------------------------------------------------------
+    -- EJECUCIÓN REAL
+    -----------------------------------------------------------------
+    DECLARE @Alu_Id INT;
+    DECLARE cur CURSOR LOCAL FAST_FORWARD FOR
+        SELECT Alu_Id FROM @Candidatos ORDER BY Alu_Id;
+
+    OPEN cur;
+    FETCH NEXT FROM cur INTO @Alu_Id;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @Procesados = @Procesados + 1;
+
+        BEGIN TRY
+            EXEC app.spGraduarAlumno
+                 @Alu_Id    = @Alu_Id,
+                 @UsuarioId = @UsuarioId;
+            SET @Exitos = @Exitos + 1;
+        END TRY
+        BEGIN CATCH
+            SET @Fallos = @Fallos + 1;
+
+            -- spGraduarAlumno ya intenta loguear; igual reforzamos contexto.
+            BEGIN TRY
+                INSERT INTO app.tbArchivoGraduadoLog
+                    (LogArc_AluGrad_Id, LogArc_AluIdOriginal, LogArc_TablaAfectada,
+                     LogArc_Accion, LogArc_RegistrosAfectados, LogArc_Detalle, LogArc_UsuarioId)
+                VALUES
+                    (NULL, @Alu_Id, '(backfill)', 'SKIP', 0,
+                     CONCAT(N'BACKFILL_ERROR: ', ERROR_MESSAGE()), @UsuarioId);
+            END TRY BEGIN CATCH END CATCH
+        END CATCH
+
+        FETCH NEXT FROM cur INTO @Alu_Id;
+    END
+
+    CLOSE cur;
+    DEALLOCATE cur;
+
+    SELECT @Procesados AS Procesados,
+           @Exitos     AS Exitos,
+           @Fallos     AS Fallos;
 END;
 GO
 
