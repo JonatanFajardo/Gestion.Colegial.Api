@@ -190,6 +190,17 @@ namespace Gestion.Colegial.Business.Services
             }
         }
 
+        public async Task<Answer> SinVinculo(string tipo)
+        {
+            if (tipo != "alumnos" && tipo != "encargados")
+            {
+                return new Answer { Access = true, Message = "Tipo no válido.", ErrorDetails = "Tipo no válido." };
+            }
+            Answer answer = await _repository.SinVinculo(tipo);
+            if (answer.Access) Logs.Error(answer);
+            return answer;
+        }
+
         public async Task<Answer> Vincular(int Enc_Id, int Alu_Id, int Par_Id)
         {
             if (Enc_Id <= 0 || Alu_Id <= 0 || Par_Id <= 0)
