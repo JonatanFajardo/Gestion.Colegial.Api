@@ -10,6 +10,8 @@ namespace Gestion.Colegial.DataAccess.Interfaces
         Task<Answer> SaldosAlumno(int aniId, int? nivId, int? cunId, int? seaId, bool soloConSaldo, DateTime hoy);
         Task<Answer> IngresosConcepto(DateTime desde, DateTime hasta, int? cpaId, int? fpaId);
         Task<Answer> AsistenciaPersonal(DateTime desde, DateTime hasta);
+        Task<Answer> ComparativoCobros(int anioBase, int anioComparado);
+        Task<Answer> ProyeccionCobros(int anio, int mesDesde);
         Task<Answer> Registrar(ReporteGeneradoDTO obj);
         Task<Answer> Recientes(int usuId, int top);
     }

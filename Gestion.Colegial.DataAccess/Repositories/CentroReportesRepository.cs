@@ -41,6 +41,14 @@ namespace Gestion.Colegial.DataAccess.Repositories
             await Read<PR_CentroReportes_AsistenciaPersonalResult>("app.PR_CentroReportes_AsistenciaPersonal",
                 new[] { Fecha("@Desde", desde), Fecha("@Hasta", hasta) });
 
+        public async Task<Answer> ComparativoCobros(int anioBase, int anioComparado) =>
+            await Read<PR_CentroReportes_ComparativoCobrosResult>("app.PR_CentroReportes_ComparativoCobros",
+                new[] { Entero("@AnioBase", anioBase), Entero("@AnioComparado", anioComparado) });
+
+        public async Task<Answer> ProyeccionCobros(int anio, int mesDesde) =>
+            await Read<PR_CentroReportes_ProyeccionCobrosResult>("app.PR_CentroReportes_ProyeccionCobros",
+                new[] { Entero("@Anio", anio), Entero("@MesDesde", mesDesde) });
+
         public async Task<Answer> Registrar(ReporteGeneradoDTO obj)
         {
             SqlParameter[] p =
