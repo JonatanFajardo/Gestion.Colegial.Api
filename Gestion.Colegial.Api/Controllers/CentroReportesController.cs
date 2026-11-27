@@ -9,7 +9,8 @@ namespace Gestion.Colegial.Api.Controllers
 {
     /// <summary>
     /// Centro de reportes: reportes que no existían (lista de clase, saldos por alumno, ingresos por
-    /// concepto, asistencia del personal) y el registro de reportes generados ("Recientes").
+    /// concepto, asistencia del personal, comparativo de cobros entre años, proyección de cobros) y el
+    /// registro de reportes generados ("Recientes").
     /// Quién puede ver cada reporte lo decide el ADM con los permisos de la sesión; además cada
     /// lectura exige en la API la pantalla de origen del reporte (sin ella responde 403).
     /// Si una lectura falla se responde 500, para que el ADM la registre como fallida.
@@ -56,6 +57,18 @@ namespace Gestion.Colegial.Api.Controllers
         [RequierePantalla("Asistencia Empleados")]
         public async Task<IActionResult> AsistenciaPersonal(DateTime desde, DateTime hasta) =>
             Lista(await _service.AsistenciaPersonal(desde, hasta));
+
+        [HttpGet]
+        [Route("ComparativoCobrosAsync")]
+        [RequierePantalla("Reportes financieros")]
+        public async Task<IActionResult> ComparativoCobros(int anioBase, int anioComparado) =>
+            Lista(await _service.ComparativoCobros(anioBase, anioComparado));
+
+        [HttpGet]
+        [Route("ProyeccionCobrosAsync")]
+        [RequierePantalla("Reportes financieros")]
+        public async Task<IActionResult> ProyeccionCobros(int anio, int mesDesde = 1) =>
+            Lista(await _service.ProyeccionCobros(anio, mesDesde));
 
         [HttpGet]
         [Route("RecientesAsync")]

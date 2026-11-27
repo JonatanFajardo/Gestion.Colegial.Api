@@ -84,4 +84,25 @@ namespace Gestion.Colegial.Entities.Entities
         public DateTime Rge_Fecha { get; set; }
         public int Veces { get; set; }
     }
+
+    /// <summary>Un mes del comparativo de cobros entre dos años (script 094).</summary>
+    public class PR_CentroReportes_ComparativoCobrosResult
+    {
+        public int Mes { get; set; }
+        public string? NombreMes { get; set; }
+        public decimal CobradoBase { get; set; }
+        public decimal CobradoComparado { get; set; }
+        public decimal Diferencia { get; set; }
+        public decimal? Variacion { get; set; }
+    }
+
+    /// <summary>Un mes de la proyección de cobros; Mes 0 = lo atrasado (script 094).</summary>
+    public class PR_CentroReportes_ProyeccionCobrosResult
+    {
+        public int Mes { get; set; }
+        public string? NombreMes { get; set; }
+        public decimal Pendiente { get; set; }
+        public decimal EstimadoPorGenerar { get; set; }
+        public decimal TotalEsperado { get; set; }
+    }
 }

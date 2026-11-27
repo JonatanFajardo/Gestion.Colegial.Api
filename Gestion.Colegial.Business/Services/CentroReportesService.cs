@@ -50,6 +50,12 @@ namespace Gestion.Colegial.Business.Services
             return Revisar(await _repository.AsistenciaPersonal(r.Desde, r.Hasta));
         }
 
+        public async Task<Answer> ComparativoCobros(int anioBase, int anioComparado) =>
+            Revisar(await _repository.ComparativoCobros(anioBase, anioComparado));
+
+        public async Task<Answer> ProyeccionCobros(int anio, int mesDesde) =>
+            Revisar(await _repository.ProyeccionCobros(anio, mesDesde < 1 || mesDesde > 12 ? 1 : mesDesde));
+
         public async Task<Answer> Registrar(ReporteGeneradoDTO obj)
         {
             if (obj == null || obj.Usu_Id <= 0 || string.IsNullOrWhiteSpace(obj.Rge_Clave))
